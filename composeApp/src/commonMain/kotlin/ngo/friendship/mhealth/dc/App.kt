@@ -1,14 +1,21 @@
 package ngo.friendship.mhealth.dc
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
+import ngo.friendship.mhealth.dc.di.appModules
 import ngo.friendship.mhealth.dc.presentation.navigation.SetupNavGraph
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
+import org.koin.compose.KoinMultiplatformApplication
+import org.koin.dsl.KoinConfiguration
 
 @Composable
-@Preview
 fun App() {
-    MaterialTheme {
-        SetupNavGraph()
+    if(BuildKonfig.IS_DEBUG)
+        Napier.base(DebugAntilog())
+    KoinMultiplatformApplication(config = KoinConfiguration { modules(appModules) }) {
+        FriendshipTheme {
+            SetupNavGraph()
+        }
     }
 }

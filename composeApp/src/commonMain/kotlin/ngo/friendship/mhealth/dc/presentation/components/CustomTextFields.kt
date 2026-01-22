@@ -30,13 +30,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.presentation.theme.DisabledBorderColor
-import ngo.friendship.mhealth.dc.presentation.theme.FocusedBorderColor
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
-import ngo.friendship.mhealth.dc.presentation.theme.Transparent
-import ngo.friendship.mhealth.dc.presentation.theme.UnfocusedBorderColor
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.DisabledBorderColor
+import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
+import ngo.friendship.mhealth.dc.theme.TextPrimary
+import ngo.friendship.mhealth.dc.theme.Transparent
+import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 @Composable
 fun TopLabeledTextField(
@@ -56,7 +55,7 @@ fun TopLabeledTextField(
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge.copy(
-                fontFamily = RobotoCondensedFont(),
+                
                 fontSize = FontSize.REGULAR,
                 fontWeight = FontWeight.Normal,
                 color = TextPrimary.copy(alpha = 0.8f)
@@ -75,7 +74,7 @@ fun TopLabeledTextField(
             placeholder = {
                 if (placeholder.isNotBlank()) Text(
                     text = placeholder,
-                    fontFamily = RobotoCondensedFont(),
+                    
                     fontSize = FontSize.REGULAR
                 )
             },
@@ -124,7 +123,7 @@ fun FloatingLabeledTextField(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = RobotoCondensedFont(),
+                    
                     fontSize = FontSize.REGULAR,
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.3.sp,
@@ -137,7 +136,7 @@ fun FloatingLabeledTextField(
             if (placeholder.isNotBlank()) {
                 Text(
                     text = placeholder,
-                    fontFamily = RobotoCondensedFont(),
+                    
                     fontSize = FontSize.REGULAR,
                     color = TextPrimary.copy(alpha = 0.6f)
                 )
@@ -188,7 +187,7 @@ fun PasswordSecureFloatingLabeledTextField(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = RobotoCondensedFont(),
+                    
                     fontSize = FontSize.REGULAR,
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.3.sp,
@@ -201,7 +200,7 @@ fun PasswordSecureFloatingLabeledTextField(
             if (placeholder.isNotBlank()) {
                 Text(
                     text = placeholder,
-                    fontFamily = RobotoCondensedFont(),
+                    
                     fontSize = FontSize.REGULAR,
                     color = TextPrimary.copy(alpha = 0.6f)
                 )
@@ -238,7 +237,7 @@ fun PasswordSecureFloatingLabeledTextField(
             supportingText?.let {
                 Text(
                     text = it,
-                    fontFamily = RobotoCondensedFont(),
+                    
                     fontSize = FontSize.SMALL
                 )
             }

@@ -17,9 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.TrendRowUi
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.TextSecondary
 
 @Composable
 fun TrendTableCard(
@@ -62,7 +61,8 @@ fun TrendTableCard(
                         valueColor = colors.third
                     )
                 }
-                if (idx != rows.lastIndex) Divider(color = Color(0xFFF0F0F0))
+                if (idx != rows.lastIndex)
+                    HorizontalDivider()
             }
         }
     }
@@ -79,7 +79,7 @@ private fun RowScope.TableCell(
         text = text,
         modifier = Modifier.weight(weight),
         fontSize = if (isHeader) FontSize.SMALL else FontSize.REGULAR,
-        fontFamily = RobotoCondensedFont(),
+        
         fontWeight = if (isHeader) FontWeight.SemiBold else FontWeight.Normal,
         color = valueColor,
         textAlign = if (weight == 1.2f) TextAlign.Start else TextAlign.Center

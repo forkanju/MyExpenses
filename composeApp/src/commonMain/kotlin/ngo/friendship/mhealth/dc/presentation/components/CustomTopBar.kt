@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.AppLogo
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.Red
-import ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.AppLogoWhite
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.Red
+import ngo.friendship.mhealth.dc.theme.Resources.Icon.AppLogoWhite
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 

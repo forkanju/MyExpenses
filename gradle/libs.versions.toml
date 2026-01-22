@@ -1,81 +1,155 @@
 [versions]
-agp = "8.11.2"
-android-compileSdk = "36"
-android-minSdk = "24"
-android-targetSdk = "36"
+agp = "9.0.0"
 androidx-activity = "1.12.2"
 androidx-lifecycle = "2.9.6"
-composeMultiplatform = "1.9.3"
+buildkonfig = "0.17.1"
+composeMultiplatform = "1.10.0"
+coreSplashscreen = "1.2.0"
+connectivity = "2.4.0"
 kotlin = "2.3.0"
-
-navigation = "2.9.1"
-notifier = "1.6.1"
+kotlinx-coroutines = "1.10.2"
+coil = "3.3.0"
 koin = "4.1.1"
-serialization = "1.9.0"
-coil3 = "3.3.0"
+koinComp = "2.3.1"
+kotlinxDatetime = "0.7.1"
 ktor = "3.3.3"
-coroutines = "1.10.2"
+ksp = "2.3.4"
+ktorMonitorLogging = "1.9.4"
+material3 = "1.10.0-alpha05"
+napier = "2.7.1"
+materialIcons = "1.7.3"
+navigationCompose = "2.9.1"
+multiplatformSettings = "1.3.0"
+nav3Core = "1.0.0"
+nav3CoreJb = "1.0.0-alpha06"
+nav3Material = "1.3.0-alpha03"
+nav3Lifecycle = "2.10.0-alpha07"
+room = "2.8.4"
+kotlinxSerialization = "1.10.0"
+savedstateCompose = "1.4.0"
+scanner = "0.6.0"
+slf4j = "2.0.17"
+sqlite = "2.6.2"
+kotzila = "1.3.1"
 messagebar = "1.0.9"
 browser = "1.0.4"
-settings = "1.3.0"
-splash = "1.2.0"
-kotzila = "1.3.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-#androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
-#androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
-
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", version.ref = "room" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-viewmodelCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
+compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "composeMultiplatform" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
+coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 
-splash-screen = { module = "androidx.core:core-splashscreen" , version.ref ="splash" }
-compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigation" }
-
-kmp-notifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "notifier" }
-
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+koin-compose-navigation = { module = "io.insert-koin:koin-compose-viewmodel-navigation", version.ref = "koin" }
+koin-compose-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koin" }
 
-#koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
-#koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel", version = "1.2.0-Beta4" }
+koin-ksp-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinComp" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koinComp" }
 
-
-kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-
-coil3 = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
-coil3-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
-coil3-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coil3" }
-coil3-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
-
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-darwin-client = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
-ktor-android-client = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+savedstate-compose = { module = "org.jetbrains.androidx.savedstate:savedstate-compose", version.ref = "savedstateCompose" }
+scanner = { module = "io.github.kalinjul.easyqrscan:scanner", version.ref = "scanner" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+ktor-monitor-logging = { module = "ro.cosminmihu.ktor:ktor-monitor-logging", version.ref = "ktorMonitorLogging" }
+ktor-monitor-logging-no-op = { module = "ro.cosminmihu.ktor:ktor-monitor-logging-no-op", version.ref = "ktorMonitorLogging" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+
+material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "materialIcons" }
+material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIcons" }
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "kotlinxSerialization" }
+
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
+multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
+multiplatform-settings-serialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "multiplatformSettings" }
+
+# Core Navigation 3 libraries
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+androidx-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "nav3CoreJb" }
+
+# Optional add-on libraries
+androidx-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "nav3Material" }
+androidx-material3-adaptive-nav3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "nav3Material" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "nav3Lifecycle" }
+
+connectivity-core = { module = "dev.jordond.connectivity:connectivity-core", version.ref = "connectivity" }
+connectivity-device = { module = "dev.jordond.connectivity:connectivity-device", version.ref = "connectivity" }
+connectivity-compose-device = { module = "dev.jordond.connectivity:connectivity-compose-device", version.ref = "connectivity" }
+
 
 messagebar-kmp = { module = "com.stevdza-san:messagebarkmp", version.ref = "messagebar" }
 browser-kmp = { module = "com.stevdza-san:browser-kmp", version.ref = "browser" }
-
-multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
-multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings" }
-multiplatform-settings-make-observable = { module = "com.russhwolf:multiplatform-settings-make-observable", version.ref = "settings" }
-
 kotzilla-sdk-ktor3 = { module = "io.kotzilla:kotzilla-sdk-ktor3", version.ref = "kotzila" }
 
 
 
+
+[bundles]
+settings = [
+    "multiplatform-settings",
+    "multiplatform-settings-no-arg",
+    "multiplatform-settings-serialization"
+]
+nav = [
+    "androidx-navigation3-runtime",
+    "androidx-navigation3-ui",
+#    "androidx-material3-adaptive",
+#    "androidx-material3-adaptive-nav3",
+    "androidx-lifecycle-viewmodel-navigation3",
+]
+ktor = [
+    "ktor-client-core",
+    "ktor-client-logging",
+    "ktor-client-negotiation",
+    "ktor-serialization-kotlinx-json"
+]
+koin = [
+    "koin-core",
+    "koin-compose",
+    "koin-compose-viewmodel",
+    "koin-compose-navigation",
+    "napier"
+]
+coil = [
+    "coil-compose",
+    "coil-svg",
+    "coil-network-ktor",
+]
+
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidLibrary = { id = "com.android.library", version.ref = "agp" }
+androidKmpLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-#compose-multiplatform = { id = "org.jetbrains.compose" }
+kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
+room = { id = "androidx.room", version.ref = "room" }

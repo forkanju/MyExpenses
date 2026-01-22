@@ -11,13 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.theme.ButtonDisabled
-import ngo.friendship.mhealth.dc.presentation.theme.ButtonPrimary
-import ngo.friendship.mhealth.dc.presentation.theme.ButtonTextDisabled
-import ngo.friendship.mhealth.dc.presentation.theme.ButtonTextPrimary
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextWhite
+import ngo.friendship.mhealth.dc.theme.ButtonDisabled
+import ngo.friendship.mhealth.dc.theme.ButtonPrimary
+import ngo.friendship.mhealth.dc.theme.ButtonTextDisabled
+import ngo.friendship.mhealth.dc.theme.ButtonTextPrimary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.TextWhite
 
 @Composable
 fun PrimaryButton(
@@ -44,7 +43,7 @@ fun PrimaryButton(
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge.copy(
-                fontFamily = RobotoCondensedFont(),
+                
                 fontSize = FontSize.EXTRA_REGULAR,
                 fontWeight = FontWeight.Bold,
                 color = TextWhite

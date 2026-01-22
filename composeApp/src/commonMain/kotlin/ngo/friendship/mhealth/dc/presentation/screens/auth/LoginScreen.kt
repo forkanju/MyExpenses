@@ -40,13 +40,12 @@ import ngo.friendship.mhealth.dc.presentation.components.AppLogo
 import ngo.friendship.mhealth.dc.presentation.components.FloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PasswordSecureFloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.Surface
-import ngo.friendship.mhealth.dc.presentation.theme.SurfaceError
-import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
-import ngo.friendship.mhealth.dc.presentation.theme.TextWhite
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.Surface
+import ngo.friendship.mhealth.dc.theme.SurfaceError
+import ngo.friendship.mhealth.dc.theme.TextPrimary
+import ngo.friendship.mhealth.dc.theme.TextWhite
 import rememberMessageBarState
 
 @Composable
@@ -133,7 +132,7 @@ fun LoginScreen(
                             }
                             .padding(horizontal = 6.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelLarge.copy(
-                            fontFamily = RobotoCondensedFont(),
+                            
                             fontSize = FontSize.REGULAR,
                             fontWeight = FontWeight.Normal,
                             textDecoration = TextDecoration.Underline,

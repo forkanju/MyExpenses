@@ -22,11 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.theme.CanvasBackground
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.Calender
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.CanvasBackground
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.Resources.Icon.Calender
+import ngo.friendship.mhealth.dc.theme.TextSecondary
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -73,7 +72,7 @@ fun HomeTopRow(title: String, totalCaseText: String) {
             Text(
                 text = title,
                 fontSize = FontSize.MEDIUM,
-                fontFamily = RobotoCondensedFont(),
+                
                 fontWeight = FontWeight.SemiBold,
                 color = TextSecondary
             )
@@ -90,7 +89,7 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
         text = text,
         modifier = modifier.padding(top = 14.dp, bottom = 8.dp),
         fontSize = FontSize.MEDIUM,
-        fontFamily = RobotoCondensedFont(),
+        
         fontWeight = FontWeight.SemiBold,
         color = TextSecondary
     )

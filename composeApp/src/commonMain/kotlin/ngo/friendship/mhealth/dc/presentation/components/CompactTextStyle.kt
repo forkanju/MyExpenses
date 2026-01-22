@@ -9,9 +9,8 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.TextSecondary
 
 @Composable
 fun CompactTextStyle(
@@ -26,7 +25,7 @@ fun CompactTextStyle(
     color = color,
     fontWeight = fontWeight,
     fontStyle = fontStyle,
-    fontFamily = RobotoCondensedFont(),
+    
     textDecoration = textDecoration,
     textAlign = textAlign,
     lineHeightStyle = LineHeightStyle(

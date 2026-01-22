@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 rootProject.name = "DoctorCenter"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -28,4 +30,5 @@ dependencyResolutionManagement {
     }
 }
 
+include(":androidApp")
 include(":composeApp")

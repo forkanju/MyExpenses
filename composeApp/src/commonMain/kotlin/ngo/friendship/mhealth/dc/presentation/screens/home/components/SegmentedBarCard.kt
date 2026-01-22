@@ -19,8 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.SegmentUi
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.theme.FontSize
 
 
 @Composable
@@ -61,7 +60,7 @@ fun SegmentedBarCard(
                             text = "${s.percent.toInt()}%",
                             color = Color.White,
                             fontSize = FontSize.SMALL,
-                            fontFamily = RobotoCondensedFont(),
+                            
                             fontWeight = FontWeight.SemiBold
                         )
                     }

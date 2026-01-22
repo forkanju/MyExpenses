@@ -25,8 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
 import ngo.friendship.mhealth.dc.presentation.screens.case.model.CaseItemUi
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.Resources
 import org.jetbrains.compose.resources.painterResource
 
 
@@ -52,7 +53,7 @@ fun CaseListItem(ui: CaseItemUi, onClick: () -> Unit) {
                     idText = "30230",
                     photo = {
                         Image(
-                            painter = painterResource(ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.FCM),
+                            painter = painterResource(Resources.Icon.FCM),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()

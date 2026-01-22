@@ -16,9 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.KeyValueUi
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.TextSecondary
 
 @Composable
 fun KeyValueListCard(
@@ -36,7 +35,7 @@ fun KeyValueListCard(
             Text(
                 title,
                 fontSize = FontSize.REGULAR,
-                fontFamily = RobotoCondensedFont(),
+                
                 fontWeight = FontWeight.SemiBold,
                 color = TextSecondary
             )
@@ -44,8 +43,8 @@ fun KeyValueListCard(
 
             items.forEachIndexed { idx, kv ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(kv.key, fontSize = FontSize.SMALL, fontFamily = RobotoCondensedFont(), color = TextSecondary)
-                    Text(kv.value.toString(), fontSize = FontSize.SMALL, fontFamily = RobotoCondensedFont(), color = TextSecondary)
+                    Text(kv.key, fontSize = FontSize.SMALL,  color = TextSecondary)
+                    Text(kv.value.toString(), fontSize = FontSize.SMALL,  color = TextSecondary)
                 }
                 if (idx != items.lastIndex) Spacer(Modifier.height(3.dp))
             }

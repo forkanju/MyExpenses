@@ -25,11 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.state.BottomBarDestination
-import ngo.friendship.mhealth.dc.presentation.theme.BottomBarUnselected
-import ngo.friendship.mhealth.dc.presentation.theme.CardBackground
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize.REGULAR
-import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.theme.BottomBarUnselected
+import ngo.friendship.mhealth.dc.theme.CardBackground
+import ngo.friendship.mhealth.dc.theme.FontSize.REGULAR
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -75,7 +74,6 @@ fun BottomBar(
                         text = destination.title,
                         color = animatedTint,
                         fontSize = REGULAR,
-                        fontFamily = RobotoCondensedFont(),
                         fontWeight = if (selected == destination) FontWeight.Bold else FontWeight.Normal,
                         textDecoration = if (selected == destination) TextDecoration.Underline else TextDecoration.None
                     )

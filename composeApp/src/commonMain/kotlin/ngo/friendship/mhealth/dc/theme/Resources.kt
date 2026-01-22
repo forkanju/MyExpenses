@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.theme
+package ngo.friendship.mhealth.dc.theme
 
 import doctorcenter.composeapp.generated.resources.Res
 import doctorcenter.composeapp.generated.resources.apa
@@ -35,7 +35,6 @@ import doctorcenter.composeapp.generated.resources.user
 import doctorcenter.composeapp.generated.resources.vertical_menu
 import doctorcenter.composeapp.generated.resources.warning
 import doctorcenter.composeapp.generated.resources.weight
-
 
 object Resources {
 

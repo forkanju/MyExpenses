@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.FontSize
 
 @Composable
 fun TopTabsRow(

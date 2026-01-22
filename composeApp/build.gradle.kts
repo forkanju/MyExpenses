@@ -1,21 +1,57 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.serialization)
-
+    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+    jvmToolchain(ProjectConfig.javaVersion)
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-Xwhen-guards",
+            "-Xnon-local-break-continue",
+            "-Xexpect-actual-classes",
+            "-Xnested-type-aliases",
+            "-Xcontext-sensitive-resolution",
+            "-Xdata-flow-based-exhaustiveness",
+            "-Xallow-holdsin-contract",
+            "-Xallow-contracts-on-more-functions",
+            "-Xallow-condition-implies-returns-contracts"
+        )
+
+        optIn.addAll(
+            "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "androidx.compose.material3.ExperimentalMaterial3Api",
+            "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "androidx.compose.foundation.ExperimentalFoundationApi",
+            "androidx.compose.foundation.ExperimentalFoundationApi",
+            "androidx.compose.ui.ExperimentalComposeUiApi",
+            "kotlinx.serialization.ExperimentalSerializationApi",
+            "kotlin.time.ExperimentalTime",
+            "kotlinx.cinterop.ExperimentalForeignApi",
+            "org.koin.core.annotation.KoinExperimentalAPI",
+        )
+    }
+    androidLibrary {
+        namespace = ProjectConfig.packageNameCommon
+        compileSdk = ProjectConfig.compileSdk
+        minSdk = ProjectConfig.minSdk
+        androidResources {
+            enable = true
+        }
+        packaging {
+            resources {
+                excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            }
         }
     }
-
     listOf(
         iosX64(),
         iosArm64(),
@@ -24,133 +60,102 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts.add("-lsqlite3")
         }
     }
 
     sourceSets {
-        val commonMain by getting
-        val androidMain by getting
-
-        // ✅ Shared Apple (iOS) source set
-        val appleMain by creating {
-            dependsOn(commonMain)
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
-
-        // ✅ IMPORTANT: connect iOS source sets to appleMain
-        val iosX64Main by getting { dependsOn(appleMain) }
-        val iosArm64Main by getting { dependsOn(appleMain) }
-        val iosSimulatorArm64Main by getting { dependsOn(appleMain) }
-
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-
-            // ✅ Android-only Ktor engine stays in androidMain
-            implementation(libs.ktor.android.client)
-
-            implementation(libs.koin.android)
-            implementation(libs.splash.screen)
+        commonMain.configure {
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
         }
-
-        appleMain.dependencies {
-            // ✅ iOS-only Ktor engine stays in appleMain
-            implementation(libs.ktor.darwin.client)
-        }
-
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-
-            // Lifecycle ViewModel for CMP
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.compose.ui.backhandler)
             implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.savedstate.compose)
 
-            // Navigation
-            implementation(libs.compose.navigation)
+            implementation(libs.bundles.koin)
+            api(libs.koin.annotations)
+            implementation(libs.bundles.ktor)
+            implementation(libs.bundles.coil)
+            implementation(libs.bundles.settings)
+            implementation(libs.bundles.nav)
+            implementation(libs.navigation.compose)
 
-            // ✅ Ktor common (multiplatform) deps only here
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.serialization)
+            // Room
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
 
-            // Coroutines
+            implementation(libs.material.icons.core)
+            implementation(libs.material.icons.extended)
+
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.properties)
             implementation(libs.kotlinx.coroutines.core)
 
-            // Serialization
-            implementation(libs.kotlinx.serialization)
+            implementation(libs.connectivity.core)
+            implementation(libs.connectivity.device)
+            implementation(libs.connectivity.compose.device)
 
-            // Coil3 (KMP)
-            implementation(libs.coil3)
-            implementation(libs.coil3.compose)
-            implementation(libs.coil3.compose.core)
-            implementation(libs.coil3.network.ktor)
-
-            // KMP notifier
-            implementation(libs.kmp.notifier)
-
-            // Multiplatform settings
-            implementation(libs.multiplatform.settings)
-            implementation(libs.multiplatform.settings.no.arg)
-            implementation(libs.multiplatform.settings.make.observable)
-
+            if (ProjectConfig.IS_DEBUG)
+                implementation(libs.ktor.monitor.logging)
+            else
+                implementation(libs.ktor.monitor.logging.no.op)
+            implementation(libs.kotlinx.datetime)
             // Browser + Message Bar (KMP)
-            implementation(libs.browser.kmp)
+//            implementation(libs.browser.kmp)
             implementation(libs.messagebar.kmp)
-
-
-            // Koin (KMP)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
 
             // Kotzilla SDK (KMP)
             implementation(libs.kotzilla.sdk.ktor3)
 
-
         }
     }
 }
 
-android {
-    namespace = "ngo.friendship.mhealth.dc"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    // ✅ REQUIRED (fixes "non-flavored defaultConfigs must be provided")
-    defaultConfig {
-        applicationId = "ngo.friendship.mhealth.dc"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+buildkonfig {
+    packageName = ProjectConfig.packageName
+    defaultConfigs {
+        buildConfigField(Type.STRING, "packageName", ProjectConfig.packageName, const = true)
+        buildConfigField(Type.STRING, "versionName", ProjectConfig.versionName, const = true)
+        buildConfigField(Type.INT, "versionCode", ProjectConfig.versionCode.toString(), const = true)
+        buildConfigField(Type.BOOLEAN, "IS_DEBUG", ProjectConfig.IS_DEBUG.toString(), const = true)
+        buildConfigField(
+            Type.STRING, "BASE_URL",
+            if (ProjectConfig.IS_DEBUG)
+                ProjectConfig.BASE_URL_DEV
+            else
+                ProjectConfig.BASE_URL_LIVE,
+            const = true
+        )
     }
+}
 
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-        getByName("debug") {
-            isMinifyEnabled = false
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
+compose.resources {
+    publicResClass = true
+    generateResClass = always
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    "androidRuntimeClasspath"(libs.compose.ui.tooling)
+    add("kspCommonMainMetadata", libs.koin.ksp.compiler)
+
+    add("kspAndroid", libs.koin.ksp.compiler)
+    add("kspIosX64", libs.koin.ksp.compiler)
+    add("kspIosArm64", libs.koin.ksp.compiler)
+    add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
 }
+
+tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }
+    .configureEach {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }

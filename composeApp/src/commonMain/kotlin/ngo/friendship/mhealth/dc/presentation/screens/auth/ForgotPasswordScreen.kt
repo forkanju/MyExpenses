@@ -24,10 +24,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.FloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
-import ngo.friendship.mhealth.dc.presentation.theme.BebasNeueFont
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.TextPrimary
 
 @Composable
 fun ForgotPasswordScreen(
@@ -50,7 +48,6 @@ fun ForgotPasswordScreen(
         Text(
             text = "Forgot Password",
             style = MaterialTheme.typography.titleLarge.copy(
-                fontFamily = BebasNeueFont(),
                 fontSize = FontSize.LARGE,
                 color = TextPrimary
             )
@@ -61,7 +58,7 @@ fun ForgotPasswordScreen(
         Text(
             text = "Enter your email or username. We’ll send a reset link.",
             style = MaterialTheme.typography.bodyMedium.copy(
-                fontFamily = RobotoCondensedFont(),
+                
                 fontSize = FontSize.REGULAR,
                 fontWeight = FontWeight.Normal,
                 color = TextPrimary

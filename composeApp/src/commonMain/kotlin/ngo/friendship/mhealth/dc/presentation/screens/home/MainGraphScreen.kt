@@ -20,12 +20,12 @@ import ngo.friendship.mhealth.dc.presentation.state.BottomBarDestination
 import ngo.friendship.mhealth.dc.presentation.components.BottomBar
 import ngo.friendship.mhealth.dc.presentation.navigation.Screen
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseScreen
-import ngo.friendship.mhealth.dc.presentation.theme.Resources
-import ngo.friendship.mhealth.dc.presentation.theme.Surface
-import ngo.friendship.mhealth.dc.presentation.theme.SurfaceBrand
-import ngo.friendship.mhealth.dc.presentation.theme.SurfaceError
-import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
-import ngo.friendship.mhealth.dc.presentation.theme.TextWhite
+import ngo.friendship.mhealth.dc.theme.Resources
+import ngo.friendship.mhealth.dc.theme.Surface
+import ngo.friendship.mhealth.dc.theme.SurfaceBrand
+import ngo.friendship.mhealth.dc.theme.SurfaceError
+import ngo.friendship.mhealth.dc.theme.TextPrimary
+import ngo.friendship.mhealth.dc.theme.TextWhite
 import rememberMessageBarState
 
 

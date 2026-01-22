@@ -32,12 +32,11 @@ import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
 import ngo.friendship.mhealth.dc.presentation.screens.more.components.DashboardCard
 import ngo.friendship.mhealth.dc.presentation.screens.more.model.DashboardCardData
 import ngo.friendship.mhealth.dc.presentation.screens.more.model.SectionData
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
-import ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.Hand
-import ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.Report
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.Resources.Icon.Hand
+import ngo.friendship.mhealth.dc.theme.Resources.Icon.Report
+import ngo.friendship.mhealth.dc.theme.TextSecondary
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -216,7 +215,7 @@ fun LocalTreatmentCard() {
                 Text(
                     text = "Friendship employee 33",
                     style = TextStyle(
-                        fontFamily = RobotoCondensedFont(),
+                        
                         fontSize = FontSize.EXTRA_REGULAR,
                         color = TextSecondary,
                         fontWeight = FontWeight.Normal
@@ -225,7 +224,7 @@ fun LocalTreatmentCard() {
                 Text(
                     text = "Others 16",
                     style = TextStyle(
-                        fontFamily = RobotoCondensedFont(),
+                        
                         fontSize = FontSize.EXTRA_REGULAR,
                         color = TextSecondary,
                         fontWeight = FontWeight.Normal
@@ -237,7 +236,7 @@ fun LocalTreatmentCard() {
                     color = PrimaryColor,
                     style = TextStyle(
                         fontSize = FontSize.SMALL,
-                        fontFamily = RobotoCondensedFont(),
+                        
                         fontWeight = FontWeight.Normal
                     ),
                     textDecoration = TextDecoration.Underline

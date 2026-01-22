@@ -21,10 +21,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.StatRingUi
-import ngo.friendship.mhealth.dc.presentation.theme.FontSize
-import ngo.friendship.mhealth.dc.presentation.theme.RingBarBG
-import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.RingBarBG
+import ngo.friendship.mhealth.dc.theme.TextSecondary
 
 @Composable
 fun StatRingCard(
@@ -51,7 +50,7 @@ fun StatRingCard(
                 stroke = 8.dp
             )
             Spacer(Modifier.height(8.dp))
-            Text(ui.label, fontSize = FontSize.SMALL,  fontFamily = RobotoCondensedFont(), color = TextSecondary)
+            Text(ui.label, fontSize = FontSize.SMALL,   color = TextSecondary)
         }
     }
 }
@@ -90,7 +89,7 @@ fun RingProgress(
         Text(
             text = value.toString(),
             fontSize = FontSize.MEDIUM,
-            fontFamily = RobotoCondensedFont(),
+            
             fontWeight = FontWeight.Bold,
             color = color
         )
