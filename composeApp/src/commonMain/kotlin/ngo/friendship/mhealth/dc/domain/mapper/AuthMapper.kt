@@ -1,5 +1,16 @@
 package ngo.friendship.mhealth.dc.domain.mapper
 
+import ngo.friendship.mhealth.dc.data.remote.dto.UserDto
+import ngo.friendship.mhealth.dc.domain.model.User
+
+
+fun UserDto.toDomain(): User {
+    return User(
+        userId = userId ?: -1,
+        userName = userName.orEmpty(),
+        token = token.orEmpty()
+    )
+}
 
 //
 //

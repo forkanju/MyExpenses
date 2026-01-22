@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
 import ngo.friendship.mhealth.dc.presentation.screens.more.model.DashboardCardData
-import ngo.friendship.mhealth.dc.ui.theme.FontSize
-import ngo.friendship.mhealth.dc.ui.theme.PrimaryColor
-import ngo.friendship.mhealth.dc.ui.theme.TextSecondary
+import ngo.friendship.mhealth.dc.presentation.theme.FontSize
+import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
 import org.jetbrains.compose.resources.painterResource
 
 

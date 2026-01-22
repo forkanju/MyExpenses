@@ -16,16 +16,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import ngo.friendship.mhealth.dc.domain.BottomBarDestination
+import ngo.friendship.mhealth.dc.presentation.state.BottomBarDestination
 import ngo.friendship.mhealth.dc.presentation.components.BottomBar
 import ngo.friendship.mhealth.dc.presentation.navigation.Screen
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseScreen
-import ngo.friendship.mhealth.dc.ui.theme.Resources
-import ngo.friendship.mhealth.dc.ui.theme.Surface
-import ngo.friendship.mhealth.dc.ui.theme.SurfaceBrand
-import ngo.friendship.mhealth.dc.ui.theme.SurfaceError
-import ngo.friendship.mhealth.dc.ui.theme.TextPrimary
-import ngo.friendship.mhealth.dc.ui.theme.TextWhite
+import ngo.friendship.mhealth.dc.presentation.theme.Resources
+import ngo.friendship.mhealth.dc.presentation.theme.Surface
+import ngo.friendship.mhealth.dc.presentation.theme.SurfaceBrand
+import ngo.friendship.mhealth.dc.presentation.theme.SurfaceError
+import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
+import ngo.friendship.mhealth.dc.presentation.theme.TextWhite
 import rememberMessageBarState
 
 

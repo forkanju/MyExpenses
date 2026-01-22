@@ -20,13 +20,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.StatRingUi
-import ngo.friendship.mhealth.dc.ui.theme.FontSize
-import ngo.friendship.mhealth.dc.ui.theme.Red
-import ngo.friendship.mhealth.dc.ui.theme.RingBarBG
-import ngo.friendship.mhealth.dc.ui.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.ui.theme.TextSecondary
+import ngo.friendship.mhealth.dc.presentation.theme.FontSize
+import ngo.friendship.mhealth.dc.presentation.theme.RingBarBG
+import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.presentation.theme.TextSecondary
 
 @Composable
 fun StatRingCard(

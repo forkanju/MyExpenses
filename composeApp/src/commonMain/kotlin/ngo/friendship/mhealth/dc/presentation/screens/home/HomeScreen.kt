@@ -19,12 +19,12 @@ import ngo.friendship.mhealth.dc.presentation.screens.home.model.KeyValueUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.SegmentUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.StatRingUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.TrendRowUi
-import ngo.friendship.mhealth.dc.ui.theme.RingBarBlue
-import ngo.friendship.mhealth.dc.ui.theme.RingBarGreen
-import ngo.friendship.mhealth.dc.ui.theme.RingBarRed
-import ngo.friendship.mhealth.dc.ui.theme.TrendBarRed
-import ngo.friendship.mhealth.dc.ui.theme.TrendBlue
-import ngo.friendship.mhealth.dc.ui.theme.TrendRed
+import ngo.friendship.mhealth.dc.presentation.theme.RingBarBlue
+import ngo.friendship.mhealth.dc.presentation.theme.RingBarGreen
+import ngo.friendship.mhealth.dc.presentation.theme.RingBarRed
+import ngo.friendship.mhealth.dc.presentation.theme.TrendBarRed
+import ngo.friendship.mhealth.dc.presentation.theme.TrendBlue
+import ngo.friendship.mhealth.dc.presentation.theme.TrendRed
 
 @Composable
 fun HomeScreen(

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.util
+package ngo.friendship.mhealth.dc.presentation.state
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform

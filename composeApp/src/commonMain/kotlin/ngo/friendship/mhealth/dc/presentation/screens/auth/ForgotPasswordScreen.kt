@@ -24,10 +24,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.FloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
-import ngo.friendship.mhealth.dc.ui.theme.BebasNeueFont
-import ngo.friendship.mhealth.dc.ui.theme.FontSize
-import ngo.friendship.mhealth.dc.ui.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.ui.theme.TextPrimary
+import ngo.friendship.mhealth.dc.presentation.theme.BebasNeueFont
+import ngo.friendship.mhealth.dc.presentation.theme.FontSize
+import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
 
 @Composable
 fun ForgotPasswordScreen(

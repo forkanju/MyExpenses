@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.ui.theme
+package ngo.friendship.mhealth.dc.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

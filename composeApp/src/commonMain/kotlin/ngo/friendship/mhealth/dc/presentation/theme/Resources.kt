@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.ui.theme
+package ngo.friendship.mhealth.dc.presentation.theme
 
 import doctorcenter.composeapp.generated.resources.Res
 import doctorcenter.composeapp.generated.resources.apa

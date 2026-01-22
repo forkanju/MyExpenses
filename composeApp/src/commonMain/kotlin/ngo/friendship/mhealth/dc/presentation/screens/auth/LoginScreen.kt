@@ -40,13 +40,13 @@ import ngo.friendship.mhealth.dc.presentation.components.AppLogo
 import ngo.friendship.mhealth.dc.presentation.components.FloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PasswordSecureFloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
-import ngo.friendship.mhealth.dc.ui.theme.FontSize
-import ngo.friendship.mhealth.dc.ui.theme.PrimaryColor
-import ngo.friendship.mhealth.dc.ui.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.ui.theme.Surface
-import ngo.friendship.mhealth.dc.ui.theme.SurfaceError
-import ngo.friendship.mhealth.dc.ui.theme.TextPrimary
-import ngo.friendship.mhealth.dc.ui.theme.TextWhite
+import ngo.friendship.mhealth.dc.presentation.theme.FontSize
+import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.presentation.theme.Surface
+import ngo.friendship.mhealth.dc.presentation.theme.SurfaceError
+import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
+import ngo.friendship.mhealth.dc.presentation.theme.TextWhite
 import rememberMessageBarState
 
 @Composable

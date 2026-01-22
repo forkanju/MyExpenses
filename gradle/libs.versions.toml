@@ -37,8 +37,13 @@ kmp-notifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "not
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
+
+#koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin" }
+#koin-compose-viewmodel = { group = "io.insert-koin", name = "koin-compose-viewmodel", version = "1.2.0-Beta4" }
+
 
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
@@ -63,7 +68,6 @@ multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings
 multiplatform-settings-make-observable = { module = "com.russhwolf:multiplatform-settings-make-observable", version.ref = "settings" }
 
 kotzilla-sdk-ktor3 = { module = "io.kotzilla:kotzilla-sdk-ktor3", version.ref = "kotzila" }
-
 
 
 

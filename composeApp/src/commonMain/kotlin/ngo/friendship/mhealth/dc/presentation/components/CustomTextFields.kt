@@ -30,13 +30,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.ui.theme.DisabledBorderColor
-import ngo.friendship.mhealth.dc.ui.theme.FocusedBorderColor
-import ngo.friendship.mhealth.dc.ui.theme.FontSize
-import ngo.friendship.mhealth.dc.ui.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.ui.theme.TextPrimary
-import ngo.friendship.mhealth.dc.ui.theme.Transparent
-import ngo.friendship.mhealth.dc.ui.theme.UnfocusedBorderColor
+import ngo.friendship.mhealth.dc.presentation.theme.DisabledBorderColor
+import ngo.friendship.mhealth.dc.presentation.theme.FocusedBorderColor
+import ngo.friendship.mhealth.dc.presentation.theme.FontSize
+import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.presentation.theme.TextPrimary
+import ngo.friendship.mhealth.dc.presentation.theme.Transparent
+import ngo.friendship.mhealth.dc.presentation.theme.UnfocusedBorderColor
 
 @Composable
 fun TopLabeledTextField(

@@ -24,12 +24,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.domain.BottomBarDestination
-import ngo.friendship.mhealth.dc.ui.theme.BottomBarUnselected
-import ngo.friendship.mhealth.dc.ui.theme.CardBackground
-import ngo.friendship.mhealth.dc.ui.theme.FontSize.REGULAR
-import ngo.friendship.mhealth.dc.ui.theme.PrimaryColor
-import ngo.friendship.mhealth.dc.ui.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.presentation.state.BottomBarDestination
+import ngo.friendship.mhealth.dc.presentation.theme.BottomBarUnselected
+import ngo.friendship.mhealth.dc.presentation.theme.CardBackground
+import ngo.friendship.mhealth.dc.presentation.theme.FontSize.REGULAR
+import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.presentation.theme.RobotoCondensedFont
 import org.jetbrains.compose.resources.painterResource
 
 @Composable

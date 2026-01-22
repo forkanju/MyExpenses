@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
-import ngo.friendship.mhealth.dc.ui.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.presentation.theme.PrimaryColor
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -72,7 +72,7 @@ fun SearchRow(
 
             IconButton(onClick = onFilterClick, modifier = Modifier.size(32.dp)) {
                 Icon(
-                    painter = painterResource(ngo.friendship.mhealth.dc.ui.theme.Resources.Icon.Filter),
+                    painter = painterResource(ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.Filter),
                     contentDescription = "Filter",
                     tint = Color(0xFF707070),
                     modifier = Modifier.size(20.dp)

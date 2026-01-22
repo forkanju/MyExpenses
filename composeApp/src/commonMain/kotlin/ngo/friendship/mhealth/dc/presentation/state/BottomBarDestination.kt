@@ -1,7 +1,7 @@
-package ngo.friendship.mhealth.dc.domain
+package ngo.friendship.mhealth.dc.presentation.state
 
 import ngo.friendship.mhealth.dc.presentation.navigation.Screen
-import ngo.friendship.mhealth.dc.ui.theme.Resources
+import ngo.friendship.mhealth.dc.presentation.theme.Resources
 import org.jetbrains.compose.resources.DrawableResource
 
 enum class BottomBarDestination(

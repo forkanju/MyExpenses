@@ -1,7 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.screens.more.model
 
 import androidx.compose.ui.graphics.Color
-import ngo.friendship.mhealth.dc.ui.theme.Resources.Icon.Report
+import ngo.friendship.mhealth.dc.presentation.theme.Resources.Icon.Report
 import org.jetbrains.compose.resources.DrawableResource
 
 data class DashboardCardData(
