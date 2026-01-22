@@ -11,9 +11,9 @@ data class LoginRequestDto(
     @SerialName("ORG_ID") val orgId: Int,
     @SerialName("imei") val imei: String? = null,
     @SerialName("DEMO") val demo: Boolean = false,
-    @SerialName("requestType") val requestType: String,
-    @SerialName("requestName") val requestName: String,
-    @SerialName("module_name") val moduleName: String,
-    @SerialName("requestTime") val requestTime: String,
+    @SerialName("requestType") val requestType: String, // USER_GATE
+    @SerialName("requestName") val requestName: String, // LOGIN_WEB
+    @SerialName("module_name") val moduleName: String, // mHealth-FCM
+    @SerialName("requestTime") val requestTime: String, // 17/08/2021 14:05:28
     @SerialName("lang") val lang: String
 )

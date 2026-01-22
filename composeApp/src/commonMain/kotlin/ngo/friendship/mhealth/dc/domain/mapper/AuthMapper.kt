@@ -1,10 +1,10 @@
 package ngo.friendship.mhealth.dc.domain.mapper
 
-import ngo.friendship.mhealth.dc.data.remote.dto.UserDto
+import ngo.friendship.mhealth.dc.data.remote.dto.LoginResponseDto
 import ngo.friendship.mhealth.dc.domain.model.User
 
 
-fun UserDto.toDomain(): User {
+fun LoginResponseDto.Data.toDomain(): User {
     return User(
         userId = userId ?: -1,
         userName = userName.orEmpty(),

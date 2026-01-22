@@ -1,13 +1,15 @@
 package ngo.friendship.mhealth.dc.data.local
 
 import com.russhwolf.settings.Settings
+import ngo.friendship.mhealth.dc.domain.model.User
+import ngo.friendship.mhealth.dc.utils.fromJson
 import ngo.friendship.mhealth.dc.utils.toJson
 
 class AppSettings {
     private val settings = Settings()
 
     private var _token: String? = null
-//    private var _userInfo: UserInfo? = null
+    private var _userInfo: User? = null
 
     val isUserLoggedIn
         get() = token != null
@@ -16,9 +18,9 @@ class AppSettings {
         get() = _token ?: settings.getStringOrNull("token").also { _token = it }
         set(value) = settings.putOrRemove("token", value).also { _token = value }
 
-//    var userInfo
-//        get() = _userInfo ?: (settings.getStringOrNull("userInfo").fromJson<UserInfo>() ?: UserInfo()).also { _userInfo = it }
-//        set(value) = settings.putOrRemove("userInfo", value).also { _userInfo = value }
+    var userInfo
+        get() = _userInfo ?: (settings.getStringOrNull("userInfo").fromJson<User>() ?: User()).also { _userInfo = it }
+        set(value) = settings.putOrRemove("userInfo", value).also { _userInfo = value }
 
     fun clear() {
         settings.clear()
