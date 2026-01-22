@@ -21,10 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.FloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
 import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.TextPrimary
 
 @Composable
@@ -107,5 +109,13 @@ fun ForgotPasswordScreen(
             enabled = true,
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FPPrev() {
+    FriendshipTheme {
+        ForgotPasswordScreen()
     }
 }

@@ -1,7 +1,6 @@
 package ngo.friendship.mhealth.dc.di
 
-import ngo.friendship.mhealth.dc.data.local.AppSettings
-import ngo.friendship.mhealth.dc.utils.isMinusOne
+import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.utils.log
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
@@ -20,6 +19,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import ngo.friendship.mhealth.dc.BuildKonfig
+import ngo.friendship.mhealth.dc.data.remote.ApiService
 import org.koin.dsl.module
 import ro.cosminmihu.ktor.monitor.ContentLength
 import ro.cosminmihu.ktor.monitor.KtorMonitorLogging
@@ -27,7 +27,10 @@ import ro.cosminmihu.ktor.monitor.RetentionPeriod
 
 val networkModule = module {
     single {
-        val settings = get<AppSettings>()
+        ApiService(get())
+    }
+    single {
+        val settings = get<LocalSettings>()
         HttpClient {
             install(Logging) {
                 level = LogLevel.ALL

@@ -1,23 +1,22 @@
 package ngo.friendship.mhealth.dc.presentation.screens.auth
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.domain.model.User
 import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
-import ngo.friendship.mhealth.dc.presentation.state.RequestState
+import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 
-class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
+class AuthViewModel(private val repository: AuthRepository) : BaseViewModel() {
 
-    private val _loginState = MutableStateFlow<RequestState<User>>(RequestState.Idle)
-    val loginState: StateFlow<RequestState<User>> = _loginState
+    val loginState: StateFlow<User>
+        field = MutableStateFlow(User())
 
-    fun onLoginClick(userCode: String, pass: String) {
-        viewModelScope.launch {
-            _loginState.value = RequestState.Loading
-            _loginState.value = repository.login(userCode, pass)
+    fun login(userName: String, password: String) {
+        launch {
+            loginState.value = repository.login(userName, password)
+            backStack.replaceWith(Screens.Main)
         }
     }
 }

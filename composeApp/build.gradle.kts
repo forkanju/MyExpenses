@@ -23,7 +23,10 @@ kotlin {
             "-Xdata-flow-based-exhaustiveness",
             "-Xallow-holdsin-contract",
             "-Xallow-contracts-on-more-functions",
-            "-Xallow-condition-implies-returns-contracts"
+            "-Xallow-condition-implies-returns-contracts",
+            "-Xexplicit-backing-fields",
+            "-XXLanguage:+ExplicitBackingFields",
+            "-XXLanguage:+PropertyParamAnnotationDefaultTargetMode"
         )
 
         optIn.addAll(
@@ -35,7 +38,6 @@ kotlin {
             "androidx.compose.ui.ExperimentalComposeUiApi",
             "kotlinx.serialization.ExperimentalSerializationApi",
             "kotlin.time.ExperimentalTime",
-            "kotlinx.cinterop.ExperimentalForeignApi",
             "org.koin.core.annotation.KoinExperimentalAPI",
         )
     }
@@ -53,7 +55,6 @@ kotlin {
         }
     }
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -89,11 +90,10 @@ kotlin {
             implementation(libs.bundles.coil)
             implementation(libs.bundles.settings)
             implementation(libs.bundles.nav)
-            implementation(libs.navigation.compose)
 
-            // Room
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
+//            // Room
+//            implementation(libs.androidx.room.runtime)
+//            implementation(libs.androidx.sqlite.bundled)
 
             implementation(libs.material.icons.core)
             implementation(libs.material.icons.extended)
@@ -150,7 +150,6 @@ dependencies {
     add("kspCommonMainMetadata", libs.koin.ksp.compiler)
 
     add("kspAndroid", libs.koin.ksp.compiler)
-    add("kspIosX64", libs.koin.ksp.compiler)
     add("kspIosArm64", libs.koin.ksp.compiler)
     add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
 }

@@ -1,0 +1,85 @@
+package ngo.friendship.mhealth.dc.presentation.navigation
+
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.ui.NavDisplay
+import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
+import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
+import ngo.friendship.mhealth.dc.theme.Dimen
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun SetupNavDisplay(modifier: Modifier = Modifier) {
+    val viewModel = koinViewModel<MainViewModel>()
+    val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
+
+    InitBaseVM(
+        backStack = viewModel.backStack,
+        viewModel = viewModel,
+    ) { snackBarState ->
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarState) { data ->
+                    Snackbar(
+                        snackbarData = data,
+                        shape = MaterialTheme.shapes.large,
+                        modifier = Modifier.padding(Dimen.Standard)
+                    )
+                }
+            },
+            content = {
+                NavDisplay(
+                    backStack = backStack,
+                    sceneStrategy = dialogStrategy,
+                    transitionSpec = {
+                        // Slide in from right when navigating forward
+                        slideInHorizontally(initialOffsetX = { it }) togetherWith
+                                slideOutHorizontally(targetOffsetX = { -it })
+                    },
+                    popTransitionSpec = {
+                        // Slide in from left when navigating back
+                        slideInHorizontally(initialOffsetX = { -it + 1000 }) togetherWith
+                                slideOutHorizontally(targetOffsetX = { it })
+                    },
+                    predictivePopTransitionSpec = {
+                        // Slide in from left when navigating back
+                        slideInHorizontally(initialOffsetX = { -it + 1000 }) togetherWith
+                                slideOutHorizontally(targetOffsetX = { it })
+                    },
+                    entryProvider = entryProvider {
+                        dialogRoute(
+                            viewModel = viewModel
+                        )
+                        authRoute(
+                            mainViewModel = viewModel,
+                            snackBarState = snackBarState,
+                            modifier = Modifier.padding(it).imePadding()
+                        )
+                        homeRoute(
+                            viewModel = viewModel
+                        )
+                    }
+                )
+            }
+        )
+    }
+}
+

@@ -13,14 +13,14 @@ import org.jetbrains.compose.resources.Font
 
 @Composable
 fun bodyFontFamily() = FontFamily(
-    Font(Res.font.bebas_neue_regular, weight = FontWeight.Normal),
+    Font(Res.font.roboto_condensed_medium, weight = FontWeight.Normal),
     Font(Res.font.roboto_condensed_medium, weight = FontWeight.Bold)
 )
 
 @Composable
 fun displayFontFamily() = FontFamily(
     Font(Res.font.bebas_neue_regular, weight = FontWeight.Normal),
-    Font(Res.font.roboto_condensed_medium, weight = FontWeight.Bold)
+    Font(Res.font.bebas_neue_regular, weight = FontWeight.Bold)
 )
 
 val baseline = Typography()

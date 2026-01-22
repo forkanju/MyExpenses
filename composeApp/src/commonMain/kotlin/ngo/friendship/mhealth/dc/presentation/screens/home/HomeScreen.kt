@@ -1,14 +1,14 @@
 package ngo.friendship.mhealth.dc.presentation.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.screens.home.components.HomeScreenScaffold
+import ngo.friendship.mhealth.dc.presentation.screens.home.components.HomeTopRow
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.KeyValueListCard
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.SectionTitle
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.SegmentedBarCard
@@ -28,6 +28,7 @@ import ngo.friendship.mhealth.dc.theme.TrendRed
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier
 ) {
     val stats = listOf(
         StatRingUi("Pending", 45, RingBarRed, max = 100),
@@ -62,29 +63,37 @@ fun HomeScreen(
         KeyValueUi("Shyamnagar", 11),
     )
 
-    HomeScreenScaffold(
-        title = "Today",
-        totalCaseText = "Total Case: 198"
+    LazyColumn(
+        contentPadding = PaddingValues(12.dp),
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        StatRingRow(stats)
-
-        SectionTitle("Response trend for cases")
-        TrendTableCard(
-            header1 = "In 30 min",
-            header2 = "After 30 min",
-            header3 = "After 2 hours",
-            rows = trendRows,
-            colors = Triple(RingBarGreen, TrendBlue, TrendBarRed)
-        )
-
-        Spacer(Modifier.height(10.dp))
-        SegmentedBarCard(segments)
-
-        SectionTitle("Cases")
-        TwoCardsRow(
-            left = { mod -> KeyValueListCard("By services", byServices, modifier = mod) },
-            right = { mod -> KeyValueListCard("By area", byArea, modifier = mod) }
-        )
+        item {
+            HomeTopRow(title = "Today", totalCaseText = "Total Case: 198")
+        }
+        item {
+            StatRingRow(stats)
+        }
+        item {
+            SectionTitle("Response trend for cases")
+            TrendTableCard(
+                header1 = "In 30 min",
+                header2 = "After 30 min",
+                header3 = "After 2 hours",
+                rows = trendRows,
+                colors = Triple(RingBarGreen, TrendBlue, TrendBarRed)
+            )
+        }
+        item {
+            SegmentedBarCard(segments)
+        }
+        item {
+            SectionTitle("Cases")
+            TwoCardsRow(
+                left = { mod -> KeyValueListCard("By services", byServices, modifier = mod) },
+                right = { mod -> KeyValueListCard("By area", byArea, modifier = mod) }
+            )
+        }
     }
 }
 

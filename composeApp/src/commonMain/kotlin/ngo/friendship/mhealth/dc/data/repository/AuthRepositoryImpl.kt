@@ -1,33 +1,37 @@
 package ngo.friendship.mhealth.dc.data.repository
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
+import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
-import ngo.friendship.mhealth.dc.data.remote.LoginRequestDefaults
+import ngo.friendship.mhealth.dc.data.remote.dto.LoginRequestDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.User
 import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
-import ngo.friendship.mhealth.dc.presentation.state.RequestState
 
 
 class AuthRepositoryImpl(
     private val api: ApiService,
-    private val defaults: LoginRequestDefaults
+    private val settings: LocalSettings
 ) : AuthRepository {
 
-    override suspend fun login(userCode: String, password: String): RequestState<User> {
-        return try {
-            val request = defaults.build(userCode, password)
+    override suspend fun login(userName: String, password: String): User {
+        return withContext(Dispatchers.IO) {
+            val request = LoginRequestDto(userCode = userName, password = password)
             val response = api.login(request)
 
             val code = response.responseCode
             val data = response.data
 
             if (code == "01" && data != null) {
-                RequestState.Success(data.toDomain())
+                val user = data.toDomain()
+                settings.token = data.token
+                settings.user = user
+                user
             } else {
-                RequestState.Error(response.errorDesc ?: "Unauthorized")
+                error(response.errorDesc ?: "Unauthorized")
             }
-        } catch (e: Exception) {
-            RequestState.Error(e.message ?: "Network Error")
         }
     }
 }

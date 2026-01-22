@@ -1,4 +1,3 @@
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -40,7 +39,9 @@ import ngo.friendship.mhealth.dc.theme.TextSecondary
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun HealthDashboardScreen() {
+fun HealthDashboardScreen(
+    modifier: Modifier = Modifier
+) {
 // This is the "Single Source of Truth" data list
     val sections = listOf(
         SectionData(
@@ -119,9 +120,8 @@ fun HealthDashboardScreen() {
     )
 
     BoxWithConstraints(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
     ) {
         val screenWidth = maxWidth
 

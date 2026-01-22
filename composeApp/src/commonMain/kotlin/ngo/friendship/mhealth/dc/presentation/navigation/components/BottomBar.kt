@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.components
+package ngo.friendship.mhealth.dc.presentation.navigation.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.clickable
@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -24,18 +26,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.state.BottomBarDestination
+import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.theme.BottomBarUnselected
 import ngo.friendship.mhealth.dc.theme.CardBackground
 import ngo.friendship.mhealth.dc.theme.FontSize.REGULAR
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun BottomBar(
-    modifier: Modifier = Modifier,
-    selected: BottomBarDestination,
-    onSelect: (BottomBarDestination) -> Unit
+    pagerState: PagerState = rememberPagerState(initialPage = 0) { BottomNavItems.entries.size },
+    onItemClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -49,9 +50,9 @@ fun BottomBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            BottomBarDestination.entries.forEach { destination ->
+            BottomNavItems.entries.forEachIndexed { index, screen ->
                 val animatedTint by animateColorAsState(
-                    targetValue = if (selected == destination) PrimaryColor else BottomBarUnselected
+                    targetValue = if (pagerState.currentPage == index) PrimaryColor else BottomBarUnselected
                 )
                 val interactionSource = remember { MutableInteractionSource() }
 
@@ -61,21 +62,21 @@ fun BottomBar(
                         .clickable(
                             interactionSource = interactionSource,
                             indication = ripple(bounded = true)
-                        ) { onSelect(destination) },
+                        ) { onItemClick(index) },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        painter = painterResource(destination.icon),
-                        contentDescription = destination.title,
+                        imageVector = screen.icon,
+                        contentDescription = screen.name,
                         tint = animatedTint
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = destination.title,
+                        text = screen.name,
                         color = animatedTint,
                         fontSize = REGULAR,
-                        fontWeight = if (selected == destination) FontWeight.Bold else FontWeight.Normal,
-                        textDecoration = if (selected == destination) TextDecoration.Underline else TextDecoration.None
+                        fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal,
+                        textDecoration = if (pagerState.currentPage == index) TextDecoration.Underline else TextDecoration.None
                     )
                 }
             }

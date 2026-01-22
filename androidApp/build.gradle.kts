@@ -5,6 +5,23 @@ plugins {
 
 kotlin {
     jvmToolchain(ProjectConfig.javaVersion)
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-Xcontext-parameters",
+            "-Xwhen-guards",
+            "-Xnon-local-break-continue",
+            "-Xexpect-actual-classes",
+            "-Xnested-type-aliases",
+            "-Xcontext-sensitive-resolution",
+            "-Xdata-flow-based-exhaustiveness",
+            "-Xallow-holdsin-contract",
+            "-Xallow-contracts-on-more-functions",
+            "-Xallow-condition-implies-returns-contracts",
+            "-Xexplicit-backing-fields",
+            "-XXLanguage:+ExplicitBackingFields",
+            "-XXLanguage:+PropertyParamAnnotationDefaultTargetMode"
+        )
+    }
 }
 
 android {

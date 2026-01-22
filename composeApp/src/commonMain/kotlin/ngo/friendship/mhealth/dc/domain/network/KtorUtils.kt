@@ -14,7 +14,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.http.ParametersBuilder
 import io.ktor.http.contentType
@@ -31,6 +30,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.properties.encodeToMap
+import ngo.friendship.mhealth.dc.data.remote.dto.ErrorDto
+import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.tryGet
 
 /**
@@ -94,7 +95,7 @@ suspend inline fun <reified R> HttpClient.processPostRequest(
             setBody(body)
             request()
         }
-        response.body()
+        response.getSuccessBody()
     }
 }
 
@@ -117,7 +118,7 @@ suspend inline fun <reified R> HttpClient.processFormRequest(
         val response = submitForm(url, formParameters) {
             request()
         }
-        response.body()
+        response.getSuccessBody()
     }
 }
 
@@ -143,7 +144,7 @@ suspend inline fun <reified R> HttpClient.processSimplePostRequest(
             request(body, this)
             setBody(body)
         }
-        response.body()
+        response.getSuccessBody()
     }
 }
 
@@ -166,7 +167,7 @@ suspend inline fun <reified R> HttpClient.processGetRequest(
                 parameters.appendAll(request(this@get))
             }
         }
-        response.body()
+        response.getSuccessBody()
     }
 }
 
@@ -199,18 +200,18 @@ suspend fun <R> tryHttpCall(
     }
 }
 
-//suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
-//    return if (status.isSuccess()) {
+suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
+    return if (status.isSuccess()) {
 //        tryGet { body<ResultDto>() }?.let {
 //            if (it.code != null && it.code != 200) {
 //                error(it.message ?: HttpStatusCode.fromValue(it.code).description)
 //            }
 //        }
-//        body<R>().apply {
-//            log("processRequest")
-//        }
-//    } else {
-//        val errorBody = tryGet { body<ErrorDto>() }
-//        error(errorBody?.error ?: errorBody?.errorMsg ?: status.description)
-//    }
-//}
+        body<R>().apply {
+            log("processRequest")
+        }
+    } else {
+        val errorBody = tryGet { body<ErrorDto>() }
+        error(errorBody?.errorDesc ?: errorBody?.message ?: status.description)
+    }
+}
