@@ -84,7 +84,7 @@ fun Parameters.toParametersBuilder() = ParametersBuilder().apply {
 suspend inline fun <reified R> HttpClient.processPostRequest(
     url: String,
     parameters: Parameters = Parameters.Empty,
-    body: Any,
+    body: Any? = null,
     crossinline request: HttpRequestBuilder.() -> Unit = {}
 ): R {
     return tryHttpCall {
@@ -92,7 +92,9 @@ suspend inline fun <reified R> HttpClient.processPostRequest(
         val response = post(url) {
             contentType(ContentType.Application.Json)
             this.url.parameters.appendAll(parameters)
-            setBody(body)
+            body?.let {
+                setBody(it)
+            }
             request()
         }
         response.getSuccessBody()
@@ -196,7 +198,7 @@ suspend fun <R> tryHttpCall(
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        error(e.message ?: "Unknown error occurred")
+        error(e.message?.ifBlank { null } ?: "Unknown error occurred")
     }
 }
 
@@ -212,6 +214,61 @@ suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
         }
     } else {
         val errorBody = tryGet { body<ErrorDto>() }
-        error(errorBody?.errorDesc ?: errorBody?.message ?: status.description)
+        error(
+            errorBody?.errorDesc?.ifBlank { null }
+                ?: errorBody?.message?.ifBlank { null }
+                ?: status.description.ifBlank { null }
+                ?: status.value.description
+        )
     }
 }
+
+
+val Int.description: String
+    get() = when (this) {
+        // 1xx Informational
+        100 -> "Continue with the request"
+        101 -> "Switching protocols"
+        102 -> "Processing your request"
+
+        // 2xx Success
+        200 -> "Success"
+        201 -> "Resource created successfully"
+        202 -> "Request accepted for processing"
+        204 -> "Success with no content to return"
+        206 -> "Partial content delivered"
+
+        // 3xx Redirection
+        301 -> "Resource moved permanently"
+        302 -> "Resource temporarily moved"
+        304 -> "Content not modified"
+        307 -> "Temporary redirect"
+        308 -> "Permanent redirect"
+
+        // 4xx Client Errors
+        400 -> "Invalid request data"
+        401 -> "You're not authorized to access this"
+        403 -> "You don't have permission to access this"
+        404 -> "Resource not found"
+        405 -> "This action is not supported"
+        406 -> "Requested format not available"
+        408 -> "Request timed out"
+        409 -> "Conflict with current state"
+        410 -> "Resource no longer exists"
+        411 -> "Content length required"
+        413 -> "Request too large"
+        414 -> "URL too long"
+        415 -> "Unsupported file type"
+        422 -> "Unable to process the request"
+        429 -> "Too many requests, please slow down"
+
+        // 5xx Server Errors
+        500 -> "Something went wrong on our end"
+        501 -> "Feature not implemented"
+        502 -> "Bad gateway"
+        503 -> "Server is temporarily unavailable"
+        504 -> "Gateway timed out"
+        505 -> "HTTP version not supported"
+
+        else -> "An unexpected error occurred"
+    }
