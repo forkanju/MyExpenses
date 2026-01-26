@@ -8,6 +8,8 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.accept
+import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -28,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.properties.encodeToMap
 import ngo.friendship.mhealth.dc.data.remote.dto.ErrorDto
@@ -99,6 +102,33 @@ suspend inline fun <reified R> HttpClient.processPostRequest(
         }
         response.getSuccessBody()
     }
+}
+suspend inline fun <reified R, reified B> HttpClient.postAsFormData(
+    url: String,
+    body: B,
+    dataFieldName: String = "data",
+    json: Json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
+        explicitNulls = false
+    }
+): R {
+    val jsonString = json.encodeToString(body)
+
+    val response = post(url) {
+        contentType(ContentType.Application.FormUrlEncoded)
+        accept(ContentType.Application.Json)
+
+        // ✅ This is the key fix
+        setBody(
+            FormDataContent(
+                Parameters.build { append(dataFieldName, jsonString) }
+            )
+        )
+    }
+
+    return response.getSuccessBody()
 }
 
 /**
