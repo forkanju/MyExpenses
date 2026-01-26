@@ -1,7 +1,5 @@
 package ngo.friendship.mhealth.dc.di
 
-import ngo.friendship.mhealth.dc.data.local.LocalSettings
-import ngo.friendship.mhealth.dc.utils.log
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpSend
@@ -16,10 +14,13 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.KotlinxSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import ngo.friendship.mhealth.dc.BuildKonfig
+import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
+import ngo.friendship.mhealth.dc.utils.defJson
+import ngo.friendship.mhealth.dc.utils.log
 import org.koin.dsl.module
 import ro.cosminmihu.ktor.monitor.ContentLength
 import ro.cosminmihu.ktor.monitor.KtorMonitorLogging
@@ -59,12 +60,8 @@ val networkModule = module {
                 socketTimeoutMillis = 20_000L
             }
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                    encodeDefaults = true
-                    explicitNulls = false
-                })
+                json(defJson)
+                register(ContentType.Text.Plain, KotlinxSerializationConverter(defJson))
             }
         }.apply {
             plugin(HttpSend).intercept { request ->

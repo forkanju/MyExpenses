@@ -8,29 +8,20 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.accept
-import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.Parameters
-import io.ktor.http.ParametersBuilder
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
-import io.ktor.http.parameters
+import io.ktor.http.*
 import io.ktor.serialization.JsonConvertException
 import io.ktor.util.StringValuesBuilder
 import io.ktor.util.network.UnresolvedAddressException
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.properties.encodeToMap
 import ngo.friendship.mhealth.dc.data.remote.dto.ErrorDto
@@ -103,33 +94,6 @@ suspend inline fun <reified R> HttpClient.processPostRequest(
         response.getSuccessBody()
     }
 }
-suspend inline fun <reified R, reified B> HttpClient.postAsFormData(
-    url: String,
-    body: B,
-    dataFieldName: String = "data",
-    json: Json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        encodeDefaults = true
-        explicitNulls = false
-    }
-): R {
-    val jsonString = json.encodeToString(body)
-
-    val response = post(url) {
-        contentType(ContentType.Application.FormUrlEncoded)
-        accept(ContentType.Application.Json)
-
-        // ✅ This is the key fix
-        setBody(
-            FormDataContent(
-                Parameters.build { append(dataFieldName, jsonString) }
-            )
-        )
-    }
-
-    return response.getSuccessBody()
-}
 
 /**
  * Processes a POST request to the specified [url] with the given [formParameters] using the Ktor HTTP client.
@@ -165,7 +129,7 @@ suspend inline fun <reified R> HttpClient.processFormRequest(
 suspend inline fun <reified R> HttpClient.processSimplePostRequest(
     url: String,
     parameters: Parameters = Parameters.Empty,
-    crossinline request: MutableMap<String, Any>.(HttpRequestBuilder) -> Unit
+    crossinline request: MutableMap<String, Any>.(HttpRequestBuilder) -> Unit = {}
 ): R {
     return tryHttpCall {
         if (!connectionListener.isConnected) error("No internet connection")
@@ -225,10 +189,8 @@ suspend fun <R> tryHttpCall(
         error("No internet connection")
     } catch (_: IOException) {
         error("Network I/O error")
-    } catch (e: CancellationException) {
-        throw e
     } catch (e: Exception) {
-        error(e.message?.ifBlank { null } ?: "Unknown error occurred")
+        throw e
     }
 }
 

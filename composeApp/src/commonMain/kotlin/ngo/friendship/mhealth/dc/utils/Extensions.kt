@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import ngo.friendship.mhealth.dc.BuildKonfig
 import kotlin.math.*
 import kotlin.random.Random
@@ -272,6 +273,13 @@ fun Long.toDateTimeServer(): String {
     val ldt = Instant.fromEpochMilliseconds(this)
         .toLocalDateTime(TimeZone.currentSystemDefault())
     return "${ldt.year}-${ldt.month.number.pad2()}-${ldt.day.pad2()}" +
+            " ${ldt.hour.pad2()}:${ldt.minute.pad2()}:${ldt.second.pad2()}"
+}
+
+fun Long.toDateTimeServerSlash(): String {
+    val ldt = Instant.fromEpochMilliseconds(this)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${ldt.day.pad2()}/${ldt.month.number.pad2()}/${ldt.year}" +
             " ${ldt.hour.pad2()}:${ldt.minute.pad2()}:${ldt.second.pad2()}"
 }
 
@@ -706,13 +714,22 @@ fun String.getOptimizedPrintText(totalLength: Int): String {
     return newText
 }
 
+val defJson by lazy {
+    Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
+        explicitNulls = false
+    }
+}
+
 /**
  * Deserializes a JSON string to an object of type T.
  * The class T must be annotated with @Serializable.
  */
 inline fun <reified T> String?.fromJson(): T? {
     this ?: return null
-    return Json.decodeFromString<T>(this)
+    return defJson.decodeFromString<T>(this)
 }
 
 // --- More Type-Safe and Recommended Alternatives for toJson and toObject ---
@@ -722,9 +739,7 @@ inline fun <reified T> String?.fromJson(): T? {
  */
 inline fun <reified T : Any> T?.toJson(): String {
     if (this == null) return "null"
-    // This requires T to be @Serializable, which is good for type safety.
-    // If T can be null, then T? and handle null separately or use a nullable serializer.
-    return Json.encodeToString(this)
+    return defJson.encodeToString(serializer(),this)
 }
 
 fun String?.toUppercaseAllWordRegex(): String? {

@@ -18,7 +18,7 @@ class AuthRepositoryImpl(
 
     override suspend fun login(userName: String, password: String): User {
         return withContext(Dispatchers.IO) {
-            val request = LoginRequestDto(userCode = userName, password = password)
+            val request = LoginRequestDto(userName = userName, password = password)
             val response = api.login(request)
 
             val code = response.responseCode
