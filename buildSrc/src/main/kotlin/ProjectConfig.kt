@@ -16,8 +16,8 @@ object ProjectConfig {
     const val IS_DEBUG = true
 
     const val javaVersion = 21
-    const val BASE_URL_LIVE = "https://apps.friendship.ngo/mHealthEnt_gateway"
-    const val BASE_URL_DEV = "http://devs2.apps.friendship.ngo:8080/mHealthEnt_gateway"
+    const val BASE_URL_LIVE = "https://apps.friendship.ngo"
+    const val BASE_URL_DEV = "http://devs2.apps.friendship.ngo:8080"
 
     fun genVersionCode(major: Int, minor: Int, patch: Int) = major * 10_000 + minor * 100 + patch
     fun genVersionName(major: Int, minor: Int, patch: Int) = "$major.$minor.$patch"
