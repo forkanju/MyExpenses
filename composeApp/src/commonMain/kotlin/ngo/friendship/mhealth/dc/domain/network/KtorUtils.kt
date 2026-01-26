@@ -13,7 +13,12 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.*
+import io.ktor.http.ContentType
+import io.ktor.http.Parameters
+import io.ktor.http.ParametersBuilder
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import io.ktor.http.parameters
 import io.ktor.serialization.JsonConvertException
 import io.ktor.util.StringValuesBuilder
 import io.ktor.util.network.UnresolvedAddressException
@@ -24,8 +29,10 @@ import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.properties.encodeToMap
-import ngo.friendship.mhealth.dc.data.remote.dto.ErrorDto
+import ngo.friendship.mhealth.dc.data.remote.dto.BaseResponse
+import ngo.friendship.mhealth.dc.utils.fromJson
 import ngo.friendship.mhealth.dc.utils.log
+import ngo.friendship.mhealth.dc.utils.toJson
 import ngo.friendship.mhealth.dc.utils.tryGet
 
 /**
@@ -119,6 +126,32 @@ suspend inline fun <reified R> HttpClient.processFormRequest(
 }
 
 /**
+ * Processes a POST request to the specified [url] with the given [body] using the Ktor HTTP client.
+ *
+ * @param T The type of the request body. Must be serializable.
+ * @param R The type of the expected response body. Must be serializable.
+ * @param url The URL to send the POST request to.
+ * @param body The serialized request body.
+ * @param request The ktor `HttpRequestBuilder` to configure the request.
+ * @return A [R] object representing the result of the request.
+ */
+suspend inline fun <reified T, reified R> HttpClient.processFormDataRequest(
+    url: String,
+    body: T? = null,
+    crossinline request: HttpRequestBuilder.() -> Unit = {}
+): R {
+    return tryHttpCall {
+        if (!connectionListener.isConnected) error("No internet connection")
+        val response = submitForm(url, parameters {
+            append("data", body.toJson())
+        }) {
+            request()
+        }
+        response.getSuccessBody()
+    }
+}
+
+/**
  * Processes a POST request to the specified [url] with the given [map] using the Ktor HTTP client.
  *
  * @param R The type of the expected response body. Must be serializable.
@@ -190,29 +223,30 @@ suspend fun <R> tryHttpCall(
     } catch (_: IOException) {
         error("Network I/O error")
     } catch (e: Exception) {
-        throw e
+        if (!e.message.isNullOrBlank())
+            throw e
+        else
+            error("Unknown error occurred")
     }
 }
 
 suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
-    return if (status.isSuccess()) {
-//        tryGet { body<ResultDto>() }?.let {
-//            if (it.code != null && it.code != 200) {
-//                error(it.message ?: HttpStatusCode.fromValue(it.code).description)
-//            }
-//        }
-        body<R>().apply {
-            log("processRequest")
-        }
-    } else {
-        val errorBody = tryGet { body<ErrorDto>() }
-        error(
-            errorBody?.errorDesc?.ifBlank { null }
-                ?: errorBody?.message?.ifBlank { null }
-                ?: status.description.ifBlank { null }
-                ?: status.value.description
-        )
-    }
+    val body = tryGet { body<R>() }
+    body.log("getSuccessBody")
+    val baseResponse = body.toJson().fromJson<BaseResponse>()
+    val massage = (baseResponse.errorDesc?.ifBlank { null }
+        ?: baseResponse.message?.ifBlank { null })?.normalize()
+        ?: status.value.description
+    if (!status.isSuccess()) error(massage)
+    if (body == null) error(massage)
+    if (baseResponse.responseCode == null || baseResponse.responseCode != "01") error(massage)
+    return body
+}
+
+fun String.normalize(): String {
+    return lowercase()
+        .replace("_", " ")
+        .replaceFirstChar(Char::uppercase)
 }
 
 

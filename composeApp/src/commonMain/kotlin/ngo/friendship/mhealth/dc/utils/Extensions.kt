@@ -8,23 +8,47 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.number
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import ngo.friendship.mhealth.dc.BuildKonfig
-import kotlin.math.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
+import kotlin.contracts.contract
+import kotlin.math.absoluteValue
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.round
+import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -588,7 +612,7 @@ fun Int.asList(initialIndex: Int = 0) : List<Int> {
 inline fun <T> tryGet(data: () -> T): T? =
     try {
         data()
-    } catch (e: Exception) {
+    } catch (t: Throwable) {
         null
     }
 
@@ -727,9 +751,13 @@ val defJson by lazy {
  * Deserializes a JSON string to an object of type T.
  * The class T must be annotated with @Serializable.
  */
+@OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
 inline fun <reified T> String?.fromJson(): T? {
+    contract {
+        (this@fromJson != null) implies (returnsNotNull())
+    }
     this ?: return null
-    return defJson.decodeFromString<T>(this)
+    return  defJson.decodeFromString<T>(this)
 }
 
 // --- More Type-Safe and Recommended Alternatives for toJson and toObject ---
@@ -738,7 +766,7 @@ inline fun <reified T> String?.fromJson(): T? {
  * Serializes an object of a known @Serializable type T to its JSON string representation.
  */
 inline fun <reified T : Any> T?.toJson(): String {
-    if (this == null) return "null"
+    if (this == null) return "{}"
     return defJson.encodeToString(serializer(),this)
 }
 
