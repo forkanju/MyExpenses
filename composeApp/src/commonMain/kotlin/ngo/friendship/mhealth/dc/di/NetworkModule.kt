@@ -42,6 +42,7 @@ val networkModule = module {
             }
             install(KtorMonitorLogging) {
                 showNotification = true
+                log("KtorMonitorLogging installed")
                 retentionPeriod = RetentionPeriod.OneWeek
                 maxContentLength = ContentLength.Full
             }

@@ -22,6 +22,7 @@ class AuthRepositoryImpl(
             val response = api.login(request)
 
             val code = response.responseCode
+            print("StatusCode: $code")
             val data = response.data
 
             if (code == "01" && data != null) {
