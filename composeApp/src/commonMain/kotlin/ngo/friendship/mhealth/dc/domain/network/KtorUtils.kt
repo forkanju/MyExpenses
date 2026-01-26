@@ -263,7 +263,7 @@ val Int.description: String
         429 -> "Too many requests, please slow down"
 
         // 5xx Server Errors
-        500 -> "Something went wrong on our end"
+        500 -> "Something went wrong on the server side"
         501 -> "Feature not implemented"
         502 -> "Bad gateway"
         503 -> "Server is temporarily unavailable"

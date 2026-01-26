@@ -10,7 +10,7 @@ class ApiService(
 ) {
     suspend fun login(request: LoginRequestDto): LoginResponseDto {
         return client.processPostRequest(
-            url = "api/usergate",
+            url = "mHealthEnt_gateway/api/usergate",
             body = request
         )
     }
