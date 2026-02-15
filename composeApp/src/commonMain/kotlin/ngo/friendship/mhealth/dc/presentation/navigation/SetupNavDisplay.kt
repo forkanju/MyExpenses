@@ -17,11 +17,12 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
+import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.detailRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
-import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
-import ngo.friendship.mhealth.dc.presentation.MainViewModel
-import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
 import ngo.friendship.mhealth.dc.theme.Dimen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -75,6 +76,11 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         )
                         homeRoute(
                             viewModel = viewModel
+                        )
+
+                        detailRoute(
+                            mainViewModel = viewModel,
+                            snackBarState = snackBarState,
                         )
                     }
                 )

@@ -118,6 +118,9 @@ kotlin {
             // Kotzilla SDK (KMP)
             implementation(libs.kotzilla.sdk.ktor3)
 
+            implementation(libs.material.icons.extended)
+            implementation(libs.animation)
+
         }
     }
 }

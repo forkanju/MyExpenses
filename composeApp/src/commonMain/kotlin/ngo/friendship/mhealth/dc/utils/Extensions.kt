@@ -837,4 +837,26 @@ fun main() {
 //}
 
 
+fun String.toUiDateTime(): String {
+    return try {
+        // Backend: "2026-01-29 16:30:22.0"
+        val cleaned = this
+            .substringBefore(".")   // remove ".0"
+            .replace(" ", "T")      // ISO format
 
+        val dt = LocalDateTime.parse(cleaned)
+
+        val hour = dt.hour.toString().padStart(2, '0')
+        val minute = dt.minute.toString().padStart(2, '0')
+        val day = dt.dayOfMonth.toString().padStart(2, '0')
+
+        val month = dt.month.name
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
+            .take(3)
+
+        "$hour:$minute, $day $month ${dt.year}"
+    } catch (e: Exception) {
+        this // fallback
+    }
+}

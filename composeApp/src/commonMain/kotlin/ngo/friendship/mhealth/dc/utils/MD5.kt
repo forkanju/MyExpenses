@@ -1,6 +1,10 @@
 package ngo.friendship.mhealth.dc.utils
 
-fun String.md5(): String {
+// commonMain
+expect fun String.md5(): String
+
+
+fun String.md52(): String {
     val message = encodeToByteArray()
     val bitLength = message.size.toLong() shl 3
 
@@ -44,10 +48,10 @@ fun String.md5(): String {
     )
 
     val s = intArrayOf(
-        7,12,17,22, 7,12,17,22, 7,12,17,22, 7,12,17,22,
-        5,9,14,20, 5,9,14,20, 5,9,14,20, 5,9,14,20,
-        4,11,16,23, 4,11,16,23, 4,11,16,23, 4,11,16,23,
-        6,10,15,21, 6,10,15,21, 6,10,15,21, 6,10,15,21
+        7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+        5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9, 14, 20,
+        4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+        6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21
     )
 
     val m = IntArray(16)

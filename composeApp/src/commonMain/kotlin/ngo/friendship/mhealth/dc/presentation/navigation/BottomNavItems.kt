@@ -1,13 +1,15 @@
 package ngo.friendship.mhealth.dc.presentation.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Cases
-import androidx.compose.material.icons.rounded.Dashboard
-import androidx.compose.material.icons.rounded.Home
-import androidx.compose.ui.graphics.vector.ImageVector
+import doctorcenter.composeapp.generated.resources.Res
+import doctorcenter.composeapp.generated.resources.case_n
+import doctorcenter.composeapp.generated.resources.home
+import doctorcenter.composeapp.generated.resources.more
+import org.jetbrains.compose.resources.DrawableResource
 
-enum class BottomNavItems(val icon: ImageVector) {
-    Home(Icons.Rounded.Home),
-    Case(Icons.Rounded.Cases),
-    Dashboard(Icons.Rounded.Dashboard)
+enum class BottomNavItems(
+    val iconRes: DrawableResource
+) {
+    Home(Res.drawable.home),
+    Case(Res.drawable.case_n),
+    Dashboard(Res.drawable.more)
 }

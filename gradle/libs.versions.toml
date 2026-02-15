@@ -2,6 +2,7 @@
 agp = "9.0.0"
 androidx-activity = "1.12.2"
 androidx-lifecycle = "2.9.6"
+animation = "1.10.0"
 buildkonfig = "0.17.1"
 composeMultiplatform = "1.10.0"
 coreSplashscreen = "1.2.0"
@@ -41,6 +42,7 @@ androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.r
 androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", version.ref = "room" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "animation" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }

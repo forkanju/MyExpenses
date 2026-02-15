@@ -26,6 +26,7 @@ import doctorcenter.composeapp.generated.resources.map_pin
 import doctorcenter.composeapp.generated.resources.menu
 import doctorcenter.composeapp.generated.resources.minus
 import doctorcenter.composeapp.generated.resources.more
+import doctorcenter.composeapp.generated.resources.note
 import doctorcenter.composeapp.generated.resources.notification
 import doctorcenter.composeapp.generated.resources.plus
 import doctorcenter.composeapp.generated.resources.right_arrow
@@ -40,6 +41,7 @@ object Resources {
 
     object Icon {
         val Plus = Res.drawable.plus
+        val Note = Res.drawable.note
         val AppLogo = Res.drawable.logo_dc_mh
         val AppLogoWhite = Res.drawable.logo_dc_white
         val Minus = Res.drawable.minus

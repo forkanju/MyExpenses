@@ -31,6 +31,7 @@ import ngo.friendship.mhealth.dc.theme.BottomBarUnselected
 import ngo.friendship.mhealth.dc.theme.CardBackground
 import ngo.friendship.mhealth.dc.theme.FontSize.REGULAR
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun BottomBar(
@@ -66,7 +67,7 @@ fun BottomBar(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        imageVector = screen.icon,
+                        painter = painterResource(screen.iconRes),
                         contentDescription = screen.name,
                         tint = animatedTint
                     )
