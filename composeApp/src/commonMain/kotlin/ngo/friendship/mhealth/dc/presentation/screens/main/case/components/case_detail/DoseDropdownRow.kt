@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -39,6 +39,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.theme.DarkerGray
+import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
+import ngo.friendship.mhealth.dc.theme.Gray
+import ngo.friendship.mhealth.dc.theme.GrayLighter
+import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 @Composable
 fun DoseAndDrugDropdownRow(
@@ -58,18 +63,18 @@ fun DoseAndDrugDropdownRow(
     cornerRadius: Dp = 6.dp,
     borderWidth: Dp = 1.dp,
 
-    borderColor: Color = Color(0xFFD1D5DB),
-    focusedBorderColor: Color = Color(0xFF9CA3AF),
+    borderColor: Color = UnfocusedBorderColor,
+    focusedBorderColor: Color = FocusedBorderColor,
     errorBorderColor: Color = MaterialTheme.colorScheme.error,
     backgroundColor: Color = Color.White,
 
     textStyle: TextStyle = LocalTextStyle.current.copy(
         fontSize = 13.sp,
-        color = Color(0xFF111827)
+        color = DarkerGray
     ),
     placeholderStyle: TextStyle = LocalTextStyle.current.copy(
         fontSize = 13.sp,
-        color = Color(0xFF9CA3AF)
+        color = Gray
     ),
     rightPlaceholder: String = "Select"
 ) {
@@ -102,9 +107,8 @@ fun DoseAndDrugDropdownRow(
             Box(
                 modifier = Modifier
                     .padding(start = 6.dp)
-                    .height(height - 8.dp) // 👈 proportional inner pill
+                    .height(height - 8.dp)
                     .clip(RoundedCornerShape(5.dp))
-//                    .background(Color(0xFF111827))
                     .clickable(enabled = enabled) { leftExpanded = true }
 
                     .padding(horizontal = 8.dp),
@@ -113,7 +117,7 @@ fun DoseAndDrugDropdownRow(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = leftValue,
-                        style = textStyle.copy(color = Color.Black),
+                        style = textStyle.copy(color = DarkerGray),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -121,7 +125,7 @@ fun DoseAndDrugDropdownRow(
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowDown,
                         contentDescription = null,
-                        tint = Color.Black,
+                        tint = DarkerGray,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -147,14 +151,14 @@ fun DoseAndDrugDropdownRow(
                 modifier = Modifier
                     .padding(horizontal = 6.dp)
                     .fillMaxHeight()
-                    .width(1.dp)
-                    .background(Color(0xFFE5E7EB))
+                    .width(width = 1.dp)
+                    .background(color = UnfocusedBorderColor)
             )
 
             // ---------- RIGHT BIG DROPDOWN ----------
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(weight = 1f)
                     .fillMaxHeight()
                     .clickable(enabled = enabled) { rightExpanded = true }
                     .padding(end = 6.dp),
@@ -166,7 +170,7 @@ fun DoseAndDrugDropdownRow(
                 ) {
                     Box(
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(weight = 1f)
                             .padding(start = 4.dp)
                     ) {
                         if (rightValue.isBlank()) {
@@ -188,7 +192,7 @@ fun DoseAndDrugDropdownRow(
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowDown,
                         contentDescription = null,
-                        tint = Color(0xFF111827),
+                        tint = DarkerGray,
                         modifier = Modifier.size(18.dp)
                     )
                 }

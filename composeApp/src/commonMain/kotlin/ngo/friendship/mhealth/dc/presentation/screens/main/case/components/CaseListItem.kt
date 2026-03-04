@@ -70,18 +70,18 @@ fun CaseListItem(ui: Interview, onClick: () -> Unit) {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        "${ui.beneficiaryName} (${ui.status} | ${ui.status}y)",
+                        text = "${ui.beneficiaryName} (${ui.status} | ${ui.status}y)",
                         style = CompactTextStyle(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        ui.location,
+                        text = ui.location,
                         style = CompactTextStyle(
                             fontSize = FontSize.SMALL,
                             fontStyle = FontStyle.Italic
                         )
                     )
                     Text(
-                        ui.questionnaireName,
+                        text = ui.questionnaireName,
                         style = CompactTextStyle(
                             fontSize = FontSize.MEDIUM,
                             color = PrimaryColor,
@@ -97,7 +97,7 @@ fun CaseListItem(ui: Interview, onClick: () -> Unit) {
 
             // Footer Section
             Text(
-                "Ref by: ${ui.userName}",
+                text = "Ref by: ${ui.userName}",
                 style = CompactTextStyle(
                     fontSize = FontSize.EXTRA_SMALL,
                     fontStyle = FontStyle.Italic,
@@ -116,7 +116,7 @@ fun CaseListItem(ui: Interview, onClick: () -> Unit) {
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    ui.startTime.toUiDateTime(),
+                    text = ui.startTime.toUiDateTime(),
                     style = CompactTextStyle(
                         fontSize = FontSize.EXTRA_SMALL,
                         fontStyle = FontStyle.Italic,
@@ -126,7 +126,7 @@ fun CaseListItem(ui: Interview, onClick: () -> Unit) {
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    ui.status,
+                    text = ui.status,
                     style = CompactTextStyle(fontSize = FontSize.EXTRA_SMALL, color = Color.Gray),
                     fontStyle = FontStyle.Italic,
                 )

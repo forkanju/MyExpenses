@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
@@ -15,8 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 enum class MealTime {
     AGE,   // আগে
@@ -66,7 +66,7 @@ fun MedicineComposerCard(
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(1.dp, Color(0xFFE5E7EB)),
+        border = BorderStroke(width = 1.dp, color = UnfocusedBorderColor),
         tonalElevation = 0.dp
     ) {
         Column(Modifier.padding(12.dp)) {

@@ -75,8 +75,8 @@ val surfaceContainerHighDark = Color(0xFF262B26)
 val surfaceContainerHighestDark = Color(0xFF313631)
 
 
-val FocusedBorderColor = Color(0xFFBDBDBD)
-val UnfocusedBorderColor = Color(0xFFBDBDBD)
+val FocusedBorderColor = Color(0xE07DD9F1)
+val UnfocusedBorderColor = Color(0xFFCBD5E1)
 val DisabledBorderColor = Color(0xFFE0E0E0)
 
 val PrimaryColor = Color(0xFF214695)
@@ -89,6 +89,7 @@ val Greenish = Color(0xFF4CAF50)
 val Orange = Color(0xFFF24C00)
 val Black = Color(0xFF000000)
 val Gray = Color(0xFF707070)
+val DarkerGray = Color(0xFF424242)
 val White = Color(0xFFFFFFFF)
 val Red = Color(0xFFE68367)
 
@@ -113,6 +114,7 @@ val CanvasBackground = Color(0xFFF3F3F3)
 
 
 val TextPrimary = Black
+val TextDarkerGray = DarkerGray
 val TextSecondary = Gray
 val TextWhite = White
 val TextBrand = PrimaryColor

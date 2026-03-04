@@ -1,18 +1,18 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,25 +20,31 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.theme.onSurfaceVariantLight
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrescriptionTopBar(
-    titlePrefix: String,              // e.g. "Ref by Most Rina- Cox's Bazar ..."
+    titlePrefix: String,
     onBack: () -> Unit,
-    onViewClick: () -> Unit,
+    onFcmDetailsClick: () -> Unit,
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
 ) {
@@ -48,7 +54,7 @@ fun PrescriptionTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF444444)
+                    tint = onSurfaceVariantLight
                 )
             }
         },
@@ -72,32 +78,33 @@ fun PrescriptionTopBar(
                 Spacer(Modifier.width(6.dp))
 
                 Text(
-                    text = "(View)",
+                    text = "(Details)",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     fontFamily = RobotoCondensedFont(),
                     letterSpacing = 0.sp,
-                    color = Color(0xFF1E88E5),
+                    color = PrimaryColor,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { onViewClick() }
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(
+                            indication = ripple(bounded = true),
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { onFcmDetailsClick() }
+                        .padding(horizontal = 4.dp)
                 )
 
             }
         },
         actions = {
             CircleActionIcon(
-                icon = Icons.Default.Phone,
+                painter = painterResource(Resources.Icon.Call),
                 contentDescription = "Call",
-                iconTint = Color.White,
-                bgColor = Color(0xFF1E88E5),
                 onClick = onCall
             )
-            Spacer(Modifier.width(10.dp))
             CircleActionIcon(
-                icon = Icons.Default.Chat, // WhatsApp icon নেই default set-এ
+                painter = painterResource(Resources.Icon.Wapp),
                 contentDescription = "WhatsApp",
-                iconTint = Color.White,
-                bgColor = Color(0xFF25D366),
                 onClick = onWhatsApp
             )
             Spacer(Modifier.width(6.dp))
@@ -110,28 +117,26 @@ fun PrescriptionTopBar(
 
 @Composable
 private fun CircleActionIcon(
-    icon: ImageVector,
+    painter: Painter,
     contentDescription: String,
-    bgColor: Color,
-    iconTint: Color,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier.size(40.dp)
+        modifier = modifier.size(40.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(34.dp)
-                .clip(CircleShape)
-                .background(bgColor),
+                .size(36.dp)
+                .clip(CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = icon,
+                painter = painter,
                 contentDescription = contentDescription,
-                tint = iconTint,
-                modifier = Modifier.size(18.dp)
+                tint = Color.Unspecified,
+                modifier = Modifier.size(32.dp)
             )
         }
     }

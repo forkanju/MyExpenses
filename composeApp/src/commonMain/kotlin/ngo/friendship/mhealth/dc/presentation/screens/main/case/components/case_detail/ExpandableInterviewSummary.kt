@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -6,12 +6,14 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -21,9 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -41,12 +40,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.theme.Resources
+import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.theme.TextDarkerGray
+import ngo.friendship.mhealth.dc.theme.TextSecondary
+import org.jetbrains.compose.resources.painterResource
 
 data class QAItem(
     val question: String,
@@ -94,25 +99,33 @@ fun ExpandableInterviewSummary(
                     rightText = "System prescription"
                 )
                 Spacer(modifier = Modifier.weight(1f))
+
                 Box(
                     modifier = Modifier
                         .padding(end = 8.dp)
-                        .size(22.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable { onCopyClick() },
-                    contentAlignment = Alignment.Center
+                        .size(28.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.ContentCopy,
+                    Image(
+                        painter = painterResource(Resources.Icon.Symptom),
+                        contentDescription = "Symptom",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Image(
+                        painter = painterResource(Resources.Icon.Copy),
                         contentDescription = "Copy",
-                        tint = Color(0xFF8A2B2B),
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                            .size(22.dp)
+                            .clickable { onCopyClick() }
                     )
                 }
             }
         }
 
-        //-------------------
+
         // ===== Body (Expandable) =====
         AnimatedVisibility(
             visible = expanded,
@@ -130,19 +143,27 @@ fun ExpandableInterviewSummary(
                     Text(
                         text = qa.question,
                         fontSize = 13.sp,
-                        color = Color(0xFF6F6F6F),
-                        fontStyle = FontStyle.Italic
+                        color = TextSecondary,
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = RobotoCondensedFont()
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
 
                     Row(verticalAlignment = Alignment.Top) {
-                        Text(text = "•", fontSize = 16.sp, color = Color(0xFF2B2B2B))
+                        Text(
+                            text = "•",
+                            fontSize = 16.sp,
+                            fontFamily = RobotoCondensedFont(),
+                            color = Color(0xFF2B2B2B)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = qa.answer,
                             fontSize = 14.sp,
-                            color = Color(0xFF2B2B2B)
+                            color = TextDarkerGray,
+                            fontFamily = RobotoCondensedFont()
                         )
                     }
 
@@ -168,7 +189,8 @@ fun ExpandableInterviewSummary(
                 text = "Uploaded: ",
                 fontSize = 12.sp,
                 color = Color.White,
-                fontStyle = FontStyle.Italic
+                fontStyle = FontStyle.Italic,
+                fontFamily = RobotoCondensedFont()
             )
 
             Text(
@@ -176,16 +198,17 @@ fun ExpandableInterviewSummary(
                 fontSize = 12.sp,
                 color = Color.White,
                 fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontFamily = RobotoCondensedFont()
             )
 
-            Spacer(Modifier.width(4.dp))
+            Spacer(Modifier.width(6.dp))
             Icon(
-                imageVector = Icons.Rounded.KeyboardArrowUp,
+                painter = painterResource(resource = Resources.Icon.Arrow),
                 contentDescription = "Expand/Collapse",
                 tint = Color.White,
                 modifier = Modifier
-                    .size(18.dp)
+                    .size(14.dp)
                     .rotate(arrowRotation)
                     .clickable { expanded = !expanded }
             )
@@ -197,6 +220,8 @@ fun ExpandableInterviewSummary(
                 color = Color.White,
                 textDecoration = TextDecoration.Underline,
                 fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Normal,
+                fontFamily = RobotoCondensedFont(),
                 modifier = Modifier.clickable { onSeeFullClick() }
             )
         }
@@ -214,7 +239,6 @@ fun SegmentedTabs(
 ) {
     Row(
         modifier = Modifier
-
     ) {
         SegTab(text = leftText, selected = selectedIndex == 0) { onSelect(0) }
         Spacer(modifier = Modifier.width(6.dp))
@@ -239,6 +263,7 @@ private fun SegTab(
             text = text,
             fontSize = 13.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            fontFamily = RobotoCondensedFont(),
             color = if (selected) Color.White else Color(0xFF5F6368)
         )
     }

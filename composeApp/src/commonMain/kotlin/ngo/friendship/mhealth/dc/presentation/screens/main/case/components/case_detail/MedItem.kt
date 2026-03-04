@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
 data class MedItem(
     val type: String,          // Cap/Tab/Syrup etc

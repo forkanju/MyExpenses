@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -17,15 +17,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.components.AvatarBadge
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.theme.Surface
+import ngo.friendship.mhealth.dc.theme.TextDarkerGray
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -38,7 +41,7 @@ fun PatientProfileCard(
             .height(90.dp),
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFFFFF)
+            containerColor = Surface
         )
     ) {
 
@@ -66,7 +69,7 @@ fun PatientProfileCard(
                     Text(
                         text = "Most Kabita Bala Ismat (43y | F)",
                         style = TextStyle(
-                            color = Color(0xFF424242),
+                            color = TextDarkerGray,
                             fontFamily = RobotoCondensedFont(),
                             fontWeight = FontWeight.Normal
                         )
@@ -75,17 +78,18 @@ fun PatientProfileCard(
                     Text(
                         text = "Details",
                         style = TextStyle(
-                            color = Color(0xFF214695),
+                            color = PrimaryColor,
                             fontFamily = RobotoCondensedFont(),
                             fontWeight = FontWeight.Normal
-                        )
+                        ),
+                        textDecoration = TextDecoration.Underline
                     )
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = "Oral Ulcer",
                     style = TextStyle(
-                        color = Color(0xFF214695),
+                        color = PrimaryColor,
                         fontFamily = RobotoCondensedFont(),
                         fontWeight = FontWeight.SemiBold
                     )

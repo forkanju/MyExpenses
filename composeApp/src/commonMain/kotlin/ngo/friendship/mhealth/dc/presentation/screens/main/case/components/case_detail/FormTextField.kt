@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case.dummy
+package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -28,6 +28,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.theme.BottomBarUnselected
+import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
+import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 @Composable
 fun FormTextField(
@@ -45,10 +48,10 @@ fun FormTextField(
     textStyle: TextStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
     placeholderStyle: TextStyle = LocalTextStyle.current.copy(
         fontSize = 13.sp,
-        color = Color(0xFF9CA3AF)
+        color = BottomBarUnselected
     ),
-    borderColor: Color = Color(0xFFD1D5DB),         // light gray
-    focusedBorderColor: Color = Color(0xFF9CA3AF),  // slightly darker on focus
+    borderColor: Color = UnfocusedBorderColor,         // light gray
+    focusedBorderColor: Color = FocusedBorderColor,  // slightly darker on focus
     errorBorderColor: Color = MaterialTheme.colorScheme.error,
     backgroundColor: Color = Color.White
 ) {
@@ -73,7 +76,7 @@ fun FormTextField(
         textStyle = textStyle.copy(
             color = if (enabled) textStyle.color else textStyle.color.copy(alpha = 0.45f)
         ),
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        cursorBrush = SolidColor(value = MaterialTheme.colorScheme.primary),
         interactionSource = interactionSource,
         decorationBox = { innerTextField ->
             Box(
@@ -82,7 +85,7 @@ fun FormTextField(
                     .clip(shape)
                     .background(backgroundColor)
                     .border(BorderStroke(borderWidth, strokeColor), shape)
-                    .padding(contentPadding),
+                    .padding(paddingValues = contentPadding),
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (value.isBlank()) {

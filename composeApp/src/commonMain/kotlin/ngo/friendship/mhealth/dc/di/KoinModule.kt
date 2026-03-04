@@ -2,9 +2,11 @@ package ngo.friendship.mhealth.dc.di
 
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.repository.AuthRepositoryImpl
+import ngo.friendship.mhealth.dc.data.repository.InterviewDetailsRepositoryImpl
 import ngo.friendship.mhealth.dc.data.repository.InterviewListRepositoryImpl
 import ngo.friendship.mhealth.dc.domain.network.ConnectionListener
 import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
+import ngo.friendship.mhealth.dc.domain.repository.InterviewDetailsRepository
 import ngo.friendship.mhealth.dc.domain.repository.InterviewListRepository
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.auth.AuthViewModel
@@ -19,20 +21,21 @@ import org.koin.dsl.module
 expect fun platformModule(): Module
 
 val viewModelModule = module {
-    viewModelOf(::AuthViewModel)
-    viewModelOf(::MainViewModel)
-    viewModelOf(::InterviewListViewModel)
-    viewModelOf(::InterviewDetailsViewModel)
+    viewModelOf(constructor = ::AuthViewModel)
+    viewModelOf(constructor = ::MainViewModel)
+    viewModelOf(constructor = ::InterviewListViewModel)
+    viewModelOf(constructor = ::InterviewDetailsViewModel)
 }
 
 val dataModule = module {
-    singleOf(::AuthRepositoryImpl) bind AuthRepository::class
-    singleOf(::InterviewListRepositoryImpl) bind InterviewListRepository::class
+    singleOf(constructor = ::AuthRepositoryImpl) bind AuthRepository::class
+    singleOf(constructor = ::InterviewListRepositoryImpl) bind InterviewListRepository::class
+    singleOf(constructor = ::InterviewDetailsRepositoryImpl) bind InterviewDetailsRepository::class
 }
 
 val instantModule = module(createdAtStart = true) {
-    singleOf(::LocalSettings)
-    singleOf(::ConnectionListener)
+    singleOf(constructor = ::LocalSettings)
+    singleOf(constructor = ::ConnectionListener)
 }
 
 val appModules = listOf(

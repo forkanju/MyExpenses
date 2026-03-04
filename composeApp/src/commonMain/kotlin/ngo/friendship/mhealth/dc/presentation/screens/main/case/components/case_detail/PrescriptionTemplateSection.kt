@@ -1,5 +1,11 @@
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,7 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ngo.friendship.mhealth.dc.theme.DarkerGray
+import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
+import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 @Composable
 fun PrescriptionTemplateSection(
@@ -32,7 +44,7 @@ fun PrescriptionTemplateSection(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = Color(0xFF6B7280)
+                    color = TextSecondary
                 )
             )
 
@@ -41,7 +53,7 @@ fun PrescriptionTemplateSection(
             Text(
                 text = linkText,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = Color(0xFF2563EB),
+                    color = PrimaryColor,
                     textDecoration = TextDecoration.Underline
                 ),
                 modifier = Modifier.clickable { onLinkClick() }
@@ -79,7 +91,7 @@ private fun OutlineFilterChip(
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF111827)
+                color = DarkerGray
             )
         },
         modifier = modifier.height(36.dp),
@@ -87,8 +99,8 @@ private fun OutlineFilterChip(
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
-            borderColor = Color(0xFFCBD5E1),
-            selectedBorderColor = Color(0xFFCBD5E1),
+            borderColor = UnfocusedBorderColor,
+            selectedBorderColor = FocusedBorderColor,
             borderWidth = 1.dp
         ),
         colors = FilterChipDefaults.filterChipColors(
@@ -96,4 +108,15 @@ private fun OutlineFilterChip(
             selectedContainerColor = Color.Transparent
         )
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PrescriptionHeaderPreview() {
+    MaterialTheme {
+        OutlineFilterChip(
+            text = "label",
+            selected = false, // চাইলে state দিয়ে control করবে
+            onClick = { })
+    }
 }

@@ -16,8 +16,14 @@ import doctorcenter.composeapp.generated.resources.filter
 import doctorcenter.composeapp.generated.resources.google_logo
 import doctorcenter.composeapp.generated.resources.grid
 import doctorcenter.composeapp.generated.resources.home
+import doctorcenter.composeapp.generated.resources.ic_call
+import doctorcenter.composeapp.generated.resources.ic_chat
+import doctorcenter.composeapp.generated.resources.ic_copy
+import doctorcenter.composeapp.generated.resources.ic_doubled_arrow
+import doctorcenter.composeapp.generated.resources.ic_edit
 import doctorcenter.composeapp.generated.resources.ic_hand
 import doctorcenter.composeapp.generated.resources.ic_report
+import doctorcenter.composeapp.generated.resources.ic_wapp
 import doctorcenter.composeapp.generated.resources.log_in
 import doctorcenter.composeapp.generated.resources.log_out
 import doctorcenter.composeapp.generated.resources.logo_dc_mh
@@ -31,6 +37,7 @@ import doctorcenter.composeapp.generated.resources.notification
 import doctorcenter.composeapp.generated.resources.plus
 import doctorcenter.composeapp.generated.resources.right_arrow
 import doctorcenter.composeapp.generated.resources.search
+import doctorcenter.composeapp.generated.resources.symptom
 import doctorcenter.composeapp.generated.resources.unlock
 import doctorcenter.composeapp.generated.resources.user
 import doctorcenter.composeapp.generated.resources.vertical_menu
@@ -41,7 +48,13 @@ object Resources {
 
     object Icon {
         val Plus = Res.drawable.plus
+        val Chat = Res.drawable.ic_chat
+        val Edit = Res.drawable.ic_edit
         val Note = Res.drawable.note
+        val Call = Res.drawable.ic_call
+        val Copy = Res.drawable.ic_copy
+        val Wapp = Res.drawable.ic_wapp
+        val Arrow = Res.drawable.ic_doubled_arrow
         val AppLogo = Res.drawable.logo_dc_mh
         val AppLogoWhite = Res.drawable.logo_dc_white
         val Minus = Res.drawable.minus
@@ -53,11 +66,12 @@ object Resources {
         val Person = Res.drawable.user
         val Profile = Res.drawable.user
         val FCM = Res.drawable.apa
+        val Symptom = Res.drawable.symptom
         val Checkmark = Res.drawable.check
         val Filter = Res.drawable.filter
         val Report = Res.drawable.ic_report
         val Hand = Res.drawable.ic_hand
-        val Edit = Res.drawable.edit
+//        val Edit = Res.drawable.edit
         val Menu = Res.drawable.menu
         val BackArrow = Res.drawable.back_arrow
         val RightArrow = Res.drawable.right_arrow
