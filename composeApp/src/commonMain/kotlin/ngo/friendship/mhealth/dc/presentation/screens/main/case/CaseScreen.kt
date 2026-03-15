@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.domain.model.Interview
-import ngo.friendship.mhealth.dc.presentation.screens.auth.InterviewListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.components.CaseListItem
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.components.CaseTab
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.components.SearchRow

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.auth
+package ngo.friendship.mhealth.dc.presentation.screens.main.case
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

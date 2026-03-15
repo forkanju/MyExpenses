@@ -22,8 +22,7 @@ class InterviewDetailsRepositoryImpl(
                 password = password,
                 requestTime = currentTimestamp.toDateTimeServerSlash(),
                 interviewId = interviewId
-            ),
-            appVersion = 0
+            )
         )
 
         val details = response.data?.interviewDetails

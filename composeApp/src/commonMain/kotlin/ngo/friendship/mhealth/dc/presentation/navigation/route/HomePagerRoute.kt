@@ -9,7 +9,7 @@ import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.auth.InterviewListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.CaseScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.home.HomeScreen
 

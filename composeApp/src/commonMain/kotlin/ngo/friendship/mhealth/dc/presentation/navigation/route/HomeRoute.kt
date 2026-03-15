@@ -18,7 +18,7 @@ import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.BottomBar
-import ngo.friendship.mhealth.dc.presentation.screens.auth.InterviewListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewListViewModel
 import ngo.friendship.mhealth.dc.theme.Resources
 import org.koin.compose.viewmodel.koinViewModel
 

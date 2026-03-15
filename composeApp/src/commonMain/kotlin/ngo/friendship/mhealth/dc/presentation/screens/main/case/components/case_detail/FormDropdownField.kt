@@ -46,12 +46,13 @@ import ngo.friendship.mhealth.dc.theme.TextDarkerGray
 import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 @Composable
-fun FormDropdownField(
+fun <T> FormDropdownField(
     label: String? = null,
     placeholder: String,
-    options: List<String>,
-    selected: String? = "",
-    onSelectedChange: (String) -> Unit,
+    options: List<T>,
+    selected: T? = null,
+    getLabel: (T) -> String,
+    onSelectedChange: (T) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -98,7 +99,7 @@ fun FormDropdownField(
                         .padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val showText = selected?.takeIf { it.isNotBlank() }
+                    val showText = selected?.let(getLabel)?.takeIf { it.isNotBlank() }
                     Text(
                         text = showText ?: placeholder,
                         modifier = Modifier.weight(1f),
@@ -139,7 +140,7 @@ fun FormDropdownField(
                     DropdownMenuItem(
                         text = {
                             Text(
-                                text = item,
+                                text = getLabel(item),
                                 style = TextStyle(
                                     fontSize = 14.sp,
                                     fontFamily = RobotoCondensedFont(),

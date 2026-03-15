@@ -27,7 +27,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,6 +51,37 @@ import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
 import ngo.friendship.mhealth.dc.theme.TextDarkerGray
 import ngo.friendship.mhealth.dc.theme.TextSecondary
 import org.jetbrains.compose.resources.painterResource
+@Composable
+fun SegmentedTabs(
+    selectedIndex: Int, onSelect: (Int) -> Unit, leftText: String, rightText: String
+) {
+    Row(
+        modifier = Modifier
+    ) {
+        SegTab(text = leftText, selected = selectedIndex == 0) { onSelect(0) }
+        Spacer(modifier = Modifier.width(6.dp))
+        SegTab(text = rightText, selected = selectedIndex == 1) { onSelect(1) }
+    }
+}
+
+@Composable
+private fun SegTab(
+    text: String, selected: Boolean, onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier.background(if (selected) Color(0xFF2F5EA8) else Color.Transparent)
+            .clickable { onClick() }.padding(horizontal = 10.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontSize = 13.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            fontFamily = RobotoCondensedFont(),
+            color = if (selected) Color.White else Color(0xFF5F6368)
+        )
+    }
+}
 
 data class QAItem(
     val question: String,
@@ -59,9 +89,11 @@ data class QAItem(
 )
 
 @Composable
+
 fun ExpandableInterviewSummary(
     modifier: Modifier = Modifier,
-    items: List<QAItem>,
+    interviewItems: List<QAItem>,
+    prescriptionItems: List<QAItem>,
     uploadedText: String,
     selectedTab: Int,
     onTabSelect: (Int) -> Unit,
@@ -70,10 +102,15 @@ fun ExpandableInterviewSummary(
     expandedInitially: Boolean = true
 ) {
     var expanded by remember { mutableStateOf(expandedInitially) }
+
     val arrowRotation by animateFloatAsState(
         targetValue = if (expanded) 0f else 180f,
         label = "arrow"
     )
+
+    val currentItems = remember(selectedTab, interviewItems, prescriptionItems) {
+        if (selectedTab == 0) interviewItems else prescriptionItems
+    }
 
     Card(
         modifier = modifier,
@@ -96,8 +133,9 @@ fun ExpandableInterviewSummary(
                     selectedIndex = selectedTab,
                     onSelect = onTabSelect,
                     leftText = "Interview Summary",
-                    rightText = "System prescription"
+                    rightText = "System Prescription"
                 )
+
                 Spacer(modifier = Modifier.weight(1f))
 
                 Box(
@@ -125,8 +163,6 @@ fun ExpandableInterviewSummary(
             }
         }
 
-
-        // ===== Body (Expandable) =====
         AnimatedVisibility(
             visible = expanded,
             enter = fadeIn() + expandVertically(),
@@ -135,48 +171,63 @@ fun ExpandableInterviewSummary(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 220.dp) // keeps a scroll like your screenshot
+                    .heightIn(max = 220.dp)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                items.forEachIndexed { index, qa ->
+                if (currentItems.isEmpty()) {
                     Text(
-                        text = qa.question,
-                        fontSize = 13.sp,
-                        color = TextSecondary,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Normal,
+                        text = if (selectedTab == 0) {
+                            "No interview summary found"
+                        } else {
+                            "No system prescription found"
+                        },
+                        fontSize = 14.sp,
+                        color = TextDarkerGray,
                         fontFamily = RobotoCondensedFont()
                     )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Row(verticalAlignment = Alignment.Top) {
+                } else {
+                    currentItems.forEachIndexed { index, qa ->
                         Text(
-                            text = "•",
-                            fontSize = 16.sp,
-                            fontFamily = RobotoCondensedFont(),
-                            color = Color(0xFF2B2B2B)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = qa.answer,
-                            fontSize = 14.sp,
-                            color = TextDarkerGray,
+                            text = qa.question,
+                            fontSize = 13.sp,
+                            color = TextSecondary,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Normal,
                             fontFamily = RobotoCondensedFont()
                         )
-                    }
 
-                    if (index != items.lastIndex) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        HorizontalDivider(color = Color(0xFFE7E7E7), thickness = 1.dp)
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Row(verticalAlignment = Alignment.Top) {
+                            Text(
+                                text = "•",
+                                fontSize = 16.sp,
+                                fontFamily = RobotoCondensedFont(),
+                                color = Color(0xFF2B2B2B)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = qa.answer,
+                                fontSize = 14.sp,
+                                color = TextDarkerGray,
+                                fontFamily = RobotoCondensedFont()
+                            )
+                        }
+
+                        if (index != currentItems.lastIndex) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            HorizontalDivider(
+                                color = Color(0xFFE7E7E7),
+                                thickness = 1.dp
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
                     }
                 }
             }
         }
 
-        // ===== Footer Bar (Blue) =====
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -203,6 +254,7 @@ fun ExpandableInterviewSummary(
             )
 
             Spacer(Modifier.width(6.dp))
+
             Icon(
                 painter = painterResource(resource = Resources.Icon.Arrow),
                 contentDescription = "Expand/Collapse",
@@ -214,6 +266,7 @@ fun ExpandableInterviewSummary(
             )
 
             Spacer(modifier = Modifier.weight(1f))
+
             Text(
                 text = "See full Interview",
                 fontSize = 13.sp,
@@ -225,72 +278,5 @@ fun ExpandableInterviewSummary(
                 modifier = Modifier.clickable { onSeeFullClick() }
             )
         }
-
-    }
-
-}
-
-@Composable
-fun SegmentedTabs(
-    selectedIndex: Int,
-    onSelect: (Int) -> Unit,
-    leftText: String,
-    rightText: String
-) {
-    Row(
-        modifier = Modifier
-    ) {
-        SegTab(text = leftText, selected = selectedIndex == 0) { onSelect(0) }
-        Spacer(modifier = Modifier.width(6.dp))
-        SegTab(text = rightText, selected = selectedIndex == 1) { onSelect(1) }
-    }
-}
-
-@Composable
-private fun SegTab(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .background(if (selected) Color(0xFF2F5EA8) else Color.Transparent)
-            .clickable { onClick() }
-            .padding(horizontal = 10.dp, vertical = 6.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            fontSize = 13.sp,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            fontFamily = RobotoCondensedFont(),
-            color = if (selected) Color.White else Color(0xFF5F6368)
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun InterviewExpandableCardPreview() {
-    MaterialTheme {
-        ExpandableInterviewSummary(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            items = listOf(
-                QAItem("Which oral part is infected?", "Angle of the mouth"),
-                QAItem("Associated problems along with oral pain?", "Pain increases on movement"),
-                QAItem(
-                    "Does it hurt while eating, drinking, or talking?",
-                    "it hurts a little while eating and drinking"
-                ),
-            ),
-            uploadedText = "16.02, 10 Nov 2026",
-            selectedTab = 0,
-            onTabSelect = {},
-            onCopyClick = {},
-            onSeeFullClick = {},
-            expandedInitially = true
-        )
     }
 }
