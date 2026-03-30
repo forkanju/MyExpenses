@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
+import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 import ngo.friendship.mhealth.dc.domain.model.SetupData
@@ -45,10 +46,11 @@ import ngo.friendship.mhealth.dc.presentation.state.RequestState
 fun PrescriptionScreen(
     modifier: Modifier = Modifier,
     interviewDetailsState: RequestState<InterviewDetails>,
-    setupData: SetupData = SetupData()
+    setupData: SetupData = SetupData(),
+    medicineListState: RequestState<List<Medicine>>
 ) {
-    val title = when (val state = interviewDetailsState) {
-        is RequestState.Success -> state.data.beneficiaryName.ifBlank { "Prescription" }
+    val title = when (interviewDetailsState) {
+        is RequestState.Success -> interviewDetailsState.data.beneficiaryName.ifBlank { "Prescription" }
         else -> "Prescription"
     }
 
@@ -180,7 +182,7 @@ fun PrescriptionScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        MedicineAddScreen()
+                        MedicineAddScreen(medicines = medicineListState.getSuccessDataOrNull()?: emptyList())
 
                         FormDropdownField(
                             label = "Doctor Advice",

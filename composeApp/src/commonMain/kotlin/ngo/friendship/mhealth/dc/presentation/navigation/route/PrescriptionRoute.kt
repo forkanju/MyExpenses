@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewDetailsViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.MedicineListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.SetupDataViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail.PrescriptionScreen
 import ngo.friendship.mhealth.dc.presentation.state.RequestState
@@ -23,10 +24,13 @@ fun PrescriptionRoute(
     interviewId: Long,
     modifier: Modifier = Modifier,
     interviewDetailsViewModel: InterviewDetailsViewModel,
-    setupDataViewModel: SetupDataViewModel = koinViewModel()
+    setupDataViewModel: SetupDataViewModel = koinViewModel(),
+    medicineListViewModel: MedicineListViewModel = koinViewModel()
 ) {
     val detailsState by interviewDetailsViewModel.interviewDetailsState.collectAsState()
     val setupDataState by setupDataViewModel.setupDataState.collectAsState()
+    val medicineListState by medicineListViewModel.medicineListState.collectAsState()
+
 
     LaunchedEffect(interviewId) {
         interviewDetailsViewModel.loadInterviewDetails(
@@ -38,10 +42,19 @@ fun PrescriptionRoute(
             userName = "sharif.dr",
             password = "1234"
         )
+        medicineListViewModel.loadMedicineList(
+            userName = "sharif.dr",
+            password = "1234",
+            type = "Tab"
+        )
     }
 
     when {
-        detailsState is RequestState.Loading || setupDataState is RequestState.Loading -> {
+        detailsState is RequestState.Idle ||
+                detailsState is RequestState.Loading ||
+                setupDataState is RequestState.Idle ||
+                setupDataState is RequestState.Loading
+            -> {
             Box(
                 modifier = modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -74,11 +87,13 @@ fun PrescriptionRoute(
             }
         }
 
-        detailsState is RequestState.Success && setupDataState is RequestState.Success -> {
+        detailsState is RequestState.Success &&
+                setupDataState is RequestState.Success -> {
             PrescriptionScreen(
                 modifier = modifier,
                 interviewDetailsState = detailsState,
-                setupData = (setupDataState as RequestState.Success<SetupData>).data
+                setupData = (setupDataState as RequestState.Success<SetupData>).data,
+                medicineListState = medicineListState
             )
         }
 

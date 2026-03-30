@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 enum class MealTime {
@@ -24,7 +28,9 @@ enum class MealTime {
 }
 
 @Composable
-fun MedicineAddScreen() {
+fun MedicineAddScreen(
+    medicines: List<Medicine>
+) {
     var selectedType by remember { mutableStateOf("Cap") }
     var selectedMed by remember { mutableStateOf("Amoxicillin 500") }
     var brand by remember { mutableStateOf("") }
@@ -38,6 +44,7 @@ fun MedicineAddScreen() {
     Column(Modifier.fillMaxSize()) {
 
         MedicineComposerCard(
+            medicines = medicines,
             onAddClick = {
                 list.add(
                     MedItem(
@@ -52,9 +59,7 @@ fun MedicineAddScreen() {
                 brand = "" // optional clear
             }
         )
-
         Spacer(Modifier.height(10.dp))
-
 
     }
 }
@@ -62,6 +67,7 @@ fun MedicineAddScreen() {
 
 @Composable
 fun MedicineComposerCard(
+    medicines: List<Medicine>,
     onAddClick: () -> Unit
 ) {
     Surface(
@@ -95,12 +101,31 @@ fun MedicineComposerCard(
 
             Spacer(Modifier.height(10.dp))
 
-            // Brand name field
-            var brand by remember { mutableStateOf("") }
-            FormTextField(
-                value = brand,
-                onValueChange = { brand = it },
-                placeholder = "Type Brand Name"
+            val medicineNames = remember(medicines) {
+                medicines.map { it.brandName }
+            }
+            LaunchedEffect(medicines) {
+                println("MEDICINE SIZE = ${medicines.size}")
+                medicines.take(5).forEach {
+                    println("MEDICINE: ${it.brandName}")
+                }
+            }
+            var medicineQuery by remember { mutableStateOf(TextFieldValue("")) }
+            var selectedMedicine by remember { mutableStateOf<Medicine?>(null) }
+
+            MedAutoCompleteTextField(
+                value = medicineQuery,
+                onValueChange = { medicineQuery = it },
+                suggestions = medicineNames,
+                placeholder = "Type medicine name",
+
+                // ✅ FIX HERE
+                onSuggestionSelected = { selectedValue ->
+                    medicineQuery = TextFieldValue(
+                        text = selectedValue.text,
+                        selection = TextRange(selectedValue.text.length)
+                    )
+                }
             )
 
             Spacer(Modifier.height(10.dp))
@@ -122,7 +147,6 @@ fun MedicineComposerCard(
                     // open note / message
                 },
                 onAddClick = {
-                    // add to list
                 }
             )
         }

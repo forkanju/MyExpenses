@@ -70,7 +70,7 @@ kotlin {
             implementation(libs.ktor.client.darwin)
         }
         commonMain.configure {
-            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+            kotlin.srcDir(layout.buildDirectory.dir("generated/ksp/metadata/commonMain/kotlin"))
         }
         commonMain.dependencies {
             implementation(libs.compose.components.resources)
