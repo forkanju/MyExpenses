@@ -5,26 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8578e0fa-3d53-49c1-a126-3435ebeee334" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackReqDto.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackResDto.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/repository/SaveDoctorFeedbackRepositoryImpl.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/mapper/SaveFeedbackMapper.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/SaveDoctorFeedbackResult.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/repository/SaveDoctorFeedbackRepository.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/SaveDoctorFeedbackViewModel.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/DoctorFeedbackFormState.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/Helper.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/ApiService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/di/KoinModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/di/KoinModule.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/SetupData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/SetupData.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/PrescriptionRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/PrescriptionRoute.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/FormDropdownField.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/FormDropdownField.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

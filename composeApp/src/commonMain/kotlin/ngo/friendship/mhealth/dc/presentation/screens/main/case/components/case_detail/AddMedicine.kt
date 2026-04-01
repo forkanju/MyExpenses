@@ -42,34 +42,12 @@ fun MedicineAddScreen(
     onAddMedicine: (PrescriptionItem) -> Unit,
     onRemoveMedicine: (Int) -> Unit
 ) {
-    var selectedType by remember { mutableStateOf("Cap") }
-    var selectedMed by remember { mutableStateOf("Amoxicillin 500") }
-    var brand by remember { mutableStateOf("") }
-    var selectedDose by remember { mutableStateOf("1+0+1") }
-    var selectedDuration by remember { mutableStateOf("৭ দিন") }
-    var selectedTiming by remember { mutableStateOf("খাবারের পরে") }
-
-
-    val list = remember { mutableStateListOf<MedItem>() }
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
 
         MedicineComposerCard(
             medicines = medicines,
             onAddClick = onAddMedicine
-//            onAddClick = {
-//                list.add(
-//                    MedItem(
-//                        type = selectedType,
-//                        name = selectedMed,
-//                        brand = brand.trim(),
-//                        dose = selectedDose,
-//                        duration = selectedDuration,
-//                        timing = selectedTiming
-//                    )
-//                )
-//                brand = "" // optional clear
-//            }
         )
         prescriptionItems.forEachIndexed { index, item ->
             Surface(
@@ -97,119 +75,16 @@ fun MedicineAddScreen(
                     }
             }
         }
-//        Spacer(Modifier.height(10.dp))
 
     }
 }
 
-
-//@Composable
-//fun MedicineComposerCard(
-//    medicines: List<Medicine>,
-//    onAddClick: (PrescriptionItem) -> Unit
-//) {
-//    var medicineQuery by remember { mutableStateOf(TextFieldValue("")) }
-//    var dose by remember { mutableStateOf("0+0+1") }
-//    var days by remember { mutableStateOf("৭ দিন") }
-//
-//    val medicineNames = remember(medicines) {
-//        medicines.map { it.brandName }
-//    }
-//    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-//
-//    }
-//    Surface(
-//        shape = RoundedCornerShape(10.dp),
-//        border = BorderStroke(width = 1.dp, color = UnfocusedBorderColor),
-//        tonalElevation = 0.dp
-//    ) {
-//        Column(Modifier.padding(12.dp)) {
-//
-//            var doseType by remember { mutableStateOf("Cap") }
-//            var medicine by remember { mutableStateOf("Amoxicillin 500") }
-//            //for bottom action row
-//
-//            var dose by remember { mutableStateOf("0+0+1") }
-//            var days by remember { mutableStateOf("৭ দিন") }
-//            var mealTime by remember { mutableStateOf(MealTime.PORE) }
-//
-//            DoseAndDrugDropdownRow(
-//                leftValue = doseType,
-//                leftItems = listOf("Cap", "Tab", "Syrup"),
-//                onLeftSelect = { doseType = it },
-//
-//                rightValue = medicine,
-//                rightItems = listOf(
-//                    "Amoxicillin 500",
-//                    "Azithromycin 250",
-//                    "Paracetamol 500"
-//                ),
-//                onRightSelect = { medicine = it }
-//            )
-//
-//            Spacer(Modifier.height(10.dp))
-//
-//            val medicineNames = remember(medicines) {
-//                medicines.map { it.brandName }
-//            }
-//            LaunchedEffect(medicines) {
-//                println("MEDICINE SIZE = ${medicines.size}")
-//                medicines.take(5).forEach {
-//                    println("MEDICINE: ${it.brandName}")
-//                }
-//            }
-////            var medicineQuery by remember { mutableStateOf(TextFieldValue("")) }
-////            var selectedMedicine by remember { mutableStateOf<Medicine?>(null) }
-//
-//            MedAutoCompleteTextField(
-//                value = medicineQuery,
-//                onValueChange = { medicineQuery = it },
-//                suggestions = medicineNames,
-//                placeholder = "Type medicine name",
-//
-//                // ✅ FIX HERE
-//                onSuggestionSelected = { selectedValue ->
-//                    medicineQuery = TextFieldValue(
-//                        text = selectedValue.text,
-//                        selection = TextRange(selectedValue.text.length)
-//                    )
-//                }
-//            )
-//
-//            Spacer(Modifier.height(10.dp))
-//
-//            // Row 2: dose + duration + timing + icons + tick button
-//            PrescriptionActionRowAligned(
-//                doseValue = dose,
-//                doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
-//                onDoseSelect = { dose = it },
-//
-//                daysValue = days,
-//                daysItems = listOf("৩ দিন", "৫ দিন", "৭ দিন", "১০ দিন"),
-//                onDaysSelect = { days = it },
-//
-//                toggleValue = mealTime,
-//                onToggleChange = { mealTime = it },
-//
-//                onMessageClick = {
-//                    // open note / message
-//                },
-//                onAddClick = {
-//                    val item = PrescriptionItem(
-//                        medicineName =
-//                    )
-//                }
-//            )
-//        }
-//    }
-//}
 
 @Composable
 fun MedicineComposerCard(
     medicines: List<Medicine>,
     onAddClick: (PrescriptionItem) -> Unit
 ) {
-    var medicineQuery by remember { mutableStateOf(TextFieldValue("")) }
 
     Surface(
         shape = RoundedCornerShape(10.dp),
@@ -242,43 +117,6 @@ fun MedicineComposerCard(
                 }
             )
 
-//            DoseAndDrugDropdownRow(
-//                leftValue = doseType,
-//                leftItems = listOf("Cap", "Tab", "Syrup"),
-//                onLeftSelect = { doseType = it },
-//
-//                rightValue = medicine,
-//                rightItems = listOf(
-//                    "Amoxicillin 500",
-//                    "Azithromycin 250",
-//                    "Paracetamol 500"
-//                ),
-//                onRightSelect = {
-//                    medicine = it
-//                    medicineQuery = TextFieldValue(
-//                        text = it,
-//                        selection = TextRange(it.length)
-//                    )
-//                }
-//            )
-//            DoseAndDrugDropdownRow(
-//                leftValue = doseType,
-//                leftItems = listOf("Cap", "Tab", "Syrup"),
-//                onLeftSelect = { doseType = it },
-//
-//                rightValue = medicineQuery.text.ifEmpty { "Select medicine" }, // 🔥 FIX
-//                rightItems = listOf(
-//                    "Amoxicillin 500",
-//                    "Azithromycin 250",
-//                    "Paracetamol 500"
-//                ),
-//                onRightSelect = { selected ->
-//                    medicineQuery = TextFieldValue(
-//                        text = selected,
-//                        selection = TextRange(selected.length)
-//                    )
-//                }
-//            )
             Spacer(Modifier.height(10.dp))
 
             val medicineNames = remember(medicines) {

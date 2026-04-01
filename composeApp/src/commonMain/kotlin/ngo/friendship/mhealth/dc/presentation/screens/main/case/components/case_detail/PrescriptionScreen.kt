@@ -87,11 +87,6 @@ fun PrescriptionScreen(
             else -> Unit
         }
     }
-//    var selectedDiagnosis by remember { mutableStateOf<Diagnosis?>(null) }
-//    var selectedInvestigation by remember { mutableStateOf<Investigation?>(null) }
-//    var selectedReferralCenter by remember { mutableStateOf<ReferralCenter?>(null) }
-//    var selectedMedicineTypes by remember { mutableStateOf<MedicineBrandType?>(null) }
-//
 
     Scaffold(
         modifier = modifier,
@@ -140,15 +135,9 @@ fun PrescriptionScreen(
             },
             onSuccess = { details ->
 
-                var dx by remember { mutableStateOf<String?>(null) }
                 var checked by remember { mutableStateOf(false) }
                 var selectedTab by remember { mutableStateOf(0) }
 
-//                if (formState.interviewId == null) {
-//                    formState = formState.copy(
-//                        interviewId = details.interviewId
-//                    )
-//                }
 
                 LaunchedEffect(details.interviewId) {
                     formState = formState.copy(
@@ -165,8 +154,6 @@ fun PrescriptionScreen(
                     }
                 }
 
-                // Temporary demo items for System Prescription tab
-                // Later you can replace this with API data
                 val systemPrescriptionItems = remember {
                     listOf(
                         QAItem("Medicine", "Napa Extra"),
@@ -198,20 +185,6 @@ fun PrescriptionScreen(
 
                     FormContainerCard {
                         PrescriptionHeader()
-//                         CHIP SECTION COMMENTED
-//                        Spacer(modifier = Modifier.height(8.dp))
-//
-//                        PrescriptionTemplateSection(
-//                            chips = listOf(
-//                                "Oral ulcer prescription by Abir",
-//                                "Prescription 2",
-//                                "Ulcer by me",
-//                                "Follow up"
-//                            ),
-//                            onLinkClick = { },
-//                            onChipClick = { }
-//                        )
-
                         Spacer(modifier = Modifier.height(8.dp))
                         HorizontalDivider(modifier = Modifier.height(1.dp))
                         Spacer(modifier = Modifier.height(12.dp))
@@ -237,12 +210,7 @@ fun PrescriptionScreen(
                             )
                         }
 
-
                         Spacer(modifier = Modifier.height(12.dp))
-
-//                        MedicineAddScreen(
-//                            medicines = medicineListState.getSuccessDataOrNull() ?: emptyList()
-//                        )
                         MedicineAddScreen(
                             medicines = medicineListState.getSuccessDataOrNull() ?: emptyList(),
                             prescriptionItems = formState.prescriptions,
@@ -258,14 +226,6 @@ fun PrescriptionScreen(
                             }
                         )
 
-//                        FormDropdownField(
-//                            label = "Doctor Advice",
-//                            placeholder = "Select",
-//                            options = setupData.medicineBrandTypes,
-//                            selected = selectedMedicineTypes,
-//                            getLabel = { it.type },
-//                            onSelectedChange = { selectedMedicineTypes = it }
-//                        )
                         LabeledFormTextField(
                             label = "Doctor Advice",
                             placeholder = "Advice",
@@ -279,23 +239,6 @@ fun PrescriptionScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-//                        FormDropdownField(
-//                            label = "Investigation",
-//                            placeholder = "Select",
-//                            options = setupData.investigations,
-//                            selected = selectedInvestigation,
-//                            getLabel = { it.investigationName },
-//                            onSelectedChange = { selectedInvestigation = it }
-//                        )
-                        //INVESTIGATION
-//                        LabeledFormTextField(
-//                            label = "Investigation Result",
-//                            placeholder = "Result",
-//                            value = formState.investigationResult,
-//                            onValueChange = {
-//                                formState = formState.copy(investigationResult = it)
-//                            }
-//                        )
                         FormAutoCompleteDropdownField(
                             label = "Investigation",
                             placeholder = "Type",
