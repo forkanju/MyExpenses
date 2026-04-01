@@ -5,32 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8578e0fa-3d53-49c1-a126-3435ebeee334" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/MedicineListReqDto.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/MedicineListResDto.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/repository/MedicineListRepositoryImpl.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/mapper/MedicineMapper.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/Medicine.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/repository/MedicineListRepository.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/MedicineListViewModel.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/MedAutoCompleteTextField.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/assetWizardSettings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/deviceManager.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/project.xml" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackReqDto.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackResDto.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/repository/SaveDoctorFeedbackRepositoryImpl.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/mapper/SaveFeedbackMapper.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/SaveDoctorFeedbackResult.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/repository/SaveDoctorFeedbackRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/SaveDoctorFeedbackViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/DoctorFeedbackFormState.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/Helper.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/migrations.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/receipt.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/SimpleCardPreview.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/ApiService.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/di/KoinModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/di/KoinModule.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/SetupData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/SetupData.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/PrescriptionRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/PrescriptionRoute.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/InterviewDetailScreen.kt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/FormTextField.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/FormDropdownField.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/FormDropdownField.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,6 +44,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Kotlin File" />
+        <option value="Kotlin Interface" />
+        <option value="Kotlin Data Class" />
         <option value="Kotlin Class" />
       </list>
     </option>
@@ -57,42 +54,45 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "forkanju"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;forkanju&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/forkanju/DoctorCenter.git",
-    "accountId": "1843de0a-249d-406f-af28-dc47185e667f"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/forkanju/DoctorCenter.git&quot;,
+    &quot;accountId&quot;: &quot;1843de0a-249d-406f-af28-dc47185e667f&quot;
   }
-}]]></component>
+}</component>
   <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$" gradleHome="C:\Users\User\.gradle\wrapper\dists\gradle-9.3.0-bin\79n14ral3mx1ozqr3csh2u872\gradle-9.3.0" javaHome="C:\Program Files\Android\Android Studio\jbr" gradleVersion="9.3.0" />
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="3BeDlFng0mRx5tnHJWzdhDLNscV" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Android App.androidApp.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Android App.androidApp.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="androidApp" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="DoctorCenter.androidApp" />

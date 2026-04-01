@@ -1,7 +1,12 @@
 package ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,31 +19,44 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.theme.DarkerGray
+import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
 import ngo.friendship.mhealth.dc.theme.Gray
 import ngo.friendship.mhealth.dc.theme.GrayLighter
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
@@ -174,6 +192,200 @@ fun <T> FormDropdownField(
                     fontSize = 14.sp,
                     fontFamily = RobotoCondensedFont(),
                     fontWeight = FontWeight.Normal
+                ),
+                color = if (isError) MaterialTheme.colorScheme.error else Gray
+            )
+        }
+    }
+}
+
+@Composable
+fun <T> FormAutoCompleteDropdownField(
+    label: String? = null,
+    placeholder: String,
+    options: List<T>,
+    selected: T? = null,
+    getLabel: (T) -> String,
+    onSelectedChange: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    supportingText: String? = null,
+    maxSuggestions: Int = 5,
+    height: Dp = 44.dp,
+    cornerRadius: Dp = 6.dp,
+    borderWidth: Dp = 1.dp
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val focusManager = LocalFocusManager.current
+
+    var value by remember(selected) {
+        mutableStateOf(
+            TextFieldValue(
+                text = selected?.let(getLabel).orEmpty(),
+                selection = TextRange(selected?.let(getLabel)?.length ?: 0)
+            )
+        )
+    }
+
+    var expanded by remember { mutableStateOf(false) }
+    var suppressNextExpand by remember { mutableStateOf(false) }
+    var selectingSuggestion by remember { mutableStateOf(false) }
+
+    val filteredOptions = remember(value.text, options) {
+        if (value.text.isBlank()) {
+            emptyList()
+        } else {
+            options
+                .filter { getLabel(it).contains(value.text, ignoreCase = true) }
+                .distinctBy { getLabel(it) }
+                .take(maxSuggestions)
+        }
+    }
+
+    LaunchedEffect(value.text, isFocused, filteredOptions, suppressNextExpand) {
+        expanded = when {
+            suppressNextExpand -> false
+            !isFocused -> false
+            else -> filteredOptions.isNotEmpty()
+        }
+    }
+
+    val shape = RoundedCornerShape(cornerRadius)
+    val strokeColor = when {
+        isError -> MaterialTheme.colorScheme.error
+        isFocused -> FocusedBorderColor
+        else -> UnfocusedBorderColor
+    }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+
+        if (label != null) {
+            Text(
+                text = label,
+                style = TextStyle(
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 14.sp,
+                    fontFamily = RobotoCondensedFont(),
+                    color = TextDarkerGray
+                )
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+        }
+
+        BasicTextField(
+            value = value,
+            onValueChange = {
+                if (selectingSuggestion) {
+                    selectingSuggestion = false
+                    return@BasicTextField
+                }
+
+                suppressNextExpand = false
+                value = it
+                expanded = true
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height),
+            enabled = enabled,
+            singleLine = true,
+            interactionSource = interactionSource,
+            textStyle = TextStyle(
+                fontSize = 14.sp,
+                fontFamily = RobotoCondensedFont(),
+                color = if (enabled) DarkerGray else DarkerGray.copy(alpha = 0.45f)
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(shape)
+                        .background(Color.White)
+                        .border(
+                            border = BorderStroke(borderWidth, strokeColor),
+                            shape = shape
+                        )
+                        .padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (value.text.isBlank()) {
+                        Text(
+                            text = placeholder,
+                            color = Gray,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 14.sp,
+                            fontFamily = RobotoCondensedFont(),
+                            maxLines = 1
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+
+        AnimatedVisibility(visible = expanded) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    filteredOptions.forEachIndexed { index, item ->
+                        val itemLabel = getLabel(item)
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectingSuggestion = true
+                                    suppressNextExpand = true
+
+                                    value = TextFieldValue(
+                                        text = itemLabel,
+                                        selection = TextRange(itemLabel.length)
+                                    )
+
+                                    onSelectedChange(item)
+                                    expanded = false
+                                    focusManager.clearFocus()
+                                }
+                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                        ) {
+                            Text(
+                                text = itemLabel,
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    fontFamily = RobotoCondensedFont(),
+                                    fontWeight = FontWeight.Normal,
+                                    color = DarkerGray
+                                )
+                            )
+                        }
+
+                        if (index != filteredOptions.lastIndex) {
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = GrayLighter
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        if (supportingText != null) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = supportingText,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = RobotoCondensedFont()
                 ),
                 color = if (isError) MaterialTheme.colorScheme.error else Gray
             )

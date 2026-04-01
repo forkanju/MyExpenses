@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewDetailsViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.MedicineListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.SaveDoctorFeedbackViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.SetupDataViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.components.case_detail.PrescriptionScreen
 import ngo.friendship.mhealth.dc.presentation.state.RequestState
@@ -25,7 +26,8 @@ fun PrescriptionRoute(
     modifier: Modifier = Modifier,
     interviewDetailsViewModel: InterviewDetailsViewModel,
     setupDataViewModel: SetupDataViewModel = koinViewModel(),
-    medicineListViewModel: MedicineListViewModel = koinViewModel()
+    medicineListViewModel: MedicineListViewModel = koinViewModel(),
+    saveDoctorFeedbackViewModel: SaveDoctorFeedbackViewModel = koinViewModel() // ✅ ADD
 ) {
     val detailsState by interviewDetailsViewModel.interviewDetailsState.collectAsState()
     val setupDataState by setupDataViewModel.setupDataState.collectAsState()
@@ -93,7 +95,8 @@ fun PrescriptionRoute(
                 modifier = modifier,
                 interviewDetailsState = detailsState,
                 setupData = (setupDataState as RequestState.Success<SetupData>).data,
-                medicineListState = medicineListState
+                medicineListState = medicineListState,
+                saveDoctorFeedbackViewModel = saveDoctorFeedbackViewModel // ✅ ADD
             )
         }
 

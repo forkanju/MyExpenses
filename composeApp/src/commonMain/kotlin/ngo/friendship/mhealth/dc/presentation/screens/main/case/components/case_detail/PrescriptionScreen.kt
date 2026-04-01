@@ -22,6 +22,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,15 +33,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.domain.model.Diagnosis
+import kotlinx.serialization.json.Json
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackParam1
+import ngo.friendship.mhealth.dc.data.remote.dto.toDto
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
-import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.Medicine
-import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
-import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 import ngo.friendship.mhealth.dc.domain.model.SetupData
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.SaveDoctorFeedbackViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.DiagnosisChipGroup
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.InvestigationChipGroup
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.addDiagnosis
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.addInvestigation
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.removeDiagnosis
+import ngo.friendship.mhealth.dc.presentation.screens.main.case.save_feedback.removeInvestigation
 import ngo.friendship.mhealth.dc.presentation.state.DisplayResult
 import ngo.friendship.mhealth.dc.presentation.state.RequestState
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,18 +57,41 @@ fun PrescriptionScreen(
     modifier: Modifier = Modifier,
     interviewDetailsState: RequestState<InterviewDetails>,
     setupData: SetupData = SetupData(),
-    medicineListState: RequestState<List<Medicine>>
+    medicineListState: RequestState<List<Medicine>>,
+    saveDoctorFeedbackViewModel: SaveDoctorFeedbackViewModel // ✅ ADD
 ) {
     val title = when (interviewDetailsState) {
         is RequestState.Success -> interviewDetailsState.data.beneficiaryName.ifBlank { "Prescription" }
         else -> "Prescription"
     }
+    val saveState by saveDoctorFeedbackViewModel.state.collectAsState()
+    var formState by remember {
+        mutableStateOf(DoctorFeedbackFormState())
+    }
+// ✅ PUT HERE (TOP LEVEL — NOT inside onSuccess)
+    LaunchedEffect(saveState) {
+        when (val state = saveState) {
 
-    var selectedDiagnosis by remember { mutableStateOf<Diagnosis?>(null) }
-    var selectedInvestigation by remember { mutableStateOf<Investigation?>(null) }
-    var selectedReferralCenter by remember { mutableStateOf<ReferralCenter?>(null) }
-    var selectedMedicineTypes by remember { mutableStateOf<MedicineBrandType?>(null) }
+            is RequestState.Success -> {
+                if (state.data.isSuccess) {
+                    println("SAVE_API Saved successfully")
+                } else {
+                    println("SAVE_API ❌ ${state.data.message}")
+                }
+            }
 
+            is RequestState.Error -> {
+                println("❌ Error: ${state.message}")
+            }
+
+            else -> Unit
+        }
+    }
+//    var selectedDiagnosis by remember { mutableStateOf<Diagnosis?>(null) }
+//    var selectedInvestigation by remember { mutableStateOf<Investigation?>(null) }
+//    var selectedReferralCenter by remember { mutableStateOf<ReferralCenter?>(null) }
+//    var selectedMedicineTypes by remember { mutableStateOf<MedicineBrandType?>(null) }
+//
 
     Scaffold(
         modifier = modifier,
@@ -111,6 +144,18 @@ fun PrescriptionScreen(
                 var checked by remember { mutableStateOf(false) }
                 var selectedTab by remember { mutableStateOf(0) }
 
+//                if (formState.interviewId == null) {
+//                    formState = formState.copy(
+//                        interviewId = details.interviewId
+//                    )
+//                }
+
+                LaunchedEffect(details.interviewId) {
+                    formState = formState.copy(
+                        interviewId = details.interviewId
+                    )
+                }
+
                 val interviewQaItems = remember(details.details) {
                     details.details.map {
                         QAItem(
@@ -153,66 +198,136 @@ fun PrescriptionScreen(
 
                     FormContainerCard {
                         PrescriptionHeader()
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        PrescriptionTemplateSection(
-                            chips = listOf(
-                                "Oral ulcer prescription by Abir",
-                                "Prescription 2",
-                                "Ulcer by me",
-                                "Follow up"
-                            ),
-                            onLinkClick = { },
-                            onChipClick = { }
-                        )
+//                         CHIP SECTION COMMENTED
+//                        Spacer(modifier = Modifier.height(8.dp))
+//
+//                        PrescriptionTemplateSection(
+//                            chips = listOf(
+//                                "Oral ulcer prescription by Abir",
+//                                "Prescription 2",
+//                                "Ulcer by me",
+//                                "Follow up"
+//                            ),
+//                            onLinkClick = { },
+//                            onChipClick = { }
+//                        )
 
                         Spacer(modifier = Modifier.height(8.dp))
                         HorizontalDivider(modifier = Modifier.height(1.dp))
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        FormDropdownField(
+                        FormAutoCompleteDropdownField(
                             label = "DX",
                             placeholder = "Type",
                             options = setupData.diagnoses,
-                            selected = selectedDiagnosis,
+                            selected = null,//selectedDiagnosis
                             getLabel = { it.diagName },
-                            onSelectedChange = { selectedDiagnosis = it }
+                            onSelectedChange = { selected ->
+                                formState = addDiagnosis(formState, selected)
+                            }
                         )
+
+                        if (formState.selectedDiagnoses.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DiagnosisChipGroup(
+                                items = formState.selectedDiagnoses,
+                                onRemove = { item ->
+                                    formState = removeDiagnosis(formState, item)
+                                }
+                            )
+                        }
+
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        MedicineAddScreen(medicines = medicineListState.getSuccessDataOrNull()?: emptyList())
+//                        MedicineAddScreen(
+//                            medicines = medicineListState.getSuccessDataOrNull() ?: emptyList()
+//                        )
+                        MedicineAddScreen(
+                            medicines = medicineListState.getSuccessDataOrNull() ?: emptyList(),
+                            prescriptionItems = formState.prescriptions,
+                            onAddMedicine = { item ->
+                                formState = formState.copy(
+                                    prescriptions = formState.prescriptions + item
+                                )
+                            },
+                            onRemoveMedicine = { index ->
+                                formState = formState.copy(
+                                    prescriptions = formState.prescriptions.filterIndexed { i, _ -> i != index }
+                                )
+                            }
+                        )
 
-                        FormDropdownField(
+//                        FormDropdownField(
+//                            label = "Doctor Advice",
+//                            placeholder = "Select",
+//                            options = setupData.medicineBrandTypes,
+//                            selected = selectedMedicineTypes,
+//                            getLabel = { it.type },
+//                            onSelectedChange = { selectedMedicineTypes = it }
+//                        )
+                        LabeledFormTextField(
                             label = "Doctor Advice",
-                            placeholder = "Select",
-                            options = setupData.medicineBrandTypes,
-                            selected = selectedMedicineTypes,
-                            getLabel = { it.type },
-                            onSelectedChange = { selectedMedicineTypes = it }
+                            placeholder = "Advice",
+                            value = formState.doctorAdvice,
+                            onValueChange = {
+                                formState = formState.copy(doctorAdvice = it)
+                            },
+                            isError = false,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        FormDropdownField(
+//                        FormDropdownField(
+//                            label = "Investigation",
+//                            placeholder = "Select",
+//                            options = setupData.investigations,
+//                            selected = selectedInvestigation,
+//                            getLabel = { it.investigationName },
+//                            onSelectedChange = { selectedInvestigation = it }
+//                        )
+                        //INVESTIGATION
+//                        LabeledFormTextField(
+//                            label = "Investigation Result",
+//                            placeholder = "Result",
+//                            value = formState.investigationResult,
+//                            onValueChange = {
+//                                formState = formState.copy(investigationResult = it)
+//                            }
+//                        )
+                        FormAutoCompleteDropdownField(
                             label = "Investigation",
-                            placeholder = "Select",
+                            placeholder = "Type",
                             options = setupData.investigations,
-                            selected = selectedInvestigation,
+                            selected = null,
                             getLabel = { it.investigationName },
-                            onSelectedChange = { selectedInvestigation = it }
+                            onSelectedChange = { selected ->
+                                formState = addInvestigation(formState, selected)
+                            }
                         )
+
+                        if (formState.selectedInvestigations.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            InvestigationChipGroup(
+                                items = formState.selectedInvestigations,
+                                onRemove = { item ->
+                                    formState = removeInvestigation(formState, item)
+                                }
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(12.dp))
 
                         LabeledFormTextField(
                             label = "Comments for FCM",
                             placeholder = "Comment",
-                            value = "",
-                            onValueChange = { },
+                            value = formState.commentsForFcm,
+                            onValueChange = {
+                                formState = formState.copy(commentsForFcm = it)
+                            },
                             isError = false,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -221,9 +336,11 @@ fun PrescriptionScreen(
                             label = "Refer to others",
                             placeholder = "Select",
                             options = setupData.referralCenters,
-                            selected = selectedReferralCenter,
+                            selected = formState.selectedReferralCenter,
                             getLabel = { it.refCenterName },
-                            onSelectedChange = { selectedReferralCenter = it }
+                            onSelectedChange = { selected ->
+                                formState = formState.copy(selectedReferralCenter = selected)
+                            }
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -231,10 +348,12 @@ fun PrescriptionScreen(
                         LabeledFormTextField(
                             label = "Doctor notes",
                             placeholder = "Note",
-                            value = "",
-                            onValueChange = { },
+                            value = formState.doctorNotes,
+                            onValueChange = {
+                                formState = formState.copy(doctorNotes = it)
+                            },
                             isError = false,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -252,6 +371,8 @@ fun PrescriptionScreen(
                             rightText = "Save as a template",
                             onLeftClick = {
                                 println("Open date picker")
+                                formState = formState.copy(nextFollowUpDate = "2026-04-10")
+                                println("Selected next follow-up date: ${formState.nextFollowUpDate}")
                             },
                             onRightClick = {
                                 println("Save as template")
@@ -280,7 +401,17 @@ fun PrescriptionScreen(
 
                                 PrescriptionActionButtonRow(
                                     onSendClick = {
-                                        println("Send prescription")
+                                        val param1 = DoctorFeedbackParam1(
+                                            doctorFeedbackObject = formState.toDto()
+                                        )
+                                        val jsonString = Json.encodeToString(param1)
+
+                                        println("PARAM1_JSON: $jsonString")
+                                        saveDoctorFeedbackViewModel.saveDoctorFeedback(
+                                            userName = "sharif.dr",
+                                            password = "1234",
+                                            formState = formState
+                                        )
                                     },
                                     onShareClick = {
                                         println("Share prescription")

@@ -18,6 +18,8 @@ object ProjectConfig {
     const val javaVersion = 21
     const val BASE_URL_LIVE = "https://apps.friendship.ngo"
     const val BASE_URL_DEV = "http://devs2.apps.friendship.ngo:8080"
+//    const val BASE_URL_DEV = "http://10.11.9.49:8080"65
+
 
     fun genVersionCode(major: Int, minor: Int, patch: Int) = major * 10_000 + minor * 100 + patch
     fun genVersionName(major: Int, minor: Int, patch: Int) = "$major.$minor.$patch"
