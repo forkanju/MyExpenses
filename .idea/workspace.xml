@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8578e0fa-3d53-49c1-a126-3435ebeee334" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackReqDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackReqDto.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/DoctorFeedbackFormState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/DoctorFeedbackFormState.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

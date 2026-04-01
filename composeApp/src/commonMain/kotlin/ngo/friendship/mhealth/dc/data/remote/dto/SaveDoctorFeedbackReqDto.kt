@@ -100,7 +100,7 @@ data class DoctorFeedbackObject(
     val adviceMessageForFcm: String,
 
     @SerialName("REF_CENTER_ID")
-    val refCenterId: Long?,
+    val refCenterId: String?,
 
     @SerialName("investigation_result")
     val investigationResult: String,
@@ -158,7 +158,7 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
             doctorAdvice.takeIf { it.isNotBlank() },
             commentsForFcm.takeIf { it.isNotBlank() }
         ).joinToString("\n"),
-        refCenterId = selectedReferralCenter?.refCenterId,
+        refCenterId = selectedReferralCenter?.refCenterId.toString(),
         investigationResult = investigationResult,
         nextFollowUpDate = nextFollowUpDate,
         investigation = selectedInvestigations.map {
