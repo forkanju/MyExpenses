@@ -15,15 +15,8 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.addAll(
             "-Xcontext-parameters",
-            "-Xwhen-guards",
-            "-Xnon-local-break-continue",
             "-Xexpect-actual-classes",
-            "-Xnested-type-aliases",
             "-Xcontext-sensitive-resolution",
-            "-Xdata-flow-based-exhaustiveness",
-            "-Xallow-holdsin-contract",
-            "-Xallow-contracts-on-more-functions",
-            "-Xallow-condition-implies-returns-contracts",
             "-Xexplicit-backing-fields",
             "-XXLanguage:+ExplicitBackingFields",
             "-XXLanguage:+PropertyParamAnnotationDefaultTargetMode"
@@ -37,8 +30,7 @@ kotlin {
             "androidx.compose.foundation.ExperimentalFoundationApi",
             "androidx.compose.ui.ExperimentalComposeUiApi",
             "kotlinx.serialization.ExperimentalSerializationApi",
-            "kotlin.time.ExperimentalTime",
-            "org.koin.core.annotation.KoinExperimentalAPI",
+            "kotlin.time.ExperimentalTime"
         )
     }
     androidLibrary {
@@ -85,7 +77,6 @@ kotlin {
             implementation(libs.savedstate.compose)
 
             implementation(libs.bundles.koin)
-            api(libs.koin.annotations)
             implementation(libs.bundles.ktor)
             implementation(libs.bundles.coil)
             implementation(libs.bundles.settings)
@@ -106,10 +97,7 @@ kotlin {
             implementation(libs.connectivity.device)
             implementation(libs.connectivity.compose.device)
 
-            if (ProjectConfig.IS_DEBUG)
-                implementation(libs.ktor.monitor.logging)
-            else
-                implementation(libs.ktor.monitor.logging.no.op)
+            api(libs.ktor.monitor.logging)
             implementation(libs.kotlinx.datetime)
             // Browser + Message Bar (KMP)
 //            implementation(libs.browser.kmp)
@@ -131,15 +119,6 @@ buildkonfig {
         buildConfigField(Type.STRING, "packageName", ProjectConfig.packageName, const = true)
         buildConfigField(Type.STRING, "versionName", ProjectConfig.versionName, const = true)
         buildConfigField(Type.INT, "versionCode", ProjectConfig.versionCode.toString(), const = true)
-        buildConfigField(Type.BOOLEAN, "IS_DEBUG", ProjectConfig.IS_DEBUG.toString(), const = true)
-        buildConfigField(
-            Type.STRING, "BASE_URL",
-            if (ProjectConfig.IS_DEBUG)
-                ProjectConfig.BASE_URL_DEV
-            else
-                ProjectConfig.BASE_URL_LIVE,
-            const = true
-        )
     }
 }
 
@@ -150,11 +129,6 @@ compose.resources {
 
 dependencies {
     "androidRuntimeClasspath"(libs.compose.ui.tooling)
-    add("kspCommonMainMetadata", libs.koin.ksp.compiler)
-
-    add("kspAndroid", libs.koin.ksp.compiler)
-    add("kspIosArm64", libs.koin.ksp.compiler)
-    add("kspIosSimulatorArm64", libs.koin.ksp.compiler)
 }
 
 tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }

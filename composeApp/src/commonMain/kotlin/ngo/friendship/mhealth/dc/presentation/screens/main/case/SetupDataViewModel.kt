@@ -11,9 +11,8 @@ class SetupDataViewModel(
     private val repository: SetupDataRepository
 ) : BaseViewModel() {
 
-    private val _setupDataState =
-        MutableStateFlow<RequestState<SetupData>>(RequestState.Idle)
-    val setupDataState: StateFlow<RequestState<SetupData>> = _setupDataState
+    val setupDataState : StateFlow<RequestState<SetupData>>
+        field = MutableStateFlow<RequestState<SetupData>>(RequestState.Idle)
 
 
     fun loadSetupData(
@@ -21,7 +20,7 @@ class SetupDataViewModel(
         password: String
     ) {
         launch {
-            _setupDataState.value = RequestState.Loading
+            setupDataState.value = RequestState.Loading
 
             runCatching {
 
@@ -42,9 +41,9 @@ class SetupDataViewModel(
                 }
 
             }.onSuccess { result ->
-                _setupDataState.value = RequestState.Success(result)
+                setupDataState.value = RequestState.Success(result)
             }.onFailure { throwable ->
-                _setupDataState.value = RequestState.Error(
+                setupDataState.value = RequestState.Error(
                     throwable.message ?: "Failed to load setup data"
                 )
             }

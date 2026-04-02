@@ -10,9 +10,9 @@ import ngo.friendship.mhealth.dc.presentation.state.RequestState
 class MedicineListViewModel(
     private val repository: MedicineListRepository
 ) : BaseViewModel() {
-    private val _medicineListState =
-        MutableStateFlow<RequestState<List<Medicine>>>(RequestState.Idle)
-    val medicineListState: StateFlow<RequestState<List<Medicine>>> = _medicineListState
+
+    val medicineListState : StateFlow<RequestState<List<Medicine>>>
+        field = MutableStateFlow<RequestState<List<Medicine>>>(RequestState.Idle)
 
     fun loadMedicineList(
         userName: String,
@@ -20,7 +20,7 @@ class MedicineListViewModel(
         type: String = "Tab"
     ) {
         launch {
-            _medicineListState.value = RequestState.Loading
+            medicineListState.value = RequestState.Loading
             runCatching {
                 repository.getMedicineList(
                     userName = userName,
@@ -28,9 +28,9 @@ class MedicineListViewModel(
                     type = type
                 )
             }.onSuccess { medicines ->
-                _medicineListState.value = RequestState.Success(medicines)
+                medicineListState.value = RequestState.Success(medicines)
             }.onFailure { throwable ->
-                _medicineListState.value = RequestState.Error(
+                medicineListState.value = RequestState.Error(
                     throwable.message ?: "Failed to load medicine list"
                 )
             }
@@ -38,6 +38,6 @@ class MedicineListViewModel(
     }
 
     fun resetMedicineListState() {
-        _medicineListState.value = RequestState.Idle
+        medicineListState.value = RequestState.Idle
     }
 }

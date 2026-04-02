@@ -10,9 +10,9 @@ import ngo.friendship.mhealth.dc.presentation.state.RequestState
 class InterviewDetailsViewModel(
     private val repository: InterviewDetailsRepository
 ) : BaseViewModel() {
-    private val _interviewDetailsState =
-        MutableStateFlow<RequestState<InterviewDetails>>(RequestState.Idle)
-    val interviewDetailsState: StateFlow<RequestState<InterviewDetails>> = _interviewDetailsState
+
+    val interviewDetailsState : StateFlow<RequestState<InterviewDetails>>
+        field = MutableStateFlow<RequestState<InterviewDetails>>(RequestState.Idle)
 
     fun loadInterviewDetails(
         userName: String,
@@ -20,7 +20,7 @@ class InterviewDetailsViewModel(
         interviewId: Long
     ) {
         launch {
-            _interviewDetailsState.value = RequestState.Loading
+            interviewDetailsState.value = RequestState.Loading
             runCatching {
                 repository.getInterviewDetails(
                     userName = userName,
@@ -28,9 +28,9 @@ class InterviewDetailsViewModel(
                     interviewId = interviewId
                 )
             }.onSuccess { result ->
-                _interviewDetailsState.value = RequestState.Success(data = result)
+                interviewDetailsState.value = RequestState.Success(data = result)
             }.onFailure { throwable ->
-                _interviewDetailsState.value = RequestState.Error(
+                interviewDetailsState.value = RequestState.Error(
                     throwable.message ?: "Failed to load interview"
                 )
             }

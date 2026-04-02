@@ -5,8 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.serialization.saved
+import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
+import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
+import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
@@ -29,6 +32,17 @@ class MainViewModel(
 
     var selectedBottomTab by mutableStateOf(BottomNavItems.Home)
         private set
+
+    init {
+        viewModelScope.launch {
+            isUnauthorizedFlow.collect { isUnauthorized ->
+                if (isUnauthorized) {
+                    showError("Session Expired. Please login again.")
+                    backStack.replaceWith(Screens.Auth)
+                }
+            }
+        }
+    }
 
     fun selectBottomTab(tab: BottomNavItems){
         selectedBottomTab = tab

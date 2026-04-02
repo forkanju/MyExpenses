@@ -16,9 +16,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.KotlinxSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
-import ngo.friendship.mhealth.dc.BuildKonfig
+import kotlinx.coroutines.flow.MutableSharedFlow
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
+import ngo.friendship.mhealth.dc.domain.network.NetworkConfig
 import ngo.friendship.mhealth.dc.utils.defJson
 import ngo.friendship.mhealth.dc.utils.log
 import org.koin.dsl.module
@@ -43,12 +44,11 @@ val networkModule = module {
             }
             install(KtorMonitorLogging) {
                 showNotification = true
-                log("KtorMonitorLogging installed")
                 retentionPeriod = RetentionPeriod.OneWeek
                 maxContentLength = ContentLength.Full
             }
             install(DefaultRequest) {
-                url(BuildKonfig.BASE_URL)
+                url(NetworkConfig.getBaseUrl())
                 accept(ContentType.Application.Json)
                 settings.token?.let {
                     header(HttpHeaders.Authorization, "Bearer $it")
@@ -66,10 +66,14 @@ val networkModule = module {
         }.apply {
             plugin(HttpSend).intercept { request ->
                 execute(request).apply {
-                    if (response.status == HttpStatusCode.Unauthorized)
+                    if (response.status == HttpStatusCode.Unauthorized) {
                         settings.token = null
+                        isUnauthorizedFlow.emit(true)
+                    }
                 }
             }
         }
     }
 }
+
+val isUnauthorizedFlow = MutableSharedFlow<Boolean>()

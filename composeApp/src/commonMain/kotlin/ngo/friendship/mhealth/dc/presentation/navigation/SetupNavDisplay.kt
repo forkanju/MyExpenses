@@ -46,7 +46,7 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                     )
                 }
             },
-            content = {
+            content = { paddingValues ->
                 NavDisplay(
                     backStack = backStack,
                     sceneStrategy = dialogStrategy,
@@ -72,7 +72,9 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         authRoute(
                             mainViewModel = viewModel,
                             snackBarState = snackBarState,
-                            modifier = Modifier.padding(it).imePadding()
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .imePadding()
                         )
                         homeRoute(
                             viewModel = viewModel

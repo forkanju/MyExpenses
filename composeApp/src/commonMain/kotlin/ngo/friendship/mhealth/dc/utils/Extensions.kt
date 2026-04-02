@@ -8,47 +8,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.number
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import ngo.friendship.mhealth.dc.BuildKonfig
+import ngo.friendship.mhealth.dc.isDebugBuild
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.contract
-import kotlin.math.absoluteValue
-import kotlin.math.min
-import kotlin.math.pow
-import kotlin.math.round
-import kotlin.math.roundToInt
+import kotlin.math.*
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -190,7 +169,7 @@ fun Any.cat(message: String) {
 }
 
 fun Any?.log(tag: String = "TAG"): Any? {
-    if (!BuildKonfig.IS_DEBUG) return null
+    if (!isDebugBuild) return null
     if (this is Throwable)
         Napier.i("log> '$tag' ${this.message}", this, tag = tag)
     else

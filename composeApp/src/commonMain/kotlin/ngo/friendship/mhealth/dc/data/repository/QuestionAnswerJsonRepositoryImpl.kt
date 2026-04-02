@@ -3,7 +3,7 @@ package ngo.friendship.mhealth.dc.data.repository
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
-import ngo.friendship.mhealth.dc.domain.model.GateQuestionAnswerData
+import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.repository.QuestionAnswerJsonRepository
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
@@ -16,7 +16,7 @@ class QuestionAnswerJsonRepositoryImpl(
     override suspend fun getQuestionAnswerData(
         userName: String,
         password: String
-    ): GateQuestionAnswerData {
+    ): QuestionAnswerJson {
         val response = api.getQuestionAnswerData(
             request = QuestionAnswerJsonReqDto.build(
                 userName = userName,
