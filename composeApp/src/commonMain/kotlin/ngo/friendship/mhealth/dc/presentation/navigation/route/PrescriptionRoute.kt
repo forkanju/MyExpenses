@@ -8,8 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewDetailsViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.case.MedicineListViewModel
@@ -27,7 +30,8 @@ fun PrescriptionRoute(
     interviewDetailsViewModel: InterviewDetailsViewModel,
     setupDataViewModel: SetupDataViewModel = koinViewModel(),
     medicineListViewModel: MedicineListViewModel = koinViewModel(),
-    saveDoctorFeedbackViewModel: SaveDoctorFeedbackViewModel = koinViewModel() // ✅ ADD
+    saveDoctorFeedbackViewModel: SaveDoctorFeedbackViewModel = koinViewModel(),
+    onNavigateToCaseAfterSave:() -> Unit = {}
 ) {
     val detailsState by interviewDetailsViewModel.interviewDetailsState.collectAsState()
     val setupDataState by setupDataViewModel.setupDataState.collectAsState()
@@ -91,12 +95,14 @@ fun PrescriptionRoute(
 
         detailsState is RequestState.Success &&
                 setupDataState is RequestState.Success -> {
+                    val scope = rememberCoroutineScope()
             PrescriptionScreen(
                 modifier = modifier,
                 interviewDetailsState = detailsState,
                 setupData = (setupDataState as RequestState.Success<SetupData>).data,
                 medicineListState = medicineListState,
-                saveDoctorFeedbackViewModel = saveDoctorFeedbackViewModel // ✅ ADD
+                saveDoctorFeedbackViewModel = saveDoctorFeedbackViewModel,
+                onSaveSuccess = onNavigateToCaseAfterSave
             )
         }
 

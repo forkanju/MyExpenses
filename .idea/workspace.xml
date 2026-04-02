@@ -5,10 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8578e0fa-3d53-49c1-a126-3435ebeee334" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/QuestionAnswerJsonReqDto.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/QuestionAnswerJsonResDto.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/repository/QuestionAnswerJsonRepositoryImpl.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/mapper/QuestionAnswerJsonMapper.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/model/QuestionAnswerJson.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/domain/repository/QuestionAnswerJsonRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/QuestionAnswerJsonViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" beforeDir="false" afterPath="$PROJECT_DIR$/buildSrc/src/main/kotlin/ProjectConfig.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackReqDto.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/dto/SaveDoctorFeedbackReqDto.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/DoctorFeedbackFormState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/save_feedback/DoctorFeedbackFormState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/data/remote/ApiService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/di/KoinModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/di/KoinModule.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/MainViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/MainViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/HomePagerRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/HomePagerRoute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/InterviewDetailRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/InterviewDetailRoute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/PrescriptionRoute.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/navigation/route/PrescriptionRoute.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/SaveDoctorFeedbackViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/SaveDoctorFeedbackViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/AddMedicine.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/MedicineAddScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/composeApp/src/commonMain/kotlin/ngo/friendship/mhealth/dc/presentation/screens/main/case/components/case_detail/PrescriptionScreen.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,7 +32,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[PhysicalDevice::serial=R87YA006R5V]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[LocalEmulator::path=C:\Users\User\.android\avd\Medium_Phone.avd]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -27,9 +41,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Kotlin Data Class" />
         <option value="Kotlin File" />
         <option value="Kotlin Interface" />
-        <option value="Kotlin Data Class" />
         <option value="Kotlin Class" />
       </list>
     </option>

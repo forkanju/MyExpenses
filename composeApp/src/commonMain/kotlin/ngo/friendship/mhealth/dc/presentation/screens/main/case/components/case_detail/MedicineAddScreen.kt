@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,25 +53,25 @@ fun MedicineAddScreen(
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(1.dp, Color(0xFFCBD5E1))
             ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = item.medicineName)
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(text = "Dose: ${item.dose} | Days: ${item.duration}")
-                        }
-
-                        Text(
-                            text = "Remove",
-                            modifier = Modifier.clickable {
-                                onRemoveMedicine(index)
-                            }
-                        )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = item.medicineName)
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(text = "Dose: ${item.dose} | Days: ${item.duration}")
                     }
+
+                    Text(
+                        text = "Remove",
+                        modifier = Modifier.clickable {
+                            onRemoveMedicine(index)
+                        }
+                    )
+                }
             }
         }
 

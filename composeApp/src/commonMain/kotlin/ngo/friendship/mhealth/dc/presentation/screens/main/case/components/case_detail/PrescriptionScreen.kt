@@ -20,6 +20,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,12 +61,14 @@ fun PrescriptionScreen(
     interviewDetailsState: RequestState<InterviewDetails>,
     setupData: SetupData = SetupData(),
     medicineListState: RequestState<List<Medicine>>,
-    saveDoctorFeedbackViewModel: SaveDoctorFeedbackViewModel // ✅ ADD
+    saveDoctorFeedbackViewModel: SaveDoctorFeedbackViewModel,
+    onSaveSuccess: () -> Unit = {}
 ) {
     val title = when (interviewDetailsState) {
         is RequestState.Success -> interviewDetailsState.data.beneficiaryName.ifBlank { "Prescription" }
         else -> "Prescription"
     }
+    val snackbarHostState = remember { SnackbarHostState() }
     val saveState by saveDoctorFeedbackViewModel.state.collectAsState()
     var formState by remember {
         mutableStateOf(DoctorFeedbackFormState())
@@ -74,14 +79,19 @@ fun PrescriptionScreen(
 
             is RequestState.Success -> {
                 if (state.data.isSuccess) {
-                    println("SAVE_API Saved successfully")
+                    snackbarHostState.showSnackbar("✅ Saved successfully")
+                    saveDoctorFeedbackViewModel.clearState()
+                    onSaveSuccess()
                 } else {
-                    println("SAVE_API ❌ ${state.data.message}")
+                    snackbarHostState.showSnackbar("❌ ${state.data.message}")
+                    saveDoctorFeedbackViewModel.clearState()
                 }
+
             }
 
             is RequestState.Error -> {
-                println("❌ Error: ${state.message}")
+                snackbarHostState.showSnackbar("❌ Error: ${state.message}")
+                saveDoctorFeedbackViewModel.clearState()
             }
 
             else -> Unit
@@ -90,6 +100,15 @@ fun PrescriptionScreen(
 
     Scaffold(
         modifier = modifier,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState, snackbar = { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = Color(0xFF214695),
+                    contentColor = Color.White
+                )
+            })
+        },
         topBar = {
             PrescriptionTopBar(
                 titlePrefix = title,

@@ -17,8 +17,8 @@ object ProjectConfig {
 
     const val javaVersion = 21
     const val BASE_URL_LIVE = "https://apps.friendship.ngo"
-//    const val BASE_URL_DEV = "http://devs2.apps.friendship.ngo:8080"
-    const val BASE_URL_DEV = "http://10.11.9.49:8080"
+    const val BASE_URL_DEV = "http://devs2.apps.friendship.ngo:8080" //DEVS_2
+//    const val BASE_URL_DEV = "http://10.11.9.49:8080"  //YEASIN_IP
 
 
     fun genVersionCode(major: Int, minor: Int, patch: Int) = major * 10_000 + minor * 100 + patch
