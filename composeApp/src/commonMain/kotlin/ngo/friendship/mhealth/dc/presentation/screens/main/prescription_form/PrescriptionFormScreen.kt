@@ -57,16 +57,15 @@ fun PrescriptionFormScreen(
     onWhatsApp: () -> Unit,
     onBack: () -> Unit
 ) {
-    val title = interviewDetails.beneficiaryName.ifBlank { "Prescription" }
     var formState by remember {
-        mutableStateOf(DoctorFeedbackFormState())
+        mutableStateOf(DoctorFeedbackFormState(interviewId = interviewDetails.interviewId))
     }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             PrescriptionTopBar(
-                titlePrefix = title,
+                titlePrefix = interviewDetails.beneficiaryName.ifBlank { "Prescription" },
                 onFcmDetailsClick = onFcmDetailsClick,
                 onCall = onCall,
                 onWhatsApp = onWhatsApp,

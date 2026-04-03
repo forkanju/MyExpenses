@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -101,6 +102,12 @@ inline fun <reified T> rememberSaveableState(
         )
     ) {
         mutableStateOf(init)
+    }
+}
+
+fun TextFieldState.setText(text: String?) {
+    edit {
+        replace(0, length, text.orEmpty())
     }
 }
 
