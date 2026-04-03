@@ -2,28 +2,15 @@ package ngo.friendship.mhealth.dc.di
 
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.repository.AuthRepositoryImpl
-import ngo.friendship.mhealth.dc.data.repository.InterviewDetailsRepositoryImpl
-import ngo.friendship.mhealth.dc.data.repository.InterviewListRepositoryImpl
-import ngo.friendship.mhealth.dc.data.repository.MedicineListRepositoryImpl
-import ngo.friendship.mhealth.dc.data.repository.QuestionAnswerJsonRepositoryImpl
-import ngo.friendship.mhealth.dc.data.repository.SaveDoctorFeedbackRepositoryImpl
-import ngo.friendship.mhealth.dc.data.repository.SetupDataRepositoryImpl
+import ngo.friendship.mhealth.dc.data.repository.PrescriptionFormRepositoryImpl
+import ngo.friendship.mhealth.dc.data.repository.MainRepositoryImpl
 import ngo.friendship.mhealth.dc.domain.network.ConnectionListener
 import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
-import ngo.friendship.mhealth.dc.domain.repository.InterviewDetailsRepository
-import ngo.friendship.mhealth.dc.domain.repository.InterviewListRepository
-import ngo.friendship.mhealth.dc.domain.repository.MedicineListRepository
-import ngo.friendship.mhealth.dc.domain.repository.QuestionAnswerJsonRepository
-import ngo.friendship.mhealth.dc.domain.repository.SaveDoctorFeedbackRepository
-import ngo.friendship.mhealth.dc.domain.repository.SetupDataRepository
+import ngo.friendship.mhealth.dc.domain.repository.PrescriptionFormRepository
+import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.auth.AuthViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewListViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewDetailsViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.MedicineListViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.QuestionAnswerJsonViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.SaveDoctorFeedbackViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.SetupDataViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -35,22 +22,13 @@ expect fun platformModule(): Module
 val viewModelModule = module {
     viewModelOf(constructor = ::AuthViewModel)
     viewModelOf(constructor = ::MainViewModel)
-    viewModelOf(constructor = ::InterviewListViewModel)
-    viewModelOf(constructor = ::InterviewDetailsViewModel)
-    viewModelOf(constructor = ::SetupDataViewModel)
-    viewModelOf(constructor = ::MedicineListViewModel)
-    viewModelOf(constructor = ::SaveDoctorFeedbackViewModel)
-    viewModelOf(constructor = ::QuestionAnswerJsonViewModel)
+    viewModelOf(constructor = ::PrescriptionFormViewModel)
 }
 
 val dataModule = module {
     singleOf(constructor = ::AuthRepositoryImpl) bind AuthRepository::class
-    singleOf(constructor = ::InterviewListRepositoryImpl) bind InterviewListRepository::class
-    singleOf(constructor = ::InterviewDetailsRepositoryImpl) bind InterviewDetailsRepository::class
-    singleOf(constructor = ::SetupDataRepositoryImpl) bind SetupDataRepository::class
-    singleOf(constructor = ::MedicineListRepositoryImpl) bind MedicineListRepository::class
-    singleOf(constructor = ::SaveDoctorFeedbackRepositoryImpl) bind SaveDoctorFeedbackRepository::class
-    singleOf(constructor = ::QuestionAnswerJsonRepositoryImpl) bind QuestionAnswerJsonRepository::class
+    singleOf(constructor = ::PrescriptionFormRepositoryImpl) bind PrescriptionFormRepository::class
+    singleOf(constructor = ::MainRepositoryImpl) bind MainRepository::class
 }
 
 val instantModule = module(createdAtStart = true) {
@@ -61,6 +39,7 @@ val instantModule = module(createdAtStart = true) {
 val appModules = listOf(
     platformModule(),
     viewModelModule,
+    databaseModule,
     dataModule,
     networkModule,
     instantModule

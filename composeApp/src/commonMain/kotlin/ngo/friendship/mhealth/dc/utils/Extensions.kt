@@ -105,8 +105,7 @@ inline fun <reified T> rememberSaveableState(
 }
 
 /**Coroutines Extension Function*/
-@Suppress("FunctionName")
-suspend fun <T, R> T.IO(block: suspend T.() -> R) = withContext(Dispatchers.IO) {
+suspend fun <T, R> T.runIO(block: suspend T.() -> R) = withContext(Dispatchers.IO) {
     block()
 }
 
@@ -127,6 +126,14 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline transform: suspend T.() -> R
             transform(value)
         }
     }
+
+/**
+ * Returns a list containing all elements except the element at the specified [index].
+ */
+fun <T> List<T>.minusAt(index: Int): List<T> {
+    if (index !in indices) return this
+    return take(index) + drop(index + 1)
+}
 
 /**
  * Returns a new list containing a specified number of random elements from the original list,
@@ -827,7 +834,7 @@ fun String.toUiDateTime(): String {
 
         val hour = dt.hour.toString().padStart(2, '0')
         val minute = dt.minute.toString().padStart(2, '0')
-        val day = dt.dayOfMonth.toString().padStart(2, '0')
+        val day = dt.day.toString().padStart(2, '0')
 
         val month = dt.month.name
             .lowercase()

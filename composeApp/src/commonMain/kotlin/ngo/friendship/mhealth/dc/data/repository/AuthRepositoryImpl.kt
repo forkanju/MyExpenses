@@ -19,7 +19,7 @@ class AuthRepositoryImpl(
         val data = response.data
 
         if (data != null) {
-            val user = data.toDomain()
+            val user = data.toDomain(password)
             settings.token = data.token
             settings.user = user
             return user

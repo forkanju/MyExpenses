@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room3)
 }
 
 kotlin {
@@ -109,6 +110,11 @@ kotlin {
             implementation(libs.material.icons.extended)
             implementation(libs.animation)
 
+
+            // Room
+            implementation(libs.androidx.room3.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+
         }
     }
 }
@@ -122,6 +128,10 @@ buildkonfig {
     }
 }
 
+room3 {
+    schemaDirectory("$projectDir/schemas")
+}
+
 compose.resources {
     publicResClass = true
     generateResClass = always
@@ -129,6 +139,9 @@ compose.resources {
 
 dependencies {
     "androidRuntimeClasspath"(libs.compose.ui.tooling)
+    add("kspAndroid", libs.androidx.room3.compiler)
+    add("kspIosArm64", libs.androidx.room3.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room3.compiler)
 }
 
 tasks.matching { it.name.startsWith("ksp") && it.name != "kspCommonMainKotlinMetadata" }
