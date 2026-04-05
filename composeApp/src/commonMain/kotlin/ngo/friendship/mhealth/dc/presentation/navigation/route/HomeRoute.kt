@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
@@ -27,6 +28,10 @@ fun EntryProviderScope<NavKey>.homeRoute(
     entry<Screens.Main> {
         val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
         val scope = rememberCoroutineScope()
+
+        LaunchedEffect(Unit) {
+            viewModel.loadInterviewList(appVersion = 3069)
+        }
 
         Scaffold(
             topBar = {

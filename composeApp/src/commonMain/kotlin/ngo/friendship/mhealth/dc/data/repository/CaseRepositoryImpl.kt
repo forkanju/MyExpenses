@@ -27,7 +27,7 @@ class CaseRepositoryImpl(
     override suspend fun getInterviewList(appVersion: Int): List<Interview> {
         val response = api.getInterviewList(
             request = InterviewListReqDto.build(
-                userName = localSettings.user.userName,       // demo pattern
+                userName = localSettings.user.userName,
                 password = localSettings.user.password,
                 appVersion = appVersion,
                 requestTime = currentTimestamp.toDateTimeServerSlash()

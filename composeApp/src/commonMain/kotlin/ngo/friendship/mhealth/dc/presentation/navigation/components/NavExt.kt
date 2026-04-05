@@ -102,7 +102,8 @@ inline fun <reified VM : BaseViewModel> InitBaseVM(
     content(BaseVMContent(
         viewModel = viewModel,
         snackBarState = snackBarState,
-        isLoading = isLoading
+        isLoading = isLoading,
+        backStack = backStack
     ))
     if (isLoading)
         LoadingLayout()
@@ -135,6 +136,7 @@ data class BaseVMContent<VM : BaseViewModel>(
     val viewModel: VM,
     val isLoading: Boolean,
     val snackBarState: SnackbarHostState,
+    val backStack: NavBackStack<NavKey>
 )
 
 fun <T> MutableList<T>.keepLast() {

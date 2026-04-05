@@ -11,10 +11,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
@@ -32,11 +30,10 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SetupNavDisplay(modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<MainViewModel>()
-    val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
     InitBaseVM(
         backStack = viewModel.backStack,
         viewModel = viewModel,
-    ) { snackBarState ->
+    ) {
         Scaffold(
             modifier = modifier.fillMaxSize(),
             snackbarHost = {

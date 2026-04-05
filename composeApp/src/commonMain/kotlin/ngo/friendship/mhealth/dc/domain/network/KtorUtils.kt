@@ -89,7 +89,7 @@ suspend inline fun <reified R> HttpClient.processPostRequest(
     crossinline request: HttpRequestBuilder.() -> Unit = {}
 ): R {
     return tryHttpCall {
-        if (!connectionListener.isConnected) error("No internet connection")
+        if (!ConnectionListener.isConnected) error("No internet connection")
         val response = post(url) {
             contentType(ContentType.Application.Json)
             this.url.parameters.appendAll(parameters)
@@ -117,7 +117,7 @@ suspend inline fun <reified R> HttpClient.processFormRequest(
     crossinline request: HttpRequestBuilder.() -> Unit = {}
 ): R {
     return tryHttpCall {
-        if (!connectionListener.isConnected) error("No internet connection")
+        if (!ConnectionListener.isConnected) error("No internet connection")
         val response = submitForm(url, formParameters) {
             request()
         }
@@ -141,7 +141,7 @@ suspend inline fun <reified T, reified R> HttpClient.processFormDataRequest(
     crossinline request: HttpRequestBuilder.() -> Unit = {}
 ): R {
     return tryHttpCall {
-        if (!connectionListener.isConnected) error("No internet connection")
+        if (!ConnectionListener.isConnected) error("No internet connection")
         val response = submitForm(url, parameters {
             append("data", body.toJson())
         }) {
@@ -165,7 +165,7 @@ suspend inline fun <reified R> HttpClient.processSimplePostRequest(
     crossinline request: MutableMap<String, Any>.(HttpRequestBuilder) -> Unit = {}
 ): R {
     return tryHttpCall {
-        if (!connectionListener.isConnected) error("No internet connection")
+        if (!ConnectionListener.isConnected) error("No internet connection")
         val response = post(url) {
             contentType(ContentType.Application.Json)
             this.url.parameters.appendAll(parameters)
@@ -190,7 +190,7 @@ suspend inline fun <reified R> HttpClient.processGetRequest(
     crossinline request: HttpRequestBuilder.() -> Parameters = { Parameters.Empty }
 ): R {
     return tryHttpCall {
-        if (!connectionListener.isConnected) error("No internet connection")
+        if (!ConnectionListener.isConnected) error("No internet connection")
         val response = get(url) {
             url {
                 parameters.appendAll(request(this@get))
@@ -234,12 +234,12 @@ suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
     val body = tryGet { body<R>() }
     body.log("getSuccessBody")
     val baseResponse = body.toJson().fromJson<BaseResponse>()
-    val massage = (baseResponse?.errorDesc?.ifBlank { null }
-        ?: baseResponse?.message?.ifBlank { null })?.normalize()
+    val massage = (baseResponse.errorDesc?.ifBlank { null }
+        ?: baseResponse.message?.ifBlank { null })?.normalize()
         ?: status.value.description
     if (!status.isSuccess()) error(massage)
     if (body == null) error(massage)
-    if (baseResponse?.responseCode == null || baseResponse.responseCode != "01") error(massage)
+    if (baseResponse.responseCode == null || baseResponse.responseCode != "01") error(massage)
     return body
 }
 

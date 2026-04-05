@@ -26,8 +26,8 @@ import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
 
 class MainViewModel(
     val settings: LocalSettings,
-    private val repository: MainRepository,
     private val caseRepository: CaseRepository,
+    repository: MainRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -54,11 +54,6 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            loadInterviewList(
-//                userName = "sharif.dr",
-//                password = "1234",
-                appVersion = 3069
-            )
             isUnauthorizedFlow.collect { isUnauthorized ->
                 if (isUnauthorized) {
                     showError("Session Expired. Please login again.")

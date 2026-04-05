@@ -17,7 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -128,7 +128,7 @@ fun PrescriptionActionButtonsOutlined(
             onClick = onShareClick,
             enabled = enabled,
             modifier = Modifier.size(40.dp),
-            border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
+            border = ButtonDefaults.outlinedButtonBorder(enabled).copy(width = 1.dp),
             colors = IconButtonDefaults.outlinedIconButtonColors(
                 contentColor = Color(0xFF616161)
             )
@@ -161,7 +161,7 @@ fun PrescriptionActionButtonsExamples() {
             }
         )
 
-        Divider()
+        HorizontalDivider()
 
         // Example 2: Outlined share button
         PrescriptionActionButtonsOutlined(
@@ -173,7 +173,7 @@ fun PrescriptionActionButtonsExamples() {
             }
         )
 
-        Divider()
+        HorizontalDivider()
 
         // Example 3: Custom text
         PrescriptionActionButtonRow(
@@ -182,7 +182,7 @@ fun PrescriptionActionButtonsExamples() {
             onShareClick = { }
         )
 
-        Divider()
+        HorizontalDivider()
 
         // Example 4: Disabled state
         PrescriptionActionButtonRow(

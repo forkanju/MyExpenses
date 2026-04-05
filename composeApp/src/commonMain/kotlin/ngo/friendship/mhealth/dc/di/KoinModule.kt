@@ -4,7 +4,6 @@ import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.repository.AuthRepositoryImpl
 import ngo.friendship.mhealth.dc.data.repository.CaseRepositoryImpl
 import ngo.friendship.mhealth.dc.data.repository.MainRepositoryImpl
-import ngo.friendship.mhealth.dc.domain.network.ConnectionListener
 import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
@@ -33,7 +32,6 @@ val dataModule = module {
 
 val instantModule = module(createdAtStart = true) {
     singleOf(constructor = ::LocalSettings)
-    singleOf(constructor = ::ConnectionListener)
 }
 
 val appModules = listOf(
