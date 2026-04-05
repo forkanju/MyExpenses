@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package ngo.friendship.mhealth.dc.domain.network
 
 import io.ktor.client.HttpClient

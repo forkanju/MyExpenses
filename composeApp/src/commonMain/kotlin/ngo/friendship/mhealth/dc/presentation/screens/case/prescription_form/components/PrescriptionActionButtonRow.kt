@@ -37,13 +37,14 @@ import androidx.compose.ui.unit.sp
 fun PrescriptionActionButtonRow(
     onSendClick: () -> Unit,
     onShareClick: () -> Unit,
-    modifier: Modifier = Modifier,
     sendButtonText: String = "Send Prescription",
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     Row(
         horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
     ) {
         // Main Send Button
         Button(
