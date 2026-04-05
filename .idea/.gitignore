@@ -1,0 +1,19 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/deploymentTargetSelector.xml
+/misc.xml
+/receipt.json
+/runConfigurations.xml
+/material_theme_project_new.xml
+/markdown.xml
+/deviceManager.xml
+/appInsightsSettings.xml
+/assetWizardSettings.xml
+/artifacts/
+/caches/
+/inspectionProfiles/
+/firebender/
+/ChatHistory_schema_v4.xml
+/codeStyles/codeStyleConfig.xml
+/codeStyles/Project.xml
