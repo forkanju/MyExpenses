@@ -67,7 +67,7 @@ class MainViewModel(
         selectedBottomTab = tab
     }
 
-    fun loadInterviewList(appVersion: Int) {
+    fun loadInterviewList(appVersion: Int = 3069) {
         launch(loading = Loading.Secondary) {
             interviewListState.value =
                 caseRepository.getInterviewList(

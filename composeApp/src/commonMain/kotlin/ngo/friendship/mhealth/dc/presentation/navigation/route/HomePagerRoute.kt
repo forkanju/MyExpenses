@@ -28,7 +28,7 @@ fun HomePagerRoute(
         onRefresh = {
             when (BottomNavItems.entries[pagerState.currentPage]) {
                 BottomNavItems.Home -> Unit
-                BottomNavItems.Cases -> mainViewModel.loadInterviewList(appVersion = 3069)
+                BottomNavItems.Cases -> mainViewModel.loadInterviewList()
                 BottomNavItems.Dashboard -> Unit
             }
         },

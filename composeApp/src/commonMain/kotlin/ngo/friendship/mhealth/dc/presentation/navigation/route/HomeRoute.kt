@@ -31,7 +31,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
-            viewModel.loadInterviewList(appVersion = 3069)
+            viewModel.loadInterviewList()
         }
 
         LaunchedEffect(Unit) {
