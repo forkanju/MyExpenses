@@ -11,6 +11,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigationevent.NavigationEventInfo
@@ -31,18 +33,21 @@ fun EntryProviderScope<NavKey>.homeRoute(
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
-            viewModel.loadInterviewList()
-        }
-
-        LaunchedEffect(Unit) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 viewModel.selectBottomTab(BottomNavItems.entries[page])
+                if (page == BottomNavItems.Cases.ordinal)
+                    viewModel.loadInterviewList()
             }
         }
 
         LaunchedEffect(viewModel.selectedBottomTab){
             if (pagerState.currentPage != viewModel.selectedBottomTab.ordinal)
                 pagerState.animateScrollToPage(viewModel.selectedBottomTab.ordinal)
+        }
+
+        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+            if (viewModel.selectedBottomTab == BottomNavItems.Cases)
+                viewModel.loadInterviewList()
         }
 
         Scaffold(
