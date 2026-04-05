@@ -14,15 +14,15 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
-import ngo.friendship.mhealth.dc.domain.repository.PrescriptionFormRepository
+import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
-class PrescriptionFormRepositoryImpl(
+class CaseRepositoryImpl(
     private val api: ApiService,
     private val localSettings: LocalSettings
-) : PrescriptionFormRepository {
+) : CaseRepository {
 
     override suspend fun getInterviewList(appVersion: Int): List<Interview> {
         val response = api.getInterviewList(

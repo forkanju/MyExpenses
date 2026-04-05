@@ -7,7 +7,7 @@ import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
 import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.model.DoctorFeedbackFormState
 
-interface PrescriptionFormRepository {
+interface CaseRepository {
 
     suspend fun getInterviewList(appVersion: Int): List<Interview>
 

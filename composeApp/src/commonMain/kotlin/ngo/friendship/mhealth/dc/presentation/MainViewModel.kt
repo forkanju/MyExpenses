@@ -16,7 +16,7 @@ import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.SetupData
-import ngo.friendship.mhealth.dc.domain.repository.PrescriptionFormRepository
+import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
@@ -27,7 +27,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
 class MainViewModel(
     val settings: LocalSettings,
     private val repository: MainRepository,
-    private val prescriptionFormRepository: PrescriptionFormRepository,
+    private val caseRepository: CaseRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -75,7 +75,7 @@ class MainViewModel(
     fun loadInterviewList(appVersion: Int) {
         launch {
             interviewListState.value =
-                prescriptionFormRepository.getInterviewList(
+                caseRepository.getInterviewList(
                     appVersion = appVersion
                 )
         }

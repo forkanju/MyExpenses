@@ -1,16 +1,16 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form
+package ngo.friendship.mhealth.dc.presentation.screens.case
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
-import ngo.friendship.mhealth.dc.domain.repository.PrescriptionFormRepository
+import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.model.DoctorFeedbackFormState
 
-class PrescriptionFormViewModel(
-    private val repository: PrescriptionFormRepository
+class CaseViewModel(
+    private val repository: CaseRepository
 ) : BaseViewModel() {
 
     val interviewDetailsState: StateFlow<InterviewDetails>
