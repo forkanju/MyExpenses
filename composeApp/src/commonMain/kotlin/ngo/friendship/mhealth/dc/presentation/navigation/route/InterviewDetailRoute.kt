@@ -15,14 +15,14 @@ import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
 import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormScreen
-import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import kotlin.jvm.JvmName
 
 fun EntryProviderScope<NavKey>.detailRoute(
     mainViewModel: MainViewModel,
     snackBarState: SnackbarHostState
 ) {
-    entryWithVM<Screens.PrescriptionForm, PrescriptionFormViewModel>(
+    entryWithVM<Screens.PrescriptionForm, CaseViewModel>(
         backStack = mainViewModel.backStack,
         snackBarState = snackBarState
     ) { screen ->
