@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case_list.model
+package ngo.friendship.mhealth.dc.presentation.screens.case.case_list.model
 
 data class CaseItemUi(
     val id: String, // ✅ REQUIRED for key

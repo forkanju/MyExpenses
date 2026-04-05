@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.home.components
+package ngo.friendship.mhealth.dc.presentation.screens.home.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.screens.main.home.model.StatRingUi
+import ngo.friendship.mhealth.dc.presentation.screens.home.model.StatRingUi
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.RingBarBG
 import ngo.friendship.mhealth.dc.theme.TextSecondary

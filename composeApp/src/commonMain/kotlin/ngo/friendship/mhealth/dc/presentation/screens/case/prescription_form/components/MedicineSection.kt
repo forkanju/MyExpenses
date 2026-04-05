@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.components
+package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -145,7 +145,7 @@ fun MedicineComposerCard(
 
             Spacer(Modifier.height(10.dp))
 
-            PrescriptionActionRowAligned(
+            _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.components.PrescriptionActionRowAligned(
                 doseValue = dose,
                 doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
                 onDoseSelect = { dose = it },

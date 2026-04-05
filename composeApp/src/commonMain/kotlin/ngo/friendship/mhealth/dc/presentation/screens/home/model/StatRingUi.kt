@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.home.model
+package ngo.friendship.mhealth.dc.presentation.screens.home.model
 
 import androidx.compose.ui.graphics.Color
 

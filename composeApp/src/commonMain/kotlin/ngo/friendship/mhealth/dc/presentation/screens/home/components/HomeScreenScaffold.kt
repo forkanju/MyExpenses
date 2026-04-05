@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.home.components
+package ngo.friendship.mhealth.dc.presentation.screens.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

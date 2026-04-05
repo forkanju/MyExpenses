@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.screens.main.case_list.components.AvatarBadge
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont

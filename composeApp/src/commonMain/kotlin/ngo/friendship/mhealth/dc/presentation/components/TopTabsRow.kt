@@ -15,7 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.screens.main.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.theme.FontSize
 
 @Composable

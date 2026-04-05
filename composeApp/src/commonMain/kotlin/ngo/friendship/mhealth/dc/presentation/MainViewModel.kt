@@ -68,7 +68,7 @@ class MainViewModel(
     }
 
     fun loadInterviewList(appVersion: Int) {
-        launch {
+        launch(loading = Loading.Secondary) {
             interviewListState.value =
                 caseRepository.getInterviewList(
                     appVersion = appVersion

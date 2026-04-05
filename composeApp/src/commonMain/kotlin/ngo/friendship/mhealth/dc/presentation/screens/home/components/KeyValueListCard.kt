@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.home.components
+package ngo.friendship.mhealth.dc.presentation.screens.home.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.screens.main.home.model.KeyValueUi
+import ngo.friendship.mhealth.dc.presentation.screens.home.model.KeyValueUi
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.TextSecondary
 

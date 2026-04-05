@@ -11,14 +11,13 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.delay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
-import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
-import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormScreen
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormScreen
 import kotlin.jvm.JvmName
 
-fun EntryProviderScope<NavKey>.detailRoute(
+fun EntryProviderScope<NavKey>.caseRoute(
     mainViewModel: MainViewModel,
     snackBarState: SnackbarHostState
 ) {
@@ -44,9 +43,7 @@ fun EntryProviderScope<NavKey>.detailRoute(
             interviewDetails = interviewDetails,
             medicineList = medicineList,
             onSave = {
-                viewModel.saveDoctorFeedback(formState = it) {
-                    mainViewModel.selectBottomTab(BottomNavItems.Cases)
-                }
+                viewModel.saveDoctorFeedback(formState = it)
             },
             onFcmDetailsClick = {
                 println("Fcm details clicked")

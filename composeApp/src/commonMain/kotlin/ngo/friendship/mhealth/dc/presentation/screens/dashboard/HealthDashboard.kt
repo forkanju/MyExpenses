@@ -18,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
-import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.components.DashboardCard
-import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.model.DashboardCardData
-import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.model.SectionData
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.DashboardCard
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.DashboardCardData
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.SectionData
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Hand

@@ -53,7 +53,7 @@ fun PrescriptionActionRowAligned(
 
     daysValue: String, daysItems: List<String>, onDaysSelect: (String) -> Unit,
 
-    toggleValue: MealTime, onToggleChange: (MealTime) -> Unit,
+    toggleValue: ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime, onToggleChange: (ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime) -> Unit,
 
     onMessageClick: () -> Unit, onAddClick: () -> Unit,
 
@@ -110,7 +110,7 @@ fun PrescriptionActionRowAligned(
 
 @Composable
 fun AgePoreToggle(
-    value: MealTime, onChange: (MealTime) -> Unit, modifier: Modifier = Modifier
+    value: ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime, onChange: (ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime) -> Unit, modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.height(height = 28.dp).clip(shape = RoundedCornerShape(size = 14.dp)).clickable(
@@ -118,7 +118,7 @@ fun AgePoreToggle(
                 indication = ripple(bounded = true)
             ) {
                 onChange(
-                    if (value == MealTime.AGE) MealTime.PORE else MealTime.AGE
+                    if (value == _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.AGE) _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.PORE else _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.AGE
                 )
             },
         shape = RoundedCornerShape(size = 14.dp),
@@ -141,7 +141,7 @@ fun AgePoreToggle(
             Spacer(Modifier.width(6.dp))
 
             Text(
-                text = if (value == MealTime.AGE) "আগে" else "পরে",
+                text = if (value == _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.AGE) "আগে" else "পরে",
                 fontSize = 12.sp,
                 color = TextPrimary,
                 maxLines = 1

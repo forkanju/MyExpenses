@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.case_list.components
+package ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

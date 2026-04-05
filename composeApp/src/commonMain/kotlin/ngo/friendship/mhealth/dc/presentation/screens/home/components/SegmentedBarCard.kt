@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.home.components
+package ngo.friendship.mhealth.dc.presentation.screens.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.screens.main.home.model.SegmentUi
+import ngo.friendship.mhealth.dc.presentation.screens.home.model.SegmentUi
 import ngo.friendship.mhealth.dc.theme.FontSize
 
 

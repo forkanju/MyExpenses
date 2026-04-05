@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.model
+package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model
 
 data class MedItem(
     val type: String,          // Cap/Tab/Syrup etc

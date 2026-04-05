@@ -21,7 +21,7 @@ import androidx.navigation3.ui.NavDisplay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
 import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
-import ngo.friendship.mhealth.dc.presentation.navigation.route.detailRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.caseRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
 import ngo.friendship.mhealth.dc.theme.Dimen
@@ -86,7 +86,7 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                             viewModel = viewModel
                         )
 
-                        detailRoute(
+                        caseRoute(
                             mainViewModel = viewModel,
                             snackBarState = snackBarState,
                         )

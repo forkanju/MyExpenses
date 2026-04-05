@@ -9,6 +9,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -31,6 +32,17 @@ fun EntryProviderScope<NavKey>.homeRoute(
 
         LaunchedEffect(Unit) {
             viewModel.loadInterviewList(appVersion = 3069)
+        }
+
+        LaunchedEffect(Unit) {
+            snapshotFlow { pagerState.currentPage }.collect { page ->
+                viewModel.selectBottomTab(BottomNavItems.entries[page])
+            }
+        }
+
+        LaunchedEffect(viewModel.selectedBottomTab){
+            if (pagerState.currentPage != viewModel.selectedBottomTab.ordinal)
+                pagerState.animateScrollToPage(viewModel.selectedBottomTab.ordinal)
         }
 
         Scaffold(

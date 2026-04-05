@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.model
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard.model
 
 import androidx.compose.ui.graphics.Color
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Report

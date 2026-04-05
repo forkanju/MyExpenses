@@ -2,7 +2,7 @@ package ngo.friendship.mhealth.dc.data.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.md5
 
 @Serializable
