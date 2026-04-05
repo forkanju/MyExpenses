@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class InterviewDetails(
-    val interviewId: Long = 0L,
+    val interviewId: Long = -1L,
     val beneficiaryId: Long = 0L,
     val beneficiaryName: String = "",
     val beneficiaryCode: String = "",

@@ -48,13 +48,14 @@ inline fun <reified T : NavKey, reified VM : BaseViewModel> EntryProviderScope<N
         InitBaseVM<VM>(
             backStack = backStack,
             snackBarState = snackBarState,
-            content = { snackBarState ->
-                this.backStack = backStack
+            content = {
+                viewModel.backStack = backStack
                 content(
                     BaseContent(
                         entry = this@entryWithVM,
-                        viewModel = this@InitBaseVM,
-                        snackBarState = snackBarState,
+                        viewModel = viewModel,
+                        isLoading = isLoading,
+                        snackBarState = this.snackBarState,
                         backStack = backStack
                     ), navEntry
                 )
@@ -68,7 +69,7 @@ inline fun <reified VM : BaseViewModel> InitBaseVM(
     backStack: NavBackStack<NavKey>,
     snackBarState: SnackbarHostState? = null,
     viewModel: VM? = null,
-    noinline content: @Composable VM.(SnackbarHostState) -> Unit,
+    noinline content: @Composable BaseVMContent<VM>.() -> Unit,
 ) {
     val viewModel = viewModel ?: koinViewModel<VM>()
     val isLoading by viewModel.loadingFlow.collectAsStateWithLifecycle()
@@ -98,7 +99,11 @@ inline fun <reified VM : BaseViewModel> InitBaseVM(
         snackBarState.currentSnackbarData?.dismiss()
         snackBarState.showSnackbar(it.message)
     }
-    content(viewModel, snackBarState)
+    content(BaseVMContent(
+        viewModel = viewModel,
+        snackBarState = snackBarState,
+        isLoading = isLoading
+    ))
     if (isLoading)
         LoadingLayout()
 }
@@ -121,8 +126,15 @@ fun LoadingLayout(modifier: Modifier = Modifier) {
 data class BaseContent<VM : BaseViewModel>(
     val entry: EntryProviderScope<NavKey>,
     val viewModel: VM,
+    val isLoading: Boolean,
     val snackBarState: SnackbarHostState,
     val backStack: NavBackStack<NavKey>
+)
+
+data class BaseVMContent<VM : BaseViewModel>(
+    val viewModel: VM,
+    val isLoading: Boolean,
+    val snackBarState: SnackbarHostState,
 )
 
 fun <T> MutableList<T>.keepLast() {

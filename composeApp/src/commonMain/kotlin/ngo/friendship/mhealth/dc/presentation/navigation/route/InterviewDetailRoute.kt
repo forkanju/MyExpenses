@@ -6,14 +6,16 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.delay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
-import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormScreen
+import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormViewModel
 import kotlin.jvm.JvmName
 
 fun EntryProviderScope<NavKey>.detailRoute(
@@ -30,6 +32,11 @@ fun EntryProviderScope<NavKey>.detailRoute(
 
         LaunchedEffect(Unit) {
             viewModel.loadInterviewDetails(screen.interviewId)
+            delay(500L)
+            snapshotFlow { isLoading }.collect {
+                if (!isLoading && interviewDetails.interviewId == -1L)
+                    backStack.removeLastOrNull()
+            }
         }
 
         PrescriptionFormScreen(
@@ -50,7 +57,7 @@ fun EntryProviderScope<NavKey>.detailRoute(
             onWhatsApp = {
                 println("WhatsApp clicked")
             },
-            onBack = mainViewModel.backStack::removeLastOrNull
+            onBack = backStack::removeLastOrNull
         )
     }
 }
