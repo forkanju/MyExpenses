@@ -15,7 +15,7 @@ object Screens {
     data object Main : NavKey
 
     @Serializable
-    data class InterviewDetails(val interviewId: Long) : NavKey
+    data class PrescriptionForm(val interviewId: Long) : NavKey
 
 
     @Serializable
@@ -53,7 +53,7 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.Auth::class, Screens.Auth.serializer())
     polymorphic(NavKey::class, Screens.ForgotPassword::class, Screens.ForgotPassword.serializer())
     polymorphic(NavKey::class, Screens.Main::class, Screens.Main.serializer())
-    polymorphic(NavKey::class, Screens.InterviewDetails::class, Screens.InterviewDetails.serializer())
+    polymorphic(NavKey::class, Screens.PrescriptionForm::class, Screens.PrescriptionForm.serializer())
     //dialog
     polymorphic(NavKey::class, Screens.Dialog.Error::class, Screens.Dialog.Error.serializer())
     polymorphic(NavKey::class, Screens.Dialog.Confirmation::class, Screens.Dialog.Confirmation.serializer())

@@ -10,6 +10,6 @@ enum class BottomNavItems(
     val iconRes: DrawableResource
 ) {
     Home(Res.drawable.home),
-    Case(Res.drawable.case_n),
+    Cases(Res.drawable.case_n),
     Dashboard(Res.drawable.more)
 }

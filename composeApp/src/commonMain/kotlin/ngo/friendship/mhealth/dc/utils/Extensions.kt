@@ -8,47 +8,27 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.number
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import ngo.friendship.mhealth.dc.BuildKonfig
+import ngo.friendship.mhealth.dc.isDebugBuild
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.contract
-import kotlin.math.absoluteValue
-import kotlin.math.min
-import kotlin.math.pow
-import kotlin.math.round
-import kotlin.math.roundToInt
+import kotlin.math.*
 import kotlin.random.Random
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -125,9 +105,14 @@ inline fun <reified T> rememberSaveableState(
     }
 }
 
+fun TextFieldState.setText(text: String?) {
+    edit {
+        replace(0, length, text.orEmpty())
+    }
+}
+
 /**Coroutines Extension Function*/
-@Suppress("FunctionName")
-suspend fun <T, R> T.IO(block: suspend T.() -> R) = withContext(Dispatchers.IO) {
+suspend fun <T, R> T.runIO(block: suspend T.() -> R) = withContext(Dispatchers.IO) {
     block()
 }
 
@@ -148,6 +133,14 @@ inline fun <T, R> Flow<List<T>>.mapList(crossinline transform: suspend T.() -> R
             transform(value)
         }
     }
+
+/**
+ * Returns a list containing all elements except the element at the specified [index].
+ */
+fun <T> List<T>.minusAt(index: Int): List<T> {
+    if (index !in indices) return this
+    return take(index) + drop(index + 1)
+}
 
 /**
  * Returns a new list containing a specified number of random elements from the original list,
@@ -190,7 +183,7 @@ fun Any.cat(message: String) {
 }
 
 fun Any?.log(tag: String = "TAG"): Any? {
-    if (!BuildKonfig.IS_DEBUG) return null
+    if (!isDebugBuild) return null
     if (this is Throwable)
         Napier.i("log> '$tag' ${this.message}", this, tag = tag)
     else
@@ -848,7 +841,7 @@ fun String.toUiDateTime(): String {
 
         val hour = dt.hour.toString().padStart(2, '0')
         val minute = dt.minute.toString().padStart(2, '0')
-        val day = dt.dayOfMonth.toString().padStart(2, '0')
+        val day = dt.day.toString().padStart(2, '0')
 
         val month = dt.month.name
             .lowercase()

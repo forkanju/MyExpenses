@@ -7,20 +7,19 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.BottomBar
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewListViewModel
 import ngo.friendship.mhealth.dc.theme.Resources
-import org.koin.compose.viewmodel.koinViewModel
 
 fun EntryProviderScope<NavKey>.homeRoute(
     viewModel: MainViewModel
@@ -29,18 +28,14 @@ fun EntryProviderScope<NavKey>.homeRoute(
         val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
         val scope = rememberCoroutineScope()
 
-        //inject InterviewListViewModel
-        val interviewVm = koinViewModel<InterviewListViewModel>().apply {
-            backStack = viewModel.backStack
-        }
-        val interviewList by interviewVm.interviewListState.collectAsStateWithLifecycle()
-
         Scaffold(
             topBar = {
                 CustomTopBar(
-                    notificationIcon = Resources.Icon.Notification,    // bell
+                    notificationIcon = Resources.Icon.Notification,
                     notificationCount = 10,
-                    onNotificationClick = { /* open notifications */ },
+                    onNotificationClick = {
+                        println("Notification clicked")
+                    },
                     userName = "Dr. Ahmed Imtiaz Abir",
                     userSubtitle = "Doctor Center, Head Office",
                     profileIcon = Resources.Icon.Profile,
@@ -48,7 +43,6 @@ fun EntryProviderScope<NavKey>.homeRoute(
                 )
             },
             bottomBar = {
-
                 Box(modifier = Modifier.navigationBarsPadding()) {
                     BottomBar(
                         pagerState = pagerState,
@@ -64,16 +58,20 @@ fun EntryProviderScope<NavKey>.homeRoute(
         ) { innerPadding ->
             HomePagerRoute(
                 pagerState = pagerState,
-                viewModel = viewModel,
+                mainViewModel = viewModel,
                 modifier = Modifier.fillMaxSize()
-                    .padding(innerPadding),
-                interviewVm = interviewVm,
-                interviewList = interviewList
+                    .padding(innerPadding)
             )
         }
-//        BackHandler(pagerState.currentPage != 0) {
-//
-//        }
+        NavigationBackHandler(
+            state = rememberNavigationEventState(NavigationEventInfo.None),
+            isBackEnabled = pagerState.currentPage != 0,
+            onBackCompleted = {
+                scope.launch {
+                    pagerState.animateScrollToPage(0)
+                }
+            }
+        )
     }
 
 }

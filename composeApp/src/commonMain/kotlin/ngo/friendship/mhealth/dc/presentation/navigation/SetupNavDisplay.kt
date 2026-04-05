@@ -13,9 +13,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
@@ -30,7 +33,6 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SetupNavDisplay(modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<MainViewModel>()
     val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
-
     InitBaseVM(
         backStack = viewModel.backStack,
         viewModel = viewModel,
@@ -46,10 +48,17 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                     )
                 }
             },
-            content = {
+            content = { paddingValues ->
                 NavDisplay(
                     backStack = backStack,
-                    sceneStrategy = dialogStrategy,
+                    entryDecorators = listOf(
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    sceneStrategies = listOf(
+                        SinglePaneSceneStrategy(),
+                        DialogSceneStrategy()
+                    ),
                     transitionSpec = {
                         // Slide in from right when navigating forward
                         slideInHorizontally(initialOffsetX = { it }) togetherWith
@@ -72,7 +81,9 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         authRoute(
                             mainViewModel = viewModel,
                             snackBarState = snackBarState,
-                            modifier = Modifier.padding(it).imePadding()
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .imePadding()
                         )
                         homeRoute(
                             viewModel = viewModel

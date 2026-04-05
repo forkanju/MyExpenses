@@ -23,10 +23,6 @@ class LocalSettings {
         get() = _user ?: (settings.getStringOrNull("user").fromJson<User>() ?: User()).also { _user = it }
         set(value) = settings.putOrRemove("user", value).also { _user = value }
 
-    var setupData
-        get() = settings.getStringOrNull("setup_data").fromJson<SetupData>()?: SetupData()
-        set(value) = settings.putOrRemove("setup_data",value)
-
     fun clear() {
         settings.clear()
     }

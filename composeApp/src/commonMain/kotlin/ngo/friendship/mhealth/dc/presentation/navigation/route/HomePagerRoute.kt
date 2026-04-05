@@ -1,30 +1,31 @@
 package ngo.friendship.mhealth.dc.presentation.navigation.route
 
-import HealthDashboardScreen
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import ngo.friendship.mhealth.dc.domain.model.Interview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.InterviewListViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.case.CaseScreen
+import ngo.friendship.mhealth.dc.presentation.screens.main.case_list.CaseListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.home.HomeScreen
+import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.HealthDashboardScreen
 
 @Composable
 fun HomePagerRoute(
     pagerState: PagerState,
-    viewModel: MainViewModel,
-    modifier: Modifier,
-    interviewVm: InterviewListViewModel,
-    interviewList: List<Interview>,
+    mainViewModel: MainViewModel,
+    modifier: Modifier
 ) {
-    LaunchedEffect(viewModel.selectedBottomTab){
-        pagerState.animateScrollToPage(viewModel.selectedBottomTab.ordinal)
+    val interviewList by mainViewModel.interviewListState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(mainViewModel.selectedBottomTab){
+        pagerState.animateScrollToPage(mainViewModel.selectedBottomTab.ordinal)
     }
+
     HorizontalPager(
         state = pagerState,
     ) { page ->
@@ -33,13 +34,11 @@ fun HomePagerRoute(
                 modifier = modifier
             )
 
-            BottomNavItems.Case -> CaseScreen(
+            BottomNavItems.Cases -> CaseListScreen(
                 modifier = modifier,
-                interviewVm = interviewVm,
                 interviewList = interviewList,
-                onCaseClick = { interview ->
-                    // তুমি চাইলে এখানে details screen এ navigate করবে
-                    viewModel.backStack.add(Screens.InterviewDetails(interview.interviewId))
+                onCaseClick = {
+                    mainViewModel.backStack.add(Screens.PrescriptionForm(it))
                 },
                 onFilterClick = {
                     // filter popup/dialog

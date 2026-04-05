@@ -22,5 +22,5 @@ object ProjectConfig {
 
 
     fun genVersionCode(major: Int, minor: Int, patch: Int) = major * 10_000 + minor * 100 + patch
-    fun genVersionName(major: Int, minor: Int, patch: Int) = "$major.$minor.$patch"
+    fun genVersionName(major: Int, minor: Int, patch: Int) = "$major.$minor.${"%02d".format(patch)}"
 }

@@ -24,6 +24,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Disable Ktor Monitor LAUNCHER icon -->
+        <activity
+            android:name="ro.cosminmihu.ktor.monitor.ui.KtorMonitorActivity"
+            android:exported="true"
+            android:icon="@mipmap/ktor_ic_launcher"
+            android:label="@string/ktor_activity_name"
+            android:roundIcon="@mipmap/ktor_ic_launcher_round"
+            android:taskAffinity="ro.cosminmihu.ktor.monitor.${applicationId}"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" >
+            <intent-filter tools:node="remove">
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

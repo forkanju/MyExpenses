@@ -4,10 +4,11 @@ import ngo.friendship.mhealth.dc.data.remote.dto.LoginResponseDto
 import ngo.friendship.mhealth.dc.domain.model.User
 
 
-fun LoginResponseDto.Data.toDomain(): User {
+fun LoginResponseDto.Data.toDomain(password: String): User {
     return User(
         userId = userId ?: -1,
         userName = userName.orEmpty(),
+        password = password,
         userKey = userKey.orEmpty(),
         profileImage = profileImage.orEmpty(),
         mobileNo = mobileNo.orEmpty()
