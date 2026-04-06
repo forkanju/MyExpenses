@@ -6,17 +6,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.delay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.PrescriptionFormScreen
 import kotlin.jvm.JvmName
-import kotlin.time.Duration.Companion.seconds
 
 fun EntryProviderScope<NavKey>.caseRoute(
     mainViewModel: MainViewModel,

@@ -7,7 +7,6 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
-import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 
 class CaseViewModel(

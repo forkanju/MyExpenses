@@ -6,19 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.utils.log
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.isInitialized
 
 abstract class BaseViewModel: ViewModel() {
 
@@ -126,18 +120,6 @@ abstract class BaseViewModel: ViewModel() {
             throwable.message?.let {
                 errorFlow.emit(Info(it))
             }
-        }
-    }
-
-    fun clearError(){
-        launch(mainContext, loading = Loading.Gone) {
-            errorFlow.emit(Info())
-        }
-    }
-
-    fun clearSuccess(){
-        launch(mainContext, loading = Loading.Gone) {
-            successFlow.emit(Info())
         }
     }
 
