@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.json.Json
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackParam1
 import ngo.friendship.mhealth.dc.data.remote.dto.toDto
@@ -49,18 +48,17 @@ import ngo.friendship.mhealth.dc.utils.minusAt
 @Composable
 fun PrescriptionFormScreen(
     modifier: Modifier = Modifier,
+    formState: DoctorFeedbackFormState,
     setupData: SetupData,
     interviewDetails: InterviewDetails,
     medicineList: List<Medicine>,
-    onSave: (DoctorFeedbackFormState) -> Unit = {},
+    onUpdate: (DoctorFeedbackFormState) -> Unit = {},
+    onSave: () -> Unit = {},
     onFcmDetailsClick: () -> Unit,
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit
 ) {
-    var formState by remember {
-        mutableStateOf(DoctorFeedbackFormState(interviewId = interviewDetails.interviewId))
-    }
 
     Scaffold(
         modifier = modifier,
@@ -77,13 +75,6 @@ fun PrescriptionFormScreen(
 
         var checked by remember { mutableStateOf(false) }
         var selectedTab by remember { mutableStateOf(0) }
-
-
-        LaunchedEffect(interviewDetails.interviewId) {
-            formState = formState.copy(
-                interviewId = interviewDetails.interviewId
-            )
-        }
 
         val interviewQaItems = remember(interviewDetails.details) {
             interviewDetails.details.map {
@@ -137,7 +128,7 @@ fun PrescriptionFormScreen(
                     selected = null,//selectedDiagnosis
                     getLabel = { it.diagName },
                     onSelectedChange = { selected ->
-                        formState = addDiagnosis(formState, selected)
+                        onUpdate(addDiagnosis(formState, selected))
                     }
                 )
 
@@ -146,7 +137,7 @@ fun PrescriptionFormScreen(
                     DiagnosisChipGroup(
                         items = formState.selectedDiagnoses,
                         onRemove = { item ->
-                            formState = removeDiagnosis(formState, item)
+                            onUpdate(removeDiagnosis(formState, item))
                         }
                     )
                 }
@@ -156,14 +147,10 @@ fun PrescriptionFormScreen(
                     medicines = medicineList,
                     prescriptionItems = formState.prescriptions,
                     onAddMedicine = { item ->
-                        formState = formState.copy(
-                            prescriptions = formState.prescriptions + item
-                        )
+                        onUpdate(formState.copy(prescriptions = formState.prescriptions + item))
                     },
                     onRemoveMedicine = { index ->
-                        formState = formState.copy(
-                            prescriptions = formState.prescriptions.minusAt(index)
-                        )
+                        onUpdate(formState.copy(prescriptions = formState.prescriptions.minusAt(index)))
                     }
                 )
 
@@ -172,7 +159,7 @@ fun PrescriptionFormScreen(
                     placeholder = "Advice",
                     value = formState.doctorAdvice,
                     onValueChange = {
-                        formState = formState.copy(doctorAdvice = it)
+                        onUpdate(formState.copy(doctorAdvice = it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -187,7 +174,7 @@ fun PrescriptionFormScreen(
                     selected = null,
                     getLabel = { it.investigationName },
                     onSelectedChange = { selected ->
-                        formState = addInvestigation(formState, selected)
+                        onUpdate(addInvestigation(formState, selected))
                     }
                 )
 
@@ -196,7 +183,7 @@ fun PrescriptionFormScreen(
                     InvestigationChipGroup(
                         items = formState.selectedInvestigations,
                         onRemove = { item ->
-                            formState = removeInvestigation(formState, item)
+                            onUpdate(removeInvestigation(formState, item))
                         }
                     )
                 }
@@ -208,7 +195,7 @@ fun PrescriptionFormScreen(
                     placeholder = "Comment",
                     value = formState.commentsForFcm,
                     onValueChange = {
-                        formState = formState.copy(commentsForFcm = it)
+                        onUpdate(formState.copy(commentsForFcm = it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -223,7 +210,7 @@ fun PrescriptionFormScreen(
                     selected = formState.selectedReferralCenter,
                     getLabel = { it.refCenterName },
                     onSelectedChange = { selected ->
-                        formState = formState.copy(selectedReferralCenter = selected)
+                        onUpdate(formState.copy(selectedReferralCenter = selected))
                     }
                 )
 
@@ -234,7 +221,7 @@ fun PrescriptionFormScreen(
                     placeholder = "Note",
                     value = formState.doctorNotes,
                     onValueChange = {
-                        formState = formState.copy(doctorNotes = it)
+                        onUpdate(formState.copy(doctorNotes = it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -255,7 +242,7 @@ fun PrescriptionFormScreen(
                     rightText = "Save as a template",
                     onLeftClick = {
                         println("Open date picker")
-                        formState = formState.copy(nextFollowUpDate = "2026-04-10")
+                        onUpdate(formState.copy(nextFollowUpDate = "2026-04-10"))
                         println("Selected next follow-up date: ${formState.nextFollowUpDate}")
                     },
                     onRightClick = {
@@ -284,15 +271,7 @@ fun PrescriptionFormScreen(
                         Spacer(modifier = Modifier.height(4.dp))
 
                         PrescriptionActionButtonRow(
-                            onSendClick = {
-                                val param1 = DoctorFeedbackParam1(
-                                    doctorFeedbackObject = formState.toDto()
-                                )
-                                val jsonString = Json.encodeToString(param1)
-
-                                println("PARAM1_JSON: $jsonString")
-                                onSave(formState)
-                            },
+                            onSendClick = onSave,
                             onShareClick = {
                                 println("Share prescription")
                             }
@@ -369,7 +348,8 @@ fun PrescriptionFormScreenPrev() {
             onFcmDetailsClick = {},
             onCall = {},
             onWhatsApp = {},
-            onBack = {}
+            onBack = {},
+            formState = DoctorFeedbackFormState()
         )
     }
 }

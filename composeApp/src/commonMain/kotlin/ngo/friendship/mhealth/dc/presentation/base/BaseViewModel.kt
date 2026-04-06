@@ -1,5 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.base
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
@@ -12,13 +14,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.utils.log
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.isInitialized
 
 abstract class BaseViewModel: ViewModel() {
 
     open lateinit var backStack : NavBackStack<NavKey>
+    lateinit var snackBarState : SnackbarHostState
+
+    fun setSnackHostBarState(snackBarState: SnackbarHostState){
+        if (!::snackBarState.isInitialized)
+            this.snackBarState = snackBarState
+    }
 
     val errorFlow = MutableSharedFlow<Info>()
     val successFlow = MutableSharedFlow<Info>()
@@ -32,10 +42,47 @@ abstract class BaseViewModel: ViewModel() {
         sendError(throwable)
     }
 
+    init {
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            errorFlow.collect {
+                if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
+                snackBarState.currentSnackbarData?.dismiss()
+                if (it.message.length > 50)
+                    backStack.add(Screens.Dialog.Error(it.message))
+                else
+                    snackBarState.showSnackbar(it.message)
+            }
+        }
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            successFlow.collect {
+                if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
+                snackBarState.currentSnackbarData?.dismiss()
+                snackBarState.showSnackbar(it.message)
+            }
+        }
+    }
+
+    fun listenSnackbarControllerEvents() {
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            SnackbarController.events.collect {
+                if (it.message.isBlank()) return@collect
+                snackBarState.currentSnackbarData?.dismiss()
+                val result = snackBarState.showSnackbar(
+                    message = it.message,
+                    actionLabel = it.action?.label,
+                    withDismissAction = it.action?.onAction != null,
+                )
+                if (result == SnackbarResult.ActionPerformed)
+                    it.action?.onAction()
+            }
+        }
+    }
+
     protected fun launch(
         dispatcher: CoroutineContext = EmptyCoroutineContext,
         loading: Loading = Loading.Primary,
         coroutineExceptionHandler: CoroutineExceptionHandler = defaultErrorHandler,
+        onEnd: (() -> Unit) = {},
         block: suspend CoroutineScope.() -> Unit
     ): Job {
         return viewModelScope.launch(dispatcher + coroutineExceptionHandler) {
@@ -48,6 +95,7 @@ abstract class BaseViewModel: ViewModel() {
             } finally {
                 loadingJob.cancel()
                 setLoading(false, loading)
+                onEnd()
             }
         }
     }

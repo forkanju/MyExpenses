@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,10 +20,6 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
-import ngo.friendship.mhealth.dc.presentation.base.Info
-import ngo.friendship.mhealth.dc.presentation.base.ObserveAsEvents
-import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
-import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -73,32 +69,37 @@ inline fun <reified VM : BaseViewModel> InitBaseVM(
 ) {
     val viewModel = viewModel ?: koinViewModel<VM>()
     val isLoading by viewModel.loadingFlow.collectAsStateWithLifecycle()
+    val snackBarStateOriginal = snackBarState
     val snackBarState = snackBarState ?: remember { SnackbarHostState() }
-
-    ObserveAsEvents(SnackbarController.events) {
-        if (it.message.isBlank()) return@ObserveAsEvents
-        snackBarState.currentSnackbarData?.dismiss()
-        val result = snackBarState.showSnackbar(
-            message = it.message,
-            actionLabel = it.action?.label,
-            withDismissAction = it.action?.onAction != null,
-        )
-        if (result == SnackbarResult.ActionPerformed)
-            it.action?.onAction()
+    LaunchedEffect(Unit){
+        viewModel.setSnackHostBarState(snackBarState)
+        if (snackBarStateOriginal == null)
+            viewModel.listenSnackbarControllerEvents()
     }
-    ObserveAsEvents(viewModel.errorFlow) {
-        if (it.message.isBlank() || it.type != Info.Type.Default) return@ObserveAsEvents
-        snackBarState.currentSnackbarData?.dismiss()
-        if (it.message.length > 50)
-            backStack.add(Screens.Dialog.Error(it.message))
-        else
-            snackBarState.showSnackbar(it.message)
-    }
-    ObserveAsEvents(viewModel.successFlow) {
-        if (it.message.isBlank() || it.type != Info.Type.Default) return@ObserveAsEvents
-        snackBarState.currentSnackbarData?.dismiss()
-        snackBarState.showSnackbar(it.message)
-    }
+//    ObserveAsEvents(SnackbarController.events) {
+//        if (it.message.isBlank()) return@ObserveAsEvents
+//        snackBarState.currentSnackbarData?.dismiss()
+//        val result = snackBarState.showSnackbar(
+//            message = it.message,
+//            actionLabel = it.action?.label,
+//            withDismissAction = it.action?.onAction != null,
+//        )
+//        if (result == SnackbarResult.ActionPerformed)
+//            it.action?.onAction()
+//    }
+//    ObserveAsEvents(viewModel.errorFlow) {
+//        if (it.message.isBlank() || it.type != Info.Type.Default) return@ObserveAsEvents
+//        snackBarState.currentSnackbarData?.dismiss()
+//        if (it.message.length > 50)
+//            backStack.add(Screens.Dialog.Error(it.message))
+//        else
+//            snackBarState.showSnackbar(it.message)
+//    }
+//    ObserveAsEvents(viewModel.successFlow) {
+//        if (it.message.isBlank() || it.type != Info.Type.Default) return@ObserveAsEvents
+//        snackBarState.currentSnackbarData?.dismiss()
+//        snackBarState.showSnackbar(it.message)
+//    }
     content(BaseVMContent(
         viewModel = viewModel,
         snackBarState = snackBarState,

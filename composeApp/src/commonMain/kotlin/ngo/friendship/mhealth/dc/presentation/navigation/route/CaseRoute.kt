@@ -16,6 +16,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.PrescriptionFormScreen
 import kotlin.jvm.JvmName
+import kotlin.time.Duration.Companion.seconds
 
 fun EntryProviderScope<NavKey>.caseRoute(
     mainViewModel: MainViewModel,
@@ -28,27 +29,20 @@ fun EntryProviderScope<NavKey>.caseRoute(
         val interviewDetails by viewModel.interviewDetailsState.collectAsState()
         val setupData by mainViewModel.setupDataState.collectAsState()
         val medicineList by viewModel.medicineListState.collectAsState()
+        val formState by viewModel.formState.collectAsState()
 
         LaunchedEffect(screen.interviewId) {
             viewModel.loadInterviewDetails(screen.interviewId)
-            viewModel.loadQuestionAnswerData()
-        }
-        LaunchedEffect(Unit) {
-            delay(500L)
-            snapshotFlow { isLoading }.collect {
-                if (!isLoading && interviewDetails.interviewId == -1L) {
-                    backStack.removeLastOrNull()
-                }
-            }
+            viewModel.loadQuestionAnswerData(screen.interviewId)
         }
 
         PrescriptionFormScreen(
+            formState = formState,
             setupData = setupData,
             interviewDetails = interviewDetails,
             medicineList = medicineList,
-            onSave = {
-                viewModel.saveDoctorFeedback(formState = it)
-            },
+            onUpdate = viewModel::updateFormState,
+            onSave = viewModel::saveDoctorFeedback,
             onFcmDetailsClick = {
                 println("Fcm details clicked")
             },

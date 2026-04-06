@@ -2,12 +2,12 @@ package ngo.friendship.mhealth.dc.presentation.screens.case
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 
 class CaseViewModel(
@@ -15,26 +15,44 @@ class CaseViewModel(
 ) : BaseViewModel() {
 
     val interviewDetailsState: StateFlow<InterviewDetails>
-        field = MutableStateFlow<InterviewDetails>(InterviewDetails())
+        field = MutableStateFlow(InterviewDetails())
 
     val medicineListState: StateFlow<List<Medicine>>
-        field = MutableStateFlow<List<Medicine>>(listOf())
+        field = MutableStateFlow(listOf())
 
     val questionAnswerState: StateFlow<QuestionAnswerJson>
-        field = MutableStateFlow<QuestionAnswerJson>(QuestionAnswerJson())
+        field = MutableStateFlow(QuestionAnswerJson())
 
-    private val _formState = MutableStateFlow(DoctorFeedbackFormState())
-    val formState = _formState.asStateFlow()
+    val formState: StateFlow<DoctorFeedbackFormState>
+        field = MutableStateFlow(DoctorFeedbackFormState())
 
     init {
         loadMedicineList()
     }
 
     fun loadInterviewDetails(interviewId: Long) {
-        launch {
+        launch(onEnd = {
+            if (interviewDetailsState.value.interviewId == -1L)
+                backStack.removeLastOrNull()
+        }) {
+            interviewDetailsState.value = InterviewDetails()
             interviewDetailsState.value = repository.getInterviewDetails(interviewId = interviewId)
         }
+    }
 
+    fun loadQuestionAnswerData(interviewId: Long) {
+        launch {
+            val result = repository.getQuestionAnswerData()
+
+            questionAnswerState.value = result
+            println("TTTT LOAD q1 size = ${result.questionAnswerJson.size}")
+            println("TTTT LOAD q2 size = ${result.questionAnswerJson2.size}")
+            formState.value = formState.value.copy(
+                interviewId = interviewId,
+                questionAnswers = result.questionAnswerJson,
+                questionAnswers2 = result.questionAnswerJson2
+            )
+        }
     }
 
     fun loadMedicineList(
@@ -45,47 +63,16 @@ class CaseViewModel(
         }
     }
 
-
-//    fun saveDoctorFeedback(formState: DoctorFeedbackFormState) {
-//        launch {
-//            repository.saveDoctorFeedback(formState = formState)
-//            backStack.removeLastOrNull()
-//        }
-//    }
-
-    fun saveDoctorFeedback(formState: DoctorFeedbackFormState) {
+    fun saveDoctorFeedback() {
         launch {
-            // 🔍 DEBUG PRINT HERE
-            println("TTTT VM _formState q1 size = ${_formState.value.questionAnswers.size}")
-            println("TTTT VM _formState q2 size = ${_formState.value.questionAnswers2.size}")
-            println("TTTT UI formState q1 size = ${formState.questionAnswers.size}")
-            println("TTTT UI formState q2 size = ${formState.questionAnswers2.size}")
-            val finalState = formState.copy(
-                interviewId = formState.interviewId ?: _formState.value.interviewId,
-                questionAnswers = _formState.value.questionAnswers,
-                questionAnswers2 = _formState.value.questionAnswers2
-            )
-
-            // 🔍 AFTER MERGE CHECK
-            println("TTTT FINAL q1 size = ${finalState.questionAnswers.size}")
-            println("TTTT FINAL q2 size = ${finalState.questionAnswers2.size}")
-            repository.saveDoctorFeedback(formState = finalState)
-//            backStack.removeLastOrNull()
+            repository.saveDoctorFeedback(formState = formState.value)
+            showSuccess("Feedback saved successfully")
+            backStack.removeLastOrNull()
         }
     }
 
-    fun loadQuestionAnswerData() {
-        launch {
-            val result = repository.getQuestionAnswerData()
-
-            questionAnswerState.value = result
-            println("TTTT LOAD q1 size = ${result.questionAnswerJson.size}")
-            println("TTTT LOAD q2 size = ${result.questionAnswerJson2.size}")
-            _formState.value = _formState.value.copy(
-                questionAnswers = result.questionAnswerJson,
-                questionAnswers2 = result.questionAnswerJson2
-            )
-        }
+    fun updateFormState(state: DoctorFeedbackFormState) {
+        formState.value = state
     }
 
 }

@@ -40,13 +40,13 @@ fun EntryProviderScope<NavKey>.homeRoute(
             }
         }
 
-        LaunchedEffect(viewModel.selectedBottomTab){
+        LaunchedEffect(viewModel.selectedBottomTab) {
             if (pagerState.currentPage != viewModel.selectedBottomTab.ordinal)
                 pagerState.animateScrollToPage(viewModel.selectedBottomTab.ordinal)
         }
 
         LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-            if (viewModel.selectedBottomTab == BottomNavItems.Cases)
+            if (viewModel.selectedBottomTab == BottomNavItems.Cases || viewModel.interviewListState.value.isEmpty())
                 viewModel.loadInterviewList()
         }
 
