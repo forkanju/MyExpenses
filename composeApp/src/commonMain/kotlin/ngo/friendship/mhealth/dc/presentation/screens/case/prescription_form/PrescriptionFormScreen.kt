@@ -1,27 +1,39 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.json.Json
-import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackParam1
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
-import ngo.friendship.mhealth.dc.data.remote.dto.toDto
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
@@ -34,14 +46,13 @@ import ngo.friendship.mhealth.dc.presentation.components.FormContainerCard
 import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.DiagnosisChipGroup
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.InvestigationChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MedicineSection
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PatientProfileCard
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionActionButtonRow
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionHeader
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionTopBar
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.DiagnosisChipGroup
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.InvestigationChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.SendMessageDialog
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addInvestigation
@@ -51,25 +62,54 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.com
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.toDateString
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.toEpochMillisOrNull
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.CustomMessageState
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.utils.minusAt
-import kotlin.time.Instant
 
 
 @Composable
 fun PrescriptionFormScreen(
     modifier: Modifier = Modifier,
+    formState: DoctorFeedbackFormState,
     setupData: SetupData,
     interviewDetails: InterviewDetails,
     medicineList: List<Medicine>,
-    onSave: (DoctorFeedbackFormState, String, String) -> Unit,
+    onUpdate: (DoctorFeedbackFormState) -> Unit = {},
+    onSave: () -> Unit = {},
     onFcmDetailsClick: () -> Unit,
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit
 ) {
-    var formState by remember {
-        mutableStateOf(DoctorFeedbackFormState(interviewId = interviewDetails.interviewId))
+    var checked by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableStateOf(0) }
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showSendMessageDialog by remember { mutableStateOf(false) }
+    var customMessageState by remember {
+        mutableStateOf(
+            CustomMessageState(
+                messageText = "",
+                isFcmChecked = true,
+                isBeneficiaryChecked = true,
+                phoneNumber = ""
+            )
+        )
+    }
+
+    val interviewQaItems = remember(interviewDetails.details) {
+        interviewDetails.details.map {
+            QAItem(
+                question = it.questionName,
+                answer = it.answer
+            )
+        }
+    }
+
+    val systemPrescriptionItems = remember(interviewDetails.sysPrescriptionList) {
+        interviewDetails.sysPrescriptionList.map {
+            QAItem("Medicine", it.prescription)
+        }
     }
 
     Scaffold(
@@ -84,42 +124,6 @@ fun PrescriptionFormScreen(
             )
         }
     ) { paddingValues ->
-
-        var checked by remember { mutableStateOf(false) }
-        var selectedTab by remember { mutableStateOf(0) }
-        var showDatePicker by remember { mutableStateOf(false) }
-        var showSendMessageDialog by remember { mutableStateOf(false) }
-        var customMessageState by remember {
-            mutableStateOf(
-                CustomMessageState(
-                    messageText = "",
-                    isFcmChecked = true,
-                    isBeneficiaryChecked = true,
-                    phoneNumber = ""
-                )
-            )
-        }
-
-        LaunchedEffect(interviewDetails.interviewId) {
-            formState = formState.copy(
-                interviewId = interviewDetails.interviewId
-            )
-        }
-
-        val interviewQaItems = remember(interviewDetails.details) {
-            interviewDetails.details.map {
-                QAItem(
-                    question = it.questionName,
-                    answer = it.answer
-                )
-            }
-        }
-
-        val systemPrescriptionItems = remember(interviewDetails.sysPrescriptionList) {
-            interviewDetails.sysPrescriptionList.map {
-                QAItem("Medicine", it.prescription)
-            }
-        }
 
         Column(
             modifier = Modifier
@@ -156,7 +160,7 @@ fun PrescriptionFormScreen(
                     selected = null,//selectedDiagnosis
                     getLabel = { it.diagName },
                     onSelectedChange = { selected ->
-                        formState = addDiagnosis(formState, selected)
+                        onUpdate(addDiagnosis(formState, selected))
                     }
                 )
 
@@ -165,7 +169,7 @@ fun PrescriptionFormScreen(
                     DiagnosisChipGroup(
                         items = formState.selectedDiagnoses,
                         onRemove = { item ->
-                            formState = removeDiagnosis(formState, item)
+                            onUpdate(removeDiagnosis(formState, item))
                         }
                     )
                 }
@@ -175,14 +179,10 @@ fun PrescriptionFormScreen(
                     medicines = medicineList,
                     prescriptionItems = formState.prescriptions,
                     onAddMedicine = { item ->
-                        formState = formState.copy(
-                            prescriptions = formState.prescriptions + item
-                        )
+                        onUpdate(formState.copy(prescriptions = formState.prescriptions + item))
                     },
                     onRemoveMedicine = { index ->
-                        formState = formState.copy(
-                            prescriptions = formState.prescriptions.minusAt(index)
-                        )
+                        onUpdate(formState.copy(prescriptions = formState.prescriptions.minusAt(index)))
                     }
                 )
 
@@ -191,7 +191,7 @@ fun PrescriptionFormScreen(
                     placeholder = "Advice",
                     value = formState.doctorAdvice,
                     onValueChange = {
-                        formState = formState.copy(doctorAdvice = it)
+                        onUpdate(formState.copy(doctorAdvice = it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -206,8 +206,7 @@ fun PrescriptionFormScreen(
                     selected = null,
                     getLabel = { it.investigationName },
                     onSelectedChange = { selected ->
-                        println("TTTTTs selected investigation $selected")
-                        formState = addInvestigation(formState, selected)
+                        onUpdate(addInvestigation(formState, selected))
                     }
                 )
 
@@ -216,7 +215,7 @@ fun PrescriptionFormScreen(
                     InvestigationChipGroup(
                         items = formState.selectedInvestigations,
                         onRemove = { item ->
-                            formState = removeInvestigation(formState, item)
+                            onUpdate(removeInvestigation(formState, item))
                         }
                     )
                 }
@@ -228,7 +227,7 @@ fun PrescriptionFormScreen(
                     placeholder = "Comment",
                     value = formState.commentsForFcm,
                     onValueChange = {
-                        formState = formState.copy(commentsForFcm = it)
+                        onUpdate(formState.copy(commentsForFcm = it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -243,7 +242,7 @@ fun PrescriptionFormScreen(
                     selected = formState.selectedReferralCenter,
                     getLabel = { it.refCenterName },
                     onSelectedChange = { selected ->
-                        formState = formState.copy(selectedReferralCenter = selected)
+                        onUpdate(formState.copy(selectedReferralCenter = selected))
                     }
                 )
 
@@ -254,7 +253,7 @@ fun PrescriptionFormScreen(
                     placeholder = "Note",
                     value = formState.doctorNotes,
                     onValueChange = {
-                        formState = formState.copy(doctorNotes = it)
+                        onUpdate(formState.copy(doctorNotes = it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
@@ -292,7 +291,7 @@ fun PrescriptionFormScreen(
                     AppDatePickerDialog(
                         initialDate = formState.nextFollowUpDate,
                         onDateSelected = { selectedDate ->
-                            formState = formState.copy(nextFollowUpDate = selectedDate)
+                            onUpdate(formState.copy(nextFollowUpDate = selectedDate))
                             println("Selected next follow-up date: ${formState.nextFollowUpDate}")
                         },
                         onDismiss = {
@@ -329,15 +328,7 @@ fun PrescriptionFormScreen(
                         Spacer(modifier = Modifier.height(4.dp))
 
                         PrescriptionActionButtonRow(
-                            onSendClick = {
-                                val param1 = DoctorFeedbackParam1(
-                                    doctorFeedbackObject = formState.toDto()
-                                )
-                                val jsonString = Json.encodeToString(param1)
-
-                                println("PARAM1_JSON: $jsonString")
-                                onSave(formState,"","")
-                            },
+                            onSendClick = onSave,
                             onShareClick = {
                                 println("Share prescription")
                             }
@@ -424,11 +415,11 @@ fun PrescriptionFormScreenPrev() {
                     unitType = "Tablets"
                 )
             ),
-            onSave = { _, _, _ -> },
             onFcmDetailsClick = {},
             onCall = {},
             onWhatsApp = {},
             onBack = {},
+            formState = DoctorFeedbackFormState()
         )
     }
 }

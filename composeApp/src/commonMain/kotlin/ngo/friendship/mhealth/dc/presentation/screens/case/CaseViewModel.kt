@@ -34,8 +34,24 @@ class CaseViewModel(
     }
 
     fun loadInterviewDetails(interviewId: Long) {
-        launch {
+        launch(onEnd = {
+            if (interviewDetailsState.value.interviewId == -1L)
+                backStack.removeLastOrNull()
+        }) {
+            interviewDetailsState.value = InterviewDetails()
             interviewDetailsState.value = repository.getInterviewDetails(interviewId = interviewId)
+        }
+    }
+
+    fun loadQuestionAnswerData(interviewId: Long) {
+        launch {
+            val result = repository.getQuestionAnswerData()
+            questionAnswerState.value = result
+            formState.value = formState.value.copy(
+                interviewId = interviewId,
+                questionAnswers = result.questionAnswerJson,
+                questionAnswers2 = result.questionAnswerJson2
+            )
         }
     }
 
@@ -47,57 +63,16 @@ class CaseViewModel(
         }
     }
 
-
-    fun saveDoctorFeedback(state: DoctorFeedbackFormState, mobile: String, sms: String) {
+    fun saveDoctorFeedback() {
         launch {
-            val finalState = state.copy(
-                interviewId = state.interviewId ?: formState.value.interviewId,
-                questionAnswers = formState.value.questionAnswers,
-                questionAnswers2 = formState.value.questionAnswers2
-            )
-
-            try {
-                repository.saveDoctorFeedback(formState = finalState)
-
-                val interviewId = finalState.interviewId
-                if (interviewId != null) {
-                    val isStatusUpdated = repository.updateInterviewStatus(
-                        interviewId = interviewId,
-                        status = "Close"
-                    )
-
-                    if (!isStatusUpdated) {
-                        uiEvent.emit(
-                            CaseUiEvent.ShowSnackbar("Feedback saved, but status update failed")
-                        )
-                        return@launch
-                    }
-                }
-
-                repository.sendSms(mobile, sms);
-                uiEvent.emit(CaseUiEvent.ShowSnackbar("Feedback saved successfully"))
-                uiEvent.emit(CaseUiEvent.NavigateBack)
-
-            } catch (e: Exception) {
-                uiEvent.emit(
-                    CaseUiEvent.ShowSnackbar(
-
-                        e.message ?: "Failed to save feedback"
-                    )
-                )
-            }
+            repository.saveDoctorFeedback(formState = formState.value)
+            showSuccess("Feedback saved successfully")
+            backStack.removeLastOrNull()
         }
     }
 
-    fun loadQuestionAnswerData() {
-        launch {
-            val result = repository.getQuestionAnswerData()
-            questionAnswerState.value = result
-            formState.value = formState.value.copy(
-                questionAnswers = result.questionAnswerJson,
-                questionAnswers2 = result.questionAnswerJson2
-            )
-        }
+    fun updateFormState(state: DoctorFeedbackFormState) {
+        formState.value = state
     }
 
 }

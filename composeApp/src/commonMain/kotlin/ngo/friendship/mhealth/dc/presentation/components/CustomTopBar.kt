@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.AppLogo
+import ngo.friendship.mhealth.dc.theme.Dimen
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.Red
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.AppLogoWhite
@@ -58,10 +59,8 @@ fun CustomTopBar(
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AppLogo(
-            iconLogo = AppLogoWhite
-        )
-
+        AppLogo(iconLogo = AppLogoWhite)
+        Spacer(Modifier.weight(1f))
         BadgedBox(
             badge = {
                 DynamicCountBadge(
@@ -81,11 +80,11 @@ fun CustomTopBar(
             }
         }
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(Dimen.Standard))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.End,
         ) {
             Column(
                 horizontalAlignment = Alignment.End,

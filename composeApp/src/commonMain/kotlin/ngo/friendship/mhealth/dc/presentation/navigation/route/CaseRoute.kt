@@ -6,10 +6,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.delay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
@@ -29,18 +27,11 @@ fun EntryProviderScope<NavKey>.caseRoute(
         val interviewDetails by viewModel.interviewDetailsState.collectAsState()
         val setupData by mainViewModel.setupDataState.collectAsState()
         val medicineList by viewModel.medicineListState.collectAsState()
+        val formState by viewModel.formState.collectAsState()
 
         LaunchedEffect(screen.interviewId) {
             viewModel.loadInterviewDetails(screen.interviewId)
-            viewModel.loadQuestionAnswerData()
-        }
-        LaunchedEffect(Unit) {
-            delay(500L)
-            snapshotFlow { isLoading }.collect {
-                if (!isLoading && interviewDetails.interviewId == -1L) {
-                    backStack.removeLastOrNull()
-                }
-            }
+            viewModel.loadQuestionAnswerData(screen.interviewId)
         }
 
         LaunchedEffect(Unit) {
@@ -58,16 +49,12 @@ fun EntryProviderScope<NavKey>.caseRoute(
         }
 
         PrescriptionFormScreen(
+            formState = formState,
             setupData = setupData,
             interviewDetails = interviewDetails,
             medicineList = medicineList,
-            onSave = { formState, mobile, sms ->
-                viewModel.saveDoctorFeedback(
-                    formState = formState,
-                    mobile = mobile,
-                    sms = sms
-                )
-            },
+            onUpdate = viewModel::updateFormState,
+            onSave = viewModel::saveDoctorFeedback,
             onFcmDetailsClick = {
                 println("Fcm details clicked")
             },

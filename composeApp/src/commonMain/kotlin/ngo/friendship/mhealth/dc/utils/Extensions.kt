@@ -548,6 +548,18 @@ fun String.isValidURL(): Boolean {
     return urlRegex.matches(this)
 }
 
+fun String.startsWithNumberAndBackslash(): Boolean {
+    return """^\d+\n""".toRegex().containsMatchIn(this)
+}
+
+fun String.removeNumberBackslashPrefix(): String {
+    return replace("""^\d+\n""".toRegex(), "")
+}
+
+fun String.addSpaceBetweenSmallAndLarge(): String {
+    return replace("([a-z])([A-Z])".toRegex(), "$1 $2")
+}
+
 
 fun <T> T.isNull() = this == null
 fun <T> T.isNotNull() = this != null

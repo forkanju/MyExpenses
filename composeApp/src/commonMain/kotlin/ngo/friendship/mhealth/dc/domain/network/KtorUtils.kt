@@ -32,8 +32,10 @@ import kotlinx.io.IOException
 import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.properties.encodeToMap
 import ngo.friendship.mhealth.dc.data.remote.dto.BaseResponse
+import ngo.friendship.mhealth.dc.utils.addSpaceBetweenSmallAndLarge
 import ngo.friendship.mhealth.dc.utils.fromJson
 import ngo.friendship.mhealth.dc.utils.log
+import ngo.friendship.mhealth.dc.utils.removeNumberBackslashPrefix
 import ngo.friendship.mhealth.dc.utils.toJson
 import ngo.friendship.mhealth.dc.utils.tryGet
 
@@ -246,8 +248,11 @@ suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
 }
 
 fun String.normalize(): String {
-    return lowercase()
+    return removeNumberBackslashPrefix()
+        .addSpaceBetweenSmallAndLarge()
         .replace("_", " ")
+        .replace("  ", " ")
+        .lowercase()
         .replaceFirstChar(Char::uppercase)
 }
 
