@@ -14,7 +14,7 @@ import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.PrescriptionFormScreen
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.PrescriptionFormScreen
 import kotlin.jvm.JvmName
 
 fun EntryProviderScope<NavKey>.caseRoute(
@@ -29,12 +29,16 @@ fun EntryProviderScope<NavKey>.caseRoute(
         val setupData by mainViewModel.setupDataState.collectAsState()
         val medicineList by viewModel.medicineListState.collectAsState()
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(screen.interviewId) {
             viewModel.loadInterviewDetails(screen.interviewId)
+            viewModel.loadQuestionAnswerData()
+        }
+        LaunchedEffect(Unit) {
             delay(500L)
             snapshotFlow { isLoading }.collect {
-                if (!isLoading && interviewDetails.interviewId == -1L)
+                if (!isLoading && interviewDetails.interviewId == -1L) {
                     backStack.removeLastOrNull()
+                }
             }
         }
 

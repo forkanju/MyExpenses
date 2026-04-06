@@ -57,8 +57,6 @@ class CaseRepositoryImpl(
     }
 
     override suspend fun saveDoctorFeedback(formState: DoctorFeedbackFormState): SaveDoctorFeedbackResult {
-        println("SAVE_API: repository entered")
-
         val request = SaveDoctorFeedbackReqDto.build(
             userName = localSettings.user.userName,
             password = localSettings.user.password,

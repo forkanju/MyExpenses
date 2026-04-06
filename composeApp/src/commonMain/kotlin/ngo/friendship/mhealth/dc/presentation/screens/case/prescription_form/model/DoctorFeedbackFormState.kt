@@ -4,6 +4,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerItem
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
+import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplate
+import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplateDefault
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 
 data class DoctorFeedbackFormState(
@@ -16,7 +18,7 @@ data class DoctorFeedbackFormState(
     val doctorNotes: String = "",
     val investigationResult: String = "RBS",
     val nextFollowUpDate: String = "2026-04-10",
-    val questionAnswers: List<QuestionAnswerItem> = emptyList(),
-    val questionAnswers2: List<QuestionAnswerItem> = emptyList(),
+    val questionAnswers: List<QuestionAnswerTemplate> = emptyList(),
+    val questionAnswers2: List<QuestionAnswerTemplateDefault> = emptyList(),
     val prescriptions: List<PrescriptionItem> = emptyList()
 )

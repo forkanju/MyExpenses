@@ -2,6 +2,8 @@ package ngo.friendship.mhealth.dc.data.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplate
+import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplateDefault
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.md5
 
@@ -94,7 +96,7 @@ data class DoctorFeedbackObject(
     val interviewId: Long?,
 
     @SerialName("doctorFindings")
-    val doctorFindings: String,
+    val doctorFindings: String = "static findings",//static for temporary
 
     @SerialName("advice_message_for_fcm")
     val adviceMessageForFcm: String,
@@ -115,10 +117,10 @@ data class DoctorFeedbackObject(
     val diagnosisdx: List<IdNameItem>,
 
     @SerialName("QUESTION_ANSWER_JSON")
-    val questionAnswerJson: List<QuestionAnswerItem>,
+    val questionAnswerJson: List<QuestionAnswerTemplate>,
 
     @SerialName("QUESTION_ANSWER_JSON2")
-    val questionAnswerJson2: List<QuestionAnswerItem>,
+    val questionAnswerJson2: List<QuestionAnswerTemplateDefault>,
 
     @SerialName("prescription")
     val prescription: List<PrescriptionItem>

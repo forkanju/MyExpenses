@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form
+package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.json.Json
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackParam1
 import ngo.friendship.mhealth.dc.data.remote.dto.toDto
