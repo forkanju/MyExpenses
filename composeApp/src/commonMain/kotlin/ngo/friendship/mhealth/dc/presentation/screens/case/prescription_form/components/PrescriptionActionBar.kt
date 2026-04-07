@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.components
+package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -53,7 +53,7 @@ fun PrescriptionActionRowAligned(
 
     daysValue: String, daysItems: List<String>, onDaysSelect: (String) -> Unit,
 
-    toggleValue: ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime, onToggleChange: (ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime) -> Unit,
+    toggleValue: MealTime, onToggleChange: (MealTime) -> Unit,
 
     onMessageClick: () -> Unit, onAddClick: () -> Unit,
 
@@ -68,7 +68,7 @@ fun PrescriptionActionRowAligned(
             verticalAlignment = Alignment.CenterVertically
         ) {
             UnderlineDropdownMini(
-                value = doseValue, items = doseItems, onSelect = onDoseSelect, width =64.dp
+                value = doseValue, items = doseItems, onSelect = onDoseSelect, width = 64.dp
             )
 
             Spacer(Modifier.width(9.dp))
@@ -88,16 +88,19 @@ fun PrescriptionActionRowAligned(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onMessageClick, modifier = Modifier.size(size = 34.dp)
-            ) {
-                Icon(
-                    painter = painterResource(resource = Resources.Icon.Chat),
-                    contentDescription = "Message",
-                    tint = Gray,
-                    modifier = Modifier.size(size = 28.dp).padding(all = 2.dp)
-                )
-            }
+
+            // MESSAGE/CHAT/COMMENT / add/ message/ chat/ Add/ Message/ Chat
+
+//            IconButton(
+//                onClick = onMessageClick, modifier = Modifier.size(size = 34.dp)
+//            ) {
+//                Icon(
+//                    painter = painterResource(resource = Resources.Icon.Chat),
+//                    contentDescription = "Message",
+//                    tint = Gray,
+//                    modifier = Modifier.size(size = 28.dp).padding(all = 2.dp)
+//                )
+//            }
 
             Spacer(Modifier.width(width = 9.dp))
 
@@ -110,15 +113,16 @@ fun PrescriptionActionRowAligned(
 
 @Composable
 fun AgePoreToggle(
-    value: ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime, onChange: (ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime) -> Unit, modifier: Modifier = Modifier
+    value: MealTime, onChange: (MealTime) -> Unit, modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.height(height = 28.dp).clip(shape = RoundedCornerShape(size = 14.dp)).clickable(
+        modifier = modifier.height(height = 28.dp).clip(shape = RoundedCornerShape(size = 14.dp))
+            .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(bounded = true)
             ) {
                 onChange(
-                    if (value == _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.AGE) _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.PORE else _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.AGE
+                    if (value == MealTime.AGE) MealTime.PORE else MealTime.AGE
                 )
             },
         shape = RoundedCornerShape(size = 14.dp),
@@ -141,7 +145,7 @@ fun AgePoreToggle(
             Spacer(Modifier.width(6.dp))
 
             Text(
-                text = if (value == _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MealTime.AGE) "আগে" else "পরে",
+                text = if (value == MealTime.AGE) "আগে" else "পরে",
                 fontSize = 12.sp,
                 color = TextPrimary,
                 maxLines = 1

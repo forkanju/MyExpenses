@@ -17,7 +17,7 @@ data class DoctorFeedbackFormState(
     val commentsForFcm: String = "",
     val doctorNotes: String = "",
     val investigationResult: String = "",
-    val nextFollowUpDate: String = "2026-04-10",
+    val nextFollowUpDate: String = "",
     val questionAnswers: List<QuestionAnswerTemplate> = emptyList(),
     val questionAnswers2: List<QuestionAnswerTemplateDefault> = emptyList(),
     val prescriptions: List<PrescriptionItem> = emptyList()

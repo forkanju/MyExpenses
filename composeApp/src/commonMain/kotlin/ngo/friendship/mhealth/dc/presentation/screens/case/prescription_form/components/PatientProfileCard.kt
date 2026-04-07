@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.components
+package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun PatientProfileCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    benifName: String,
 ) {
     Card(
         modifier = modifier
@@ -67,7 +68,7 @@ fun PatientProfileCard(
 
                 ) {
                     Text(
-                        text = "Most Kabita Bala Ismat (43y | F)",
+                        text = benifName,
                         style = TextStyle(
                             color = TextDarkerGray,
                             fontFamily = RobotoCondensedFont(),
@@ -107,6 +108,6 @@ fun PatientProfileCard(
 @Composable
 fun SimpleCardPreview() {
     MaterialTheme {
-        PatientProfileCard()
+        PatientProfileCard(benifName = "Benf Name")
     }
 }

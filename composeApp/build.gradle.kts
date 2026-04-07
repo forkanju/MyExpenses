@@ -115,6 +115,10 @@ kotlin {
             implementation(libs.androidx.room3.runtime)
             implementation(libs.androidx.sqlite.bundled)
 
+            //HistoryManager
+            implementation(libs.multiplatform.settings.v111)
+            implementation(libs.kotlinx.serialization.json.v173)
+
         }
     }
 }

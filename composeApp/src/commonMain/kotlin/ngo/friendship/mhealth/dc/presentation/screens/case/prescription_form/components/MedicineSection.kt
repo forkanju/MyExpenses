@@ -26,7 +26,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Medicine
-import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugDropdownRow
+import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
 import ngo.friendship.mhealth.dc.presentation.components.MedAutoCompleteTextField
 import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
@@ -85,14 +85,12 @@ fun MedicineComposerCard(
     medicines: List<Medicine>,
     onAddClick: (PrescriptionItem) -> Unit
 ) {
-
     Surface(
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(width = 1.dp, color = UnfocusedBorderColor),
         tonalElevation = 0.dp
     ) {
         Column(Modifier.padding(12.dp)) {
-
             var doseType by remember { mutableStateOf("Cap") }
             var dropdownMedicine by remember { mutableStateOf("Amoxicillin 500") }
             var medicineQuery by remember { mutableStateOf(TextFieldValue("")) }
@@ -100,28 +98,29 @@ fun MedicineComposerCard(
             var dose by remember { mutableStateOf("0+0+1") }
             var days by remember { mutableStateOf("৭ দিন") }
             var mealTime by remember { mutableStateOf(MealTime.PORE) }
+            val medicineNames = remember(medicines) {
+                medicines.map { it.brandName }
+            }
+            var genericNameQuery by remember { mutableStateOf(TextFieldValue("")) }
+            val genericNames = remember(medicines) {
+                medicines.map { it.genericName }.distinct()
+            }
 
-            DoseAndDrugDropdownRow(
+            DoseAndDrugAutoCompleteRow(
                 leftValue = doseType,
                 leftItems = listOf("Cap", "Tab", "Syrup"),
                 onLeftSelect = { doseType = it },
-
-                rightValue = dropdownMedicine,
-                rightItems = listOf(
-                    "Amoxicillin 500",
-                    "Azithromycin 250",
-                    "Paracetamol 500"
-                ),
-                onRightSelect = { selected ->
-                    dropdownMedicine = selected
+                rightValue = genericNameQuery,
+                onRightValueChange = { genericNameQuery = it },
+                suggestions = genericNames,
+                rightPlaceholder = "Type generic name",
+                onSuggestionSelected = { selected ->
+                    genericNameQuery = selected
                 }
             )
 
             Spacer(Modifier.height(10.dp))
 
-            val medicineNames = remember(medicines) {
-                medicines.map { it.brandName }
-            }
 
             LaunchedEffect(medicines) {
                 println("MEDICINE SIZE = ${medicines.size}")
@@ -145,7 +144,7 @@ fun MedicineComposerCard(
 
             Spacer(Modifier.height(10.dp))
 
-            _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.components.PrescriptionActionRowAligned(
+            PrescriptionActionRowAligned(
                 doseValue = dose,
                 doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
                 onDoseSelect = { dose = it },

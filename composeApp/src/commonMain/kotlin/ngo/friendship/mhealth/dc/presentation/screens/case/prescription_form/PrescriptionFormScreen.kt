@@ -14,7 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackParam1
 import ngo.friendship.mhealth.dc.data.remote.dto.toDto
@@ -31,7 +34,7 @@ import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MedicineSection
-import ngo.friendship.mhealth.dc.presentation.screens.main.prescription_form.components.PatientProfileCard
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PatientProfileCard
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionActionButtonRow
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionHeader
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionTopBar
@@ -44,6 +47,7 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.com
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.removeInvestigation
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.utils.minusAt
+import kotlin.time.Instant
 
 
 @Composable
@@ -66,7 +70,7 @@ fun PrescriptionFormScreen(
         modifier = modifier,
         topBar = {
             PrescriptionTopBar(
-                titlePrefix = interviewDetails.beneficiaryName.ifBlank { "Prescription" },
+                titlePrefix = interviewDetails.fcmInfo?.ifBlank { "Prescription" } ?: "",
                 onFcmDetailsClick = onFcmDetailsClick,
                 onCall = onCall,
                 onWhatsApp = onWhatsApp,
@@ -77,7 +81,7 @@ fun PrescriptionFormScreen(
 
         var checked by remember { mutableStateOf(false) }
         var selectedTab by remember { mutableStateOf(0) }
-
+        var showDatePicker by remember { mutableStateOf(false) }
 
         LaunchedEffect(interviewDetails.interviewId) {
             formState = formState.copy(
@@ -110,7 +114,7 @@ fun PrescriptionFormScreen(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            PatientProfileCard()
+            PatientProfileCard(benifName = interviewDetails.beneficiaryName)
 
             ExpandableInterviewSummary(
                 modifier = Modifier.fillMaxWidth(),
@@ -244,7 +248,11 @@ fun PrescriptionFormScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 FormActionRow(
-                    leftText = "Next follow-up:",
+                    leftText = if (formState.nextFollowUpDate.isBlank()) {
+                        "Next follow-up:"
+                    } else {
+                        "Next follow-up: ${formState.nextFollowUpDate}"
+                    },
                     leftIcon = {
                         Icon(
                             imageVector = Icons.Default.DateRange,
@@ -253,16 +261,30 @@ fun PrescriptionFormScreen(
                             modifier = Modifier.size(18.dp)
                         )
                     },
-                    rightText = "Save as a template",
+                    rightText = "",//Save as a template
                     onLeftClick = {
+                        showDatePicker = true
                         println("Open date picker")
-                        formState = formState.copy(nextFollowUpDate = "2026-04-10")
+//                        formState = formState.copy(nextFollowUpDate = "2026-04-10")
                         println("Selected next follow-up date: ${formState.nextFollowUpDate}")
                     },
                     onRightClick = {
                         println("Save as template")
                     }
                 )
+
+                if (showDatePicker) {
+                    AppDatePickerDialog(
+                        initialDate = formState.nextFollowUpDate,
+                        onDateSelected = { selectedDate ->
+                            formState = formState.copy(nextFollowUpDate = selectedDate)
+                            println("Selected next follow-up date: ${formState.nextFollowUpDate}")
+                        },
+                        onDismiss = {
+                            showDatePicker = false
+                        }
+                    )
+                }
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -373,4 +395,59 @@ fun PrescriptionFormScreenPrev() {
             onBack = {}
         )
     }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppDatePickerDialog(
+    initialDate: String? = null, // yyyy-MM-dd
+    onDateSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val initialMillis = initialDate
+        ?.takeIf { it.isNotBlank() }
+        ?.toEpochMillisOrNull()
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialMillis
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(
+                onClick = {
+                    val selectedMillis = datePickerState.selectedDateMillis
+                    if (selectedMillis != null) {
+                        onDateSelected(selectedMillis.toDateString())
+                    }
+                    onDismiss()
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
+private fun String.toEpochMillisOrNull(): Long? {
+    return runCatching {
+        val localDate = LocalDate.parse(this) // expects yyyy-MM-dd
+        localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+    }.getOrNull()
+}
+
+private fun Long.toDateString(): String {
+    return Instant.fromEpochMilliseconds(this)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .date
+        .toString() // yyyy-MM-dd
 }
