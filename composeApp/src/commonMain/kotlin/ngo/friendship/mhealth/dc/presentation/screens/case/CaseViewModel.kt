@@ -1,7 +1,9 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case
 
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
@@ -13,7 +15,8 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.mod
 class CaseViewModel(
     private val repository: CaseRepository
 ) : BaseViewModel() {
-
+    private val _uiEvent = MutableSharedFlow<CaseUiEvent>()
+    val uiEvent = _uiEvent.asSharedFlow()
     val interviewDetailsState: StateFlow<InterviewDetails>
         field = MutableStateFlow<InterviewDetails>(InterviewDetails())
 
@@ -25,6 +28,9 @@ class CaseViewModel(
 
     private val _formState = MutableStateFlow(DoctorFeedbackFormState())
     val formState = _formState.asStateFlow()
+
+//    private val _uiEvent = MutableSharedFlow<String>()
+//    val uiEvent = _uiEvent.asSharedFlow()
 
     init {
         loadMedicineList()
@@ -46,31 +52,25 @@ class CaseViewModel(
     }
 
 
-//    fun saveDoctorFeedback(formState: DoctorFeedbackFormState) {
-//        launch {
-//            repository.saveDoctorFeedback(formState = formState)
-//            backStack.removeLastOrNull()
-//        }
-//    }
-
     fun saveDoctorFeedback(formState: DoctorFeedbackFormState) {
         launch {
-            // 🔍 DEBUG PRINT HERE
-            println("TTTT VM _formState q1 size = ${_formState.value.questionAnswers.size}")
-            println("TTTT VM _formState q2 size = ${_formState.value.questionAnswers2.size}")
-            println("TTTT UI formState q1 size = ${formState.questionAnswers.size}")
-            println("TTTT UI formState q2 size = ${formState.questionAnswers2.size}")
             val finalState = formState.copy(
                 interviewId = formState.interviewId ?: _formState.value.interviewId,
                 questionAnswers = _formState.value.questionAnswers,
                 questionAnswers2 = _formState.value.questionAnswers2
             )
 
-            // 🔍 AFTER MERGE CHECK
-            println("TTTT FINAL q1 size = ${finalState.questionAnswers.size}")
-            println("TTTT FINAL q2 size = ${finalState.questionAnswers2.size}")
-            repository.saveDoctorFeedback(formState = finalState)
-//            backStack.removeLastOrNull()
+            try {
+                repository.saveDoctorFeedback(formState = finalState)
+
+                _uiEvent.emit(CaseUiEvent.ShowSnackbar("Feedback saved successfully"))
+                _uiEvent.emit(CaseUiEvent.NavigateBack)
+
+            } catch (e: Exception) {
+                CaseUiEvent.ShowSnackbar(
+                    message = e.message ?: "Failed to save feedback"
+                )
+            }
         }
     }
 

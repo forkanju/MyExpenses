@@ -187,6 +187,7 @@ fun PrescriptionFormScreen(
                     selected = null,
                     getLabel = { it.investigationName },
                     onSelectedChange = { selected ->
+                        println("TTTTTs selected investigation $selected")
                         formState = addInvestigation(formState, selected)
                     }
                 )

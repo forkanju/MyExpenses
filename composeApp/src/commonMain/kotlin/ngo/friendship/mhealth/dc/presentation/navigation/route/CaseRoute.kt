@@ -13,6 +13,7 @@ import kotlinx.coroutines.delay
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiEvent
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.PrescriptionFormScreen
 import kotlin.jvm.JvmName
@@ -38,6 +39,20 @@ fun EntryProviderScope<NavKey>.caseRoute(
             snapshotFlow { isLoading }.collect {
                 if (!isLoading && interviewDetails.interviewId == -1L) {
                     backStack.removeLastOrNull()
+                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            viewModel.uiEvent.collect { event ->
+                when (event) {
+                    is CaseUiEvent.ShowSnackbar -> {
+                        snackBarState.showSnackbar(event.message)
+                    }
+
+                    CaseUiEvent.NavigateBack -> {
+                        backStack.removeLastOrNull()
+                    }
                 }
             }
         }

@@ -26,7 +26,10 @@ fun addInvestigation(
     item: Investigation
 ): DoctorFeedbackFormState {
     if (state.selectedInvestigations.any { it.investigationId == item.investigationId }) return state
-    return state.copy(selectedInvestigations = state.selectedInvestigations + item)
+    return state.copy(
+        selectedInvestigations = state.selectedInvestigations + item,
+        investigationResult = item.investigationName
+    )
 }
 
 fun removeInvestigation(
