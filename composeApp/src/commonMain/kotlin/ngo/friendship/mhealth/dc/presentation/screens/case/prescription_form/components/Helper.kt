@@ -1,8 +1,15 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
+import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
+import kotlin.time.Instant
 
 fun addDiagnosis(
     state: DoctorFeedbackFormState,
@@ -41,5 +48,63 @@ fun removeInvestigation(
             it.investigationId == item.investigationId
         }
     )
+}
+
+
+ fun String.toEpochMillisOrNull(): Long? {
+    return runCatching {
+        val localDate = LocalDate.parse(this) // expects yyyy-MM-dd
+        localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+    }.getOrNull()
+}
+
+ fun Long.toDateString(): String {
+    return Instant.fromEpochMilliseconds(this)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .date
+        .toString() // yyyy-MM-dd
+}
+
+ fun buildDefaultSmsMessage(
+    interviewDetails: InterviewDetails,
+    prescriptions: List<PrescriptionItem>
+): String {
+
+    val headerLine = listOfNotNull(
+        interviewDetails.beneficiaryName.takeIf { it.isNotBlank() },
+        interviewDetails.beneficiaryCode.takeIf { it.isNotBlank() },
+        interviewDetails.beneficiaryAge.takeIf { it?.isNotBlank() ?: false },
+    ).joinToString(", ")
+
+    val medicineLines = prescriptions.mapIndexedNotNull { index, item ->
+        val medicineName = item.medicineName.trim()
+        val dose = item.dose.trim()
+        val duration = item.duration.trim()
+
+        if (medicineName.isBlank()) return@mapIndexedNotNull null
+
+        buildString {
+            append("${index + 1}. ")
+            append(medicineName)
+
+            if (dose.isNotBlank()) {
+                append(", ")
+                append(dose)
+            }
+
+            if (duration.isNotBlank()) {
+                append(", ")
+                append(duration)
+            }
+        }
+    }
+
+    return buildString {
+        appendLine("Rx")
+        if (headerLine.isNotBlank()) {
+            appendLine(headerLine)
+        }
+        medicineLines.forEach { appendLine(it) }
+    }.trim()
 }
 

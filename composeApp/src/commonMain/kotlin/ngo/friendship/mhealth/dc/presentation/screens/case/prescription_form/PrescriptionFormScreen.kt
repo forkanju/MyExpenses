@@ -20,6 +20,7 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackParam1
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.data.remote.dto.toDto
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
@@ -41,10 +42,15 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.com
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.DiagnosisChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.InvestigationChipGroup
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.SendMessageDialog
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addInvestigation
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.buildDefaultSmsMessage
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.removeDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.removeInvestigation
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.toDateString
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.toEpochMillisOrNull
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.CustomMessageState
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.utils.minusAt
 import kotlin.time.Instant
@@ -82,6 +88,17 @@ fun PrescriptionFormScreen(
         var checked by remember { mutableStateOf(false) }
         var selectedTab by remember { mutableStateOf(0) }
         var showDatePicker by remember { mutableStateOf(false) }
+        var showSendMessageDialog by remember { mutableStateOf(false) }
+        var customMessageState by remember {
+            mutableStateOf(
+                CustomMessageState(
+                    messageText = "",
+                    isFcmChecked = true,
+                    isBeneficiaryChecked = true,
+                    phoneNumber = ""
+                )
+            )
+        }
 
         LaunchedEffect(interviewDetails.interviewId) {
             formState = formState.copy(
@@ -98,12 +115,10 @@ fun PrescriptionFormScreen(
             }
         }
 
-        val systemPrescriptionItems = remember {
-            listOf(
-                QAItem("Medicine", "Napa Extra"),
-                QAItem("Dose", "1 + 1 + 1 for 5 days"),
-                QAItem("Advice", "Take rest and drink more water")
-            )
+        val systemPrescriptionItems = remember(interviewDetails.sysPrescriptionList) {
+            interviewDetails.sysPrescriptionList.map {
+                QAItem("Medicine", it.prescription)
+            }
         }
 
         Column(
@@ -300,7 +315,14 @@ fun PrescriptionFormScreen(
                             checked = checked,
                             onCheckedChange = { checked = it },
                             onEditClick = {
-                                println("Edit clicked")
+                                customMessageState = customMessageState.copy(
+                                    messageText = buildDefaultSmsMessage
+                                        (
+                                        interviewDetails = interviewDetails,
+                                        prescriptions = formState.prescriptions
+                                    )
+                                )
+                                showSendMessageDialog = true
                             }
                         )
 
@@ -324,6 +346,19 @@ fun PrescriptionFormScreen(
                     }
                 }
             }
+        }
+
+        if (showSendMessageDialog) {
+            SendMessageDialog(
+                initialState = customMessageState,
+                onDismiss = { showSendMessageDialog = false },
+                onUpdateClick = { updatedState ->
+                    customMessageState = updatedState
+                    showSendMessageDialog = false
+
+                    println("updatedState = $updatedState")
+                }
+            )
         }
     }
 }
@@ -436,18 +471,4 @@ fun AppDatePickerDialog(
     ) {
         DatePicker(state = datePickerState)
     }
-}
-
-private fun String.toEpochMillisOrNull(): Long? {
-    return runCatching {
-        val localDate = LocalDate.parse(this) // expects yyyy-MM-dd
-        localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
-    }.getOrNull()
-}
-
-private fun Long.toDateString(): String {
-    return Instant.fromEpochMilliseconds(this)
-        .toLocalDateTime(TimeZone.currentSystemDefault())
-        .date
-        .toString() // yyyy-MM-dd
 }

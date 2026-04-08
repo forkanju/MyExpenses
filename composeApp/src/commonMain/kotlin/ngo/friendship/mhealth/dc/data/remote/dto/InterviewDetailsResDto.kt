@@ -10,6 +10,10 @@ data class InterviewDetailsResDto(
     @SerialName("errorDesc") val errorDesc: String? = null,
     @SerialName("responseCode") val responseCode: String? = null,
     @SerialName("responseName") val responseName: String? = null,
+    @SerialName("responseTime") val responseTime: String? = null,
+    @SerialName("dataLength") val dataLength: Int? = null,
+    @SerialName("execTime") val execTime: Int? = null,
+    @SerialName("errorCode") val errorCode: String? = null,
     @SerialName("param1") val param1: Map<String, String> = emptyMap()
 ) {
     @Serializable
@@ -38,7 +42,8 @@ data class InterviewDetailsResDto(
         @SerialName("stName") val stName: String? = null,
         @SerialName("description") val description: String? = null,
 
-        @SerialName("details_list") val detailsList: List<DetailItem> = emptyList()
+        @SerialName("details_list") val detailsList: List<DetailItem> = emptyList(),
+        @SerialName("sys_prescription_list") val sysPrescriptionList: List<SysPrescriptionItem> = emptyList()
     )
 
     @Serializable
@@ -46,5 +51,9 @@ data class InterviewDetailsResDto(
         @SerialName("ANSWER") val answer: String? = null,
         @SerialName("Q_NAME") val questionName: String? = null,
         @SerialName("Q_ID") val questionId: Long? = null
+    )
+    @Serializable
+    data class SysPrescriptionItem(
+        @SerialName("prescription") val prescription: String? = null
     )
 }

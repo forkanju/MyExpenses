@@ -3,6 +3,7 @@ package ngo.friendship.mhealth.dc.domain.mapper
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
+import ngo.friendship.mhealth.dc.domain.model.SysPrescription
 
 fun InterviewDetailsResDto.InterviewDetails.toDomain(): InterviewDetails = InterviewDetails(
     interviewId = interviewId ?: -1,
@@ -23,11 +24,16 @@ fun InterviewDetailsResDto.InterviewDetails.toDomain(): InterviewDetails = Inter
     waitingFor = waitingFor,
     stName = stName,
     description = description,
-    details = detailsList.map { it.toDomain() }
+    details = detailsList.map { it.toDomain() },
+    sysPrescriptionList = sysPrescriptionList.map { it.toDomain() }
 )
 
 fun InterviewDetailsResDto.DetailItem.toDomain(): InterviewAnswer = InterviewAnswer(
     questionId = questionId ?: -1,
     questionName = questionName.orEmpty(),
     answer = answer.orEmpty()
+)
+
+fun InterviewDetailsResDto.SysPrescriptionItem.toDomain(): SysPrescription = SysPrescription(
+    prescription = prescription.orEmpty()
 )
