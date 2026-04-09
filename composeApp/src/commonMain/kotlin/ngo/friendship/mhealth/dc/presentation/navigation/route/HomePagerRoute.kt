@@ -4,6 +4,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,6 +14,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.HealthDashboardScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.home.HomeScreen
+import ngo.friendship.mhealth.dc.utils.main
 
 @Composable
 fun HomePagerRoute(
@@ -22,6 +24,12 @@ fun HomePagerRoute(
 ) {
     val interviewList by mainViewModel.interviewListState.collectAsStateWithLifecycle()
     val isLoading by mainViewModel.loadingSecondaryFlow.collectAsStateWithLifecycle()
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (BottomNavItems.entries[pagerState.currentPage] == BottomNavItems.Cases) {
+            mainViewModel.initializeCases()
+        }
+    }
 
     PullToRefreshBox(
         isRefreshing = isLoading,
@@ -43,6 +51,11 @@ fun HomePagerRoute(
 
                 BottomNavItems.Cases -> CaseListScreen(
                     interviewList = interviewList,
+                    selectedTab = mainViewModel.selectedCaseTab,
+                    tabCounts = mainViewModel.caseTabCounts,
+                    onTabSelect = {tab ->
+                        mainViewModel.selectCaseTab(tab = tab)
+                    },
                     onCaseClick = {
                         mainViewModel.backStack.add(Screens.PrescriptionForm(it))
                     },

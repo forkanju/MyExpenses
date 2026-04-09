@@ -24,13 +24,13 @@ class CaseRepositoryImpl(
     private val localSettings: LocalSettings
 ) : CaseRepository {
 
-    override suspend fun getInterviewList(appVersion: Int): List<Interview> {
+    override suspend fun getInterviewList(appVersion: Int, type: String): List<Interview> {
         val response = api.getInterviewList(
             request = InterviewListReqDto.build(
                 userName = localSettings.user.userName,
                 password = localSettings.user.password,
-                appVersion = appVersion,
-                requestTime = currentTimestamp.toDateTimeServerSlash()
+                requestTime = currentTimestamp.toDateTimeServerSlash(),
+                type = type
             ),
             appVersion = appVersion
         )

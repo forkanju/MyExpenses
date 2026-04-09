@@ -24,19 +24,19 @@ data class InterviewListReqDto(
     @SerialName("data") val data: Map<String, String> = emptyMap(),
     @SerialName("lang") val lang: String = "bn",
 
-    @SerialName("param1") val param1: Map<String, Int> = emptyMap()
+    @SerialName("param1") val param1: Map<String, String> = emptyMap()
 ) {
     companion object {
         fun build(
             userName: String,
             password: String,
-            appVersion: Int,
-            requestTime: String
+            requestTime: String,
+            type: String
         ) = InterviewListReqDto(
             userCode = userName.md5(),
             password = password.md5(),
             requestTime = requestTime,
-            param1 = mapOf("APP_VERSION_NUMBER" to appVersion)
+            param1 = mapOf("type" to type)
         )
     }
 }

@@ -23,6 +23,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
 class MainViewModel(
     val settings: LocalSettings,
@@ -48,9 +49,24 @@ class MainViewModel(
         started = SharingStarted.Lazily,
         initialValue = SetupData()
     )
+    val interviewListState = MutableStateFlow<List<Interview>>(emptyList())
 
-    val interviewListState: StateFlow<List<Interview>>
-        field = MutableStateFlow(emptyList())
+    var selectedCaseTab by mutableStateOf(CaseTab.Pending)
+        private set
+
+    var caseTabCounts by mutableStateOf(
+        mapOf(
+            CaseTab.Pending to 0,
+            CaseTab.Opened to 0,
+            CaseTab.Older to 0,
+            CaseTab.Answered to 0
+        )
+    )
+        private set
+
+
+    var isCaseCountsLoaded by mutableStateOf(false)
+        private set
 
     init {
         viewModelScope.launch {
@@ -63,19 +79,65 @@ class MainViewModel(
         }
     }
 
-    fun selectBottomTab(tab: BottomNavItems){
+
+    fun selectBottomTab(tab: BottomNavItems) {
         selectedBottomTab = tab
     }
 
-    fun loadInterviewList(appVersion: Int = 3069) {
+    fun selectCaseTab(tab: CaseTab, appVersion: Int = 3069) {
+        if (selectedCaseTab == tab) return
+
+        selectedCaseTab = tab
+        loadInterviewList(
+            appVersion = appVersion,
+            tab = tab
+        )
+    }
+
+    fun loadInterviewList(
+        appVersion: Int = 3069,
+        tab: CaseTab = selectedCaseTab
+    ) {
         launch(loading = Loading.Secondary) {
-            interviewListState.value =
-                caseRepository.getInterviewList(
-                    appVersion = appVersion
-                )
+            val list = caseRepository.getInterviewList(
+                appVersion = appVersion,
+                type = tab.apiParam
+            )
+
+            interviewListState.value = list
+
+            caseTabCounts = caseTabCounts.toMutableMap().apply {
+                this[tab] = list.size
+            }
         }
     }
 
+    fun initializeCases(appVersion: Int = 3069) {
+        if (isCaseCountsLoaded && interviewListState.value.isNotEmpty()) return
+
+        launch(loading = Loading.Secondary) {
+            val counts = mutableMapOf<CaseTab, Int>()
+
+            val selectedList = caseRepository.getInterviewList(
+                appVersion = appVersion,
+                type = selectedCaseTab.apiParam
+            )
+            interviewListState.value = selectedList
+            counts[selectedCaseTab] = selectedList.size
+
+            CaseTab.entries
+                .filter { it != selectedCaseTab }
+                .forEach { tab ->
+                    val list = caseRepository.getInterviewList(
+                        appVersion = appVersion,
+                        type = tab.apiParam
+                    )
+                    counts[tab] = list.size
+                }
+            caseTabCounts = counts
+            isCaseCountsLoaded = true
+        }
+    }
 
 
     fun logout() {

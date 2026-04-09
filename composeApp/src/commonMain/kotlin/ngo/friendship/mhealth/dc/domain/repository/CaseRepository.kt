@@ -9,7 +9,7 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.mod
 
 interface CaseRepository {
 
-    suspend fun getInterviewList(appVersion: Int): List<Interview>
+    suspend fun getInterviewList(appVersion: Int, type: String): List<Interview>
 
     suspend fun getInterviewDetails(interviewId: Long): InterviewDetails
 

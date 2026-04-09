@@ -30,11 +30,17 @@ import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 fun CaseListScreen(
     modifier: Modifier = Modifier,
     interviewList: List<Interview>,
+    selectedTab: CaseTab,
+    tabCounts: Map<CaseTab, Int>,
+    onTabSelect: (CaseTab) -> Unit,
     onCaseClick: (Long) -> Unit = {},
     onFilterClick: () -> Unit = {},
 ) {
-    var selectedTab by remember { mutableStateOf(CaseTab.Pending) }
     var query by remember { mutableStateOf("") }
+
+    val tabItems = CaseTab.entries.map { tab ->
+        tab to (tabCounts[tab] ?: 0)
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -47,9 +53,9 @@ fun CaseListScreen(
                 Column(Modifier.fillMaxWidth()) {
                     TopTabsRow(
                         // This now uses the correct Enum reference
-                        tabs = CaseTab.entries.map { it to 10 },
+                        tabs = tabItems,
                         selected = selectedTab,
-                        onSelect = { selectedTab = it }
+                        onSelect = onTabSelect
                     )
 
                     SearchRow(
@@ -62,17 +68,30 @@ fun CaseListScreen(
             }
         }
     ) { padding ->
+
+        val filteredList = if (query.isBlank()) {
+            interviewList
+        } else {
+            interviewList.filter { item ->
+                item.beneficiaryName.contains(query, ignoreCase = true) ||
+                        item.beneficiaryCode.contains(query, ignoreCase = true) ||
+                        item.location.contains(query, ignoreCase = true) ||
+                        item.questionnaireName.contains(query, ignoreCase = true)
+            }
+        }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(interviewList, key = { it.interviewId }) { item ->
+            items(filteredList, key = { it.interviewId }) { item ->
                 CaseItem(ui = item, onClick = { onCaseClick(item.interviewId) })
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -100,7 +119,15 @@ private fun CaseListScreenPreview() {
                     questionnaireName = "Follow-up Visit",
                     userName = "Dr. Taylor"
                 )
-            )
+            ),
+            selectedTab = CaseTab.Pending,
+            tabCounts = mapOf(
+                CaseTab.Pending to 2,
+                CaseTab.Opened to 5,
+                CaseTab.Older to 1,
+                CaseTab.Answered to 9
+            ),
+            onTabSelect = {}
         )
     }
 }
