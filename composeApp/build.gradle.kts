@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room3)
+    alias(libs.plugins.googleGmsGoogleServices)
+
 }
 
 kotlin {
@@ -118,6 +120,8 @@ kotlin {
             //HistoryManager
             implementation(libs.multiplatform.settings.v111)
             implementation(libs.kotlinx.serialization.json.v173)
+            implementation(libs.firebase.messaging)
+
 
         }
     }
