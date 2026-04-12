@@ -7,7 +7,7 @@ import ngo.friendship.mhealth.dc.data.repository.MainRepositoryImpl
 import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
-import ngo.friendship.mhealth.dc.fcm.EventTopicSubscriber
+import ngo.friendship.mhealth.dc.fcm.NotifierManager
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.auth.AuthViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
@@ -36,7 +36,7 @@ val instantModule = module(createdAtStart = true) {
 }
 
 val fcmModule = module {
-    single { EventTopicSubscriber() }
+    single { NotifierManager() }
 }
 
 val appModules = listOf(

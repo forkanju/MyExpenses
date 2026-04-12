@@ -9,8 +9,6 @@ plugins {
     alias(libs.plugins.buildkonfig)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room3)
-    alias(libs.plugins.googleGmsGoogleServices)
-
 }
 
 kotlin {
@@ -57,6 +55,7 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
             linkerOpts.add("-lsqlite3")
+            export(libs.kmpnotifier)
         }
     }
 
@@ -84,10 +83,6 @@ kotlin {
             implementation(libs.bundles.coil)
             implementation(libs.bundles.settings)
             implementation(libs.bundles.nav)
-
-//            // Room
-//            implementation(libs.androidx.room.runtime)
-//            implementation(libs.androidx.sqlite.bundled)
 
             implementation(libs.material.icons.core)
             implementation(libs.material.icons.extended)
@@ -120,9 +115,8 @@ kotlin {
             //HistoryManager
             implementation(libs.multiplatform.settings.v111)
             implementation(libs.kotlinx.serialization.json.v173)
-            implementation(libs.firebase.messaging)
 
-
+            api(libs.kmpnotifier)
         }
     }
 }
