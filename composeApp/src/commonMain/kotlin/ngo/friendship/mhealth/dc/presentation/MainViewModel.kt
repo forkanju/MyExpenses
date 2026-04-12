@@ -144,4 +144,32 @@ class MainViewModel(
         settings.clear()
         backStack.replaceWith(Screens.Auth)
     }
+
+
+    fun sendSms(
+        msisdn: String,
+        message: String
+    ) {
+        launch(loading = Loading.Secondary) {
+            try {
+                val response = caseRepository.sendSms(
+                    msisdn = msisdn,
+                    message = message
+                )
+
+                // response handle
+                val status = response["status"]?.toString()
+                val statusCode = response["status_code"]?.toString()
+
+                if (statusCode == "200") {
+                    showSuccess("SMS sent successfully ✅")
+                } else {
+                    showError("SMS failed ❌: $status")
+                }
+
+            } catch (e: Exception) {
+                showError(e.message ?: "SMS sending failed")
+            }
+        }
+    }
 }

@@ -1,7 +1,12 @@
 package ngo.friendship.mhealth.dc.data.remote
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewListReqDto
@@ -17,6 +22,9 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataResDto
 import ngo.friendship.mhealth.dc.domain.network.processFormDataRequest
+import kotlinx.serialization.json.JsonObject
+import ngo.friendship.mhealth.dc.utils.Constants
+import kotlin.time.Clock
 
 class ApiService(
     private val client: HttpClient
@@ -75,4 +83,22 @@ class ApiService(
             body = request
         )
     }
+
+    suspend fun sendSms(
+        msisdn: String,
+        message: String
+    ): JsonObject {
+        return client.get("https://smsplus.sslwireless.com/api/v3/send-sms") {
+            header(HttpHeaders.ContentType, ContentType.Application.Json)
+            header(HttpHeaders.Accept, ContentType.Application.Json)
+            header(HttpHeaders.AcceptCharset, "utf-8")
+            parameter("api_token",  Constants.SMS_API_TOKEN)
+            parameter("sid", Constants.SMS_SID)
+            parameter("msisdn", msisdn)
+            parameter("sms", message)
+            parameter("csms_id", "123456")
+        }.body()
+    }
+
+
 }

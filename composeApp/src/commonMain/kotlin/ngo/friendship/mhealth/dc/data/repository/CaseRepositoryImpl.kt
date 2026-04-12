@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.data.repository
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
@@ -97,5 +98,12 @@ class CaseRepositoryImpl(
             )
         )
         return response.toDomain()
+    }
+
+    override suspend fun sendSms(msisdn: String, message: String): JsonObject {
+        return api.sendSms(
+            msisdn,
+            message
+        )
     }
 }

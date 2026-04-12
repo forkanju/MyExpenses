@@ -61,8 +61,12 @@ fun EntryProviderScope<NavKey>.caseRoute(
             setupData = setupData,
             interviewDetails = interviewDetails,
             medicineList = medicineList,
-            onSave = {
-                viewModel.saveDoctorFeedback(formState = it)
+            onSave = { formState, mobile, sms ->
+                viewModel.saveDoctorFeedback(
+                    formState = formState,
+                    mobile = mobile,
+                    sms = sms
+                )
             },
             onFcmDetailsClick = {
                 println("Fcm details clicked")

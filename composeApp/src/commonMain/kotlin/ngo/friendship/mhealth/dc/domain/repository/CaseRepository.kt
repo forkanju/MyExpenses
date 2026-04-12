@@ -1,5 +1,6 @@
 package ngo.friendship.mhealth.dc.domain.repository
 
+import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
@@ -18,4 +19,10 @@ interface CaseRepository {
     suspend fun saveDoctorFeedback(formState: DoctorFeedbackFormState): SaveDoctorFeedbackResult
 
     suspend fun getQuestionAnswerData(): QuestionAnswerJson
+
+    suspend fun sendSms(
+        msisdn: String,
+        message: String
+    ): JsonObject
+
 }
