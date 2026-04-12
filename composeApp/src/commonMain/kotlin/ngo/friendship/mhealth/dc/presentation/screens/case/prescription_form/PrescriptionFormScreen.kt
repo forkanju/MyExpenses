@@ -62,7 +62,7 @@ fun PrescriptionFormScreen(
     setupData: SetupData,
     interviewDetails: InterviewDetails,
     medicineList: List<Medicine>,
-    onSave: (DoctorFeedbackFormState) -> Unit = {},
+    onSave: (DoctorFeedbackFormState, String, String) -> Unit,
     onFcmDetailsClick: () -> Unit,
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
@@ -336,7 +336,7 @@ fun PrescriptionFormScreen(
                                 val jsonString = Json.encodeToString(param1)
 
                                 println("PARAM1_JSON: $jsonString")
-                                onSave(formState)
+                                onSave(formState,"","")
                             },
                             onShareClick = {
                                 println("Share prescription")
@@ -424,10 +424,11 @@ fun PrescriptionFormScreenPrev() {
                     unitType = "Tablets"
                 )
             ),
+            onSave = { _, _, _ -> },
             onFcmDetailsClick = {},
             onCall = {},
             onWhatsApp = {},
-            onBack = {}
+            onBack = {},
         )
     }
 }

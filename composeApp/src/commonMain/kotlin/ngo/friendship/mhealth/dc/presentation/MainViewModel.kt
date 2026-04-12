@@ -181,4 +181,6 @@ class MainViewModel(
         settings.clear()
         backStack.replaceWith(Screens.Auth)
     }
+
+
 }

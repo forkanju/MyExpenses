@@ -47,7 +47,8 @@ class CaseViewModel(
         }
     }
 
-    fun saveDoctorFeedback(formState: DoctorFeedbackFormState, appVersion: Int = 3069) {
+
+    fun saveDoctorFeedback(formState: DoctorFeedbackFormState, mobile: String, sms: String) {
         launch {
             val finalState = formState.copy(
                 interviewId = formState.interviewId ?: _formState.value.interviewId,
@@ -73,6 +74,7 @@ class CaseViewModel(
                     }
                 }
 
+                repository.sendSms(mobile, sms);
                 _uiEvent.emit(CaseUiEvent.ShowSnackbar("Feedback saved successfully"))
                 _uiEvent.emit(CaseUiEvent.NavigateBack)
 
