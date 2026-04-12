@@ -32,7 +32,6 @@ messagebar = "1.0.9"
 browser = "1.0.4"
 googleGmsGoogleServices = "4.4.4"
 firebaseMessaging = "25.0.1"
-firebaseMessagingKtx = "25.0.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -104,7 +103,6 @@ messagebar-kmp = { module = "com.stevdza-san:messagebarkmp", version.ref = "mess
 browser-kmp = { module = "com.stevdza-san:browser-kmp", version.ref = "browser" }
 kotzilla-sdk-ktor3 = { module = "io.kotzilla:kotzilla-sdk-ktor3", version.ref = "kotzila" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
-firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 
 
@@ -120,7 +118,7 @@ nav = [
     "androidx-navigationevent-compose",
     #    "androidx-material3-adaptive",
     #    "androidx-material3-adaptive-nav3",
-    "androidx-lifecycle-viewmodel-navigation3",
+    "androidx-lifecycle-viewmodel-navigation3"
 ]
 ktor = [
     "ktor-client-core",
@@ -138,7 +136,7 @@ koin = [
 coil = [
     "coil-compose",
     "coil-svg",
-    "coil-network-ktor",
+    "coil-network-ktor"
 ]
 
 [plugins]

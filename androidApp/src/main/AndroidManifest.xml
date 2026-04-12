@@ -33,7 +33,7 @@
             android:label="@string/ktor_activity_name"
             android:roundIcon="@mipmap/ktor_ic_launcher_round"
             android:taskAffinity="ro.cosminmihu.ktor.monitor.${applicationId}"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar" >
+            android:theme="@android:style/Theme.Material.Light.NoActionBar">
             <intent-filter tools:node="remove">
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,12 +41,12 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".MyFirebaseInstanceIDService">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
-            </intent-filter>
-        </service>
+        <!--        <service-->
+        <!--            android:name=".DoctorCenterFirebaseMessagingService">-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>-->
+        <!--            </intent-filter>-->
+        <!--        </service>-->
 
     </application>
 
