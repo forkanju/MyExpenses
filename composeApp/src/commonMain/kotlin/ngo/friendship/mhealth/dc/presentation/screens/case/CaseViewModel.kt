@@ -29,9 +29,6 @@ class CaseViewModel(
     private val _formState = MutableStateFlow(DoctorFeedbackFormState())
     val formState = _formState.asStateFlow()
 
-//    private val _uiEvent = MutableSharedFlow<String>()
-//    val uiEvent = _uiEvent.asSharedFlow()
-
     init {
         loadMedicineList()
     }
@@ -40,7 +37,6 @@ class CaseViewModel(
         launch {
             interviewDetailsState.value = repository.getInterviewDetails(interviewId = interviewId)
         }
-
     }
 
     fun loadMedicineList(
@@ -51,8 +47,7 @@ class CaseViewModel(
         }
     }
 
-
-    fun saveDoctorFeedback(formState: DoctorFeedbackFormState) {
+    fun saveDoctorFeedback(formState: DoctorFeedbackFormState, appVersion: Int = 3069) {
         launch {
             val finalState = formState.copy(
                 interviewId = formState.interviewId ?: _formState.value.interviewId,
@@ -63,12 +58,30 @@ class CaseViewModel(
             try {
                 repository.saveDoctorFeedback(formState = finalState)
 
+                val interviewId = finalState.interviewId
+                if (interviewId != null) {
+                    val isStatusUpdated = repository.updateInterviewStatus(
+                        interviewId = interviewId,
+                        status = "Close"
+                    )
+
+                    if (!isStatusUpdated) {
+                        _uiEvent.emit(
+                            CaseUiEvent.ShowSnackbar("Feedback saved, but status update failed")
+                        )
+                        return@launch
+                    }
+                }
+
                 _uiEvent.emit(CaseUiEvent.ShowSnackbar("Feedback saved successfully"))
                 _uiEvent.emit(CaseUiEvent.NavigateBack)
 
             } catch (e: Exception) {
-                CaseUiEvent.ShowSnackbar(
-                    message = e.message ?: "Failed to save feedback"
+                _uiEvent.emit(
+                    CaseUiEvent.ShowSnackbar(
+
+                        e.message ?: "Failed to save feedback"
+                    )
                 )
             }
         }
@@ -77,10 +90,7 @@ class CaseViewModel(
     fun loadQuestionAnswerData() {
         launch {
             val result = repository.getQuestionAnswerData()
-
             questionAnswerState.value = result
-            println("TTTT LOAD q1 size = ${result.questionAnswerJson.size}")
-            println("TTTT LOAD q2 size = ${result.questionAnswerJson2.size}")
             _formState.value = _formState.value.copy(
                 questionAnswers = result.questionAnswerJson,
                 questionAnswers2 = result.questionAnswerJson2

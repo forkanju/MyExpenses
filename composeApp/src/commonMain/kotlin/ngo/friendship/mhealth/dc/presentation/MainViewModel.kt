@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
@@ -49,6 +48,7 @@ class MainViewModel(
         started = SharingStarted.Lazily,
         initialValue = SetupData()
     )
+
     val interviewListState = MutableStateFlow<List<Interview>>(emptyList())
 
     var selectedCaseTab by mutableStateOf(CaseTab.Pending)
@@ -64,7 +64,6 @@ class MainViewModel(
     )
         private set
 
-
     var isCaseCountsLoaded by mutableStateOf(false)
         private set
 
@@ -79,37 +78,8 @@ class MainViewModel(
         }
     }
 
-
     fun selectBottomTab(tab: BottomNavItems) {
         selectedBottomTab = tab
-    }
-
-    fun selectCaseTab(tab: CaseTab, appVersion: Int = 3069) {
-        if (selectedCaseTab == tab) return
-
-        selectedCaseTab = tab
-        loadInterviewList(
-            appVersion = appVersion,
-            tab = tab
-        )
-    }
-
-    fun loadInterviewList(
-        appVersion: Int = 3069,
-        tab: CaseTab = selectedCaseTab
-    ) {
-        launch(loading = Loading.Secondary) {
-            val list = caseRepository.getInterviewList(
-                appVersion = appVersion,
-                type = tab.apiParam
-            )
-
-            interviewListState.value = list
-
-            caseTabCounts = caseTabCounts.toMutableMap().apply {
-                this[tab] = list.size
-            }
-        }
     }
 
     fun initializeCases(appVersion: Int = 3069) {
@@ -134,11 +104,78 @@ class MainViewModel(
                     )
                     counts[tab] = list.size
                 }
+
             caseTabCounts = counts
             isCaseCountsLoaded = true
         }
     }
 
+    fun selectCaseTab(tab: CaseTab, appVersion: Int = 3069) {
+        if (selectedCaseTab == tab) return
+
+        selectedCaseTab = tab
+        loadInterviewList(appVersion = appVersion, tab = tab)
+    }
+
+    fun loadInterviewList(
+        appVersion: Int = 3069,
+        tab: CaseTab = selectedCaseTab
+    ) {
+        launch(loading = Loading.Secondary) {
+            val list = caseRepository.getInterviewList(
+                appVersion = appVersion,
+                type = tab.apiParam
+            )
+
+            interviewListState.value = list
+
+            caseTabCounts = caseTabCounts.toMutableMap().apply {
+                this[tab] = list.size
+            }
+        }
+    }
+
+    private fun shouldUpdateToOpen(tab: CaseTab): Boolean {
+        return when (tab) {
+            CaseTab.Pending -> true
+            CaseTab.Older -> true
+            CaseTab.Opened -> false
+            CaseTab.Answered -> false
+        }
+    }
+
+    fun openCase(
+        interview: Interview) {
+        if (!shouldUpdateToOpen(selectedCaseTab)) {
+            backStack.add(Screens.PrescriptionForm(interview.interviewId))
+            return
+        }
+
+        launch(loading = Loading.Secondary) {
+            val isSuccess = caseRepository.updateInterviewStatus(
+                interviewId = interview.interviewId,
+                status = CaseTab.Opened.apiParam // "Open"
+            )
+
+            if (isSuccess) {
+                interviewListState.value = interviewListState.value.filterNot {
+                    it.interviewId == interview.interviewId
+                }
+
+                caseTabCounts = caseTabCounts.toMutableMap().apply {
+                    val currentCount = this[selectedCaseTab] ?: 0
+                    this[selectedCaseTab] = (currentCount - 1).coerceAtLeast(0)
+
+                    val openCount = this[CaseTab.Opened] ?: 0
+                    this[CaseTab.Opened] = openCount + 1
+                }
+
+                backStack.add(Screens.PrescriptionForm(interview.interviewId))
+            } else {
+                showError("Failed to update interview status")
+            }
+        }
+    }
 
     fun logout() {
         settings.clear()

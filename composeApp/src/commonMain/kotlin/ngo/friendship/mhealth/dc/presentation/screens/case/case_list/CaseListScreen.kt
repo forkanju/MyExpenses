@@ -33,7 +33,7 @@ fun CaseListScreen(
     selectedTab: CaseTab,
     tabCounts: Map<CaseTab, Int>,
     onTabSelect: (CaseTab) -> Unit,
-    onCaseClick: (Long) -> Unit = {},
+    onCaseClick: (Interview) -> Unit = {},
     onFilterClick: () -> Unit = {},
 ) {
     var query by remember { mutableStateOf("") }
@@ -52,7 +52,6 @@ fun CaseListScreen(
             ) {
                 Column(Modifier.fillMaxWidth()) {
                     TopTabsRow(
-                        // This now uses the correct Enum reference
                         tabs = tabItems,
                         selected = selectedTab,
                         onSelect = onTabSelect
@@ -68,7 +67,6 @@ fun CaseListScreen(
             }
         }
     ) { padding ->
-
         val filteredList = if (query.isBlank()) {
             interviewList
         } else {
@@ -81,17 +79,21 @@ fun CaseListScreen(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
             contentPadding = PaddingValues(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             items(filteredList, key = { it.interviewId }) { item ->
-                CaseItem(ui = item, onClick = { onCaseClick(item.interviewId) })
+                CaseItem(
+                    ui = item,
+                    onClick = { onCaseClick(item) }
+                )
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

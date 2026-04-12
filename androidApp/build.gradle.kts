@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 
 kotlin {
@@ -71,6 +72,8 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.slf4j.simple)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.messaging.ktx)
 }
 
 //tasks.register("updatePlistVersion") {

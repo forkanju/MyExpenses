@@ -16,6 +16,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusResDto
 import ngo.friendship.mhealth.dc.domain.network.processFormDataRequest
 
 class ApiService(
@@ -75,4 +77,11 @@ class ApiService(
             body = request
         )
     }
+
+    suspend fun updateInterviewStatus(
+        request: UpdateInterviewStatusReqDto
+    ): UpdateInterviewStatusResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
 }

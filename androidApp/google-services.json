@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "947355066889",
+    "project_id": "friendship-apps",
+    "storage_bucket": "friendship-apps.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947355066889:android:fecee6c2fa864e7b27ced8",
+        "android_client_info": {
+          "package_name": "ngo.friendship.mhealth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcSSV-B4MjEFjh_e0mAMS4XFxXFf5p77c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947355066889:android:16da5be7de1d6f7627ced8",
+        "android_client_info": {
+          "package_name": "ngo.friendship.mhealth.dc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcSSV-B4MjEFjh_e0mAMS4XFxXFf5p77c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947355066889:android:5b4bf7615545e00c27ced8",
+        "android_client_info": {
+          "package_name": "ngo.friendship.satellite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcSSV-B4MjEFjh_e0mAMS4XFxXFf5p77c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -8,6 +8,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.InterviewListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
@@ -97,5 +98,21 @@ class CaseRepositoryImpl(
             )
         )
         return response.toDomain()
+    }
+
+    override suspend fun updateInterviewStatus(
+        interviewId: Long,
+        status: String
+    ): Boolean {
+        val response = api.updateInterviewStatus(
+            request = UpdateInterviewStatusReqDto.build(
+                userName = localSettings.user.userName,
+                password = localSettings.user.password,
+                requestTime = currentTimestamp.toDateTimeServerSlash(),
+                interviewId = interviewId,
+                status = status
+            )
+        )
+        return response.responseCode == "01"
     }
 }

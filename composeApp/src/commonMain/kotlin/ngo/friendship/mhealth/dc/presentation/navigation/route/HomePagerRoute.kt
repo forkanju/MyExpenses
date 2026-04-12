@@ -10,11 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
-import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.HealthDashboardScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.home.HomeScreen
-import ngo.friendship.mhealth.dc.utils.main
 
 @Composable
 fun HomePagerRoute(
@@ -36,7 +34,9 @@ fun HomePagerRoute(
         onRefresh = {
             when (BottomNavItems.entries[pagerState.currentPage]) {
                 BottomNavItems.Home -> Unit
-                BottomNavItems.Cases -> mainViewModel.loadInterviewList()
+                BottomNavItems.Cases -> mainViewModel.loadInterviewList(
+                    tab = mainViewModel.selectedCaseTab
+                )
                 BottomNavItems.Dashboard -> Unit
             }
         },
@@ -44,8 +44,7 @@ fun HomePagerRoute(
     ) {
         HorizontalPager(
             state = pagerState,
-        )
-        { page ->
+        ) { page ->
             when (BottomNavItems.entries[page]) {
                 BottomNavItems.Home -> HomeScreen()
 
@@ -53,11 +52,9 @@ fun HomePagerRoute(
                     interviewList = interviewList,
                     selectedTab = mainViewModel.selectedCaseTab,
                     tabCounts = mainViewModel.caseTabCounts,
-                    onTabSelect = {tab ->
-                        mainViewModel.selectCaseTab(tab = tab)
-                    },
-                    onCaseClick = {
-                        mainViewModel.backStack.add(Screens.PrescriptionForm(it))
+                    onTabSelect = mainViewModel::selectCaseTab,
+                    onCaseClick = { interview ->
+                        mainViewModel.openCase(interview)
                     },
                     onFilterClick = {
                         // filter popup/dialog
@@ -68,5 +65,4 @@ fun HomePagerRoute(
             }
         }
     }
-
 }
