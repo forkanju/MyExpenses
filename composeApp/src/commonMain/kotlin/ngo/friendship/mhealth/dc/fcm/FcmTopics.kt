@@ -6,6 +6,13 @@ object FcmTopics {
     const val INTERVIEW_UPDATES = "interview_updates"
     const val PRESCRIPTION_UPDATES = "prescription_updates"
 
-    fun doctorCaseList(doctorId: String): String = "doctor_${doctorId}_case_list"
-    fun doctorInterviewUpdates(doctorId: String): String = "doctor_${doctorId}_interview_updates"
+    fun doctorCaseList(doctorId: String): String {
+        val safeDoctorId = doctorId.replace(".", "_")
+        return "doctor_${safeDoctorId}_case_list"
+    }
+
+    fun doctorInterviewUpdates(doctorId: String): String {
+        val safeDoctorId = doctorId.replace(".", "_")
+        return "doctor_${safeDoctorId}_interview_updates"
+    }
 }

@@ -9,8 +9,10 @@ import kotlinx.serialization.modules.SerializersModule
 object Screens {
     @Serializable
     data object Auth : NavKey
+
     @Serializable
     data object ForgotPassword : NavKey
+
     @Serializable
     data object Main : NavKey
 
@@ -53,11 +55,23 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.Auth::class, Screens.Auth.serializer())
     polymorphic(NavKey::class, Screens.ForgotPassword::class, Screens.ForgotPassword.serializer())
     polymorphic(NavKey::class, Screens.Main::class, Screens.Main.serializer())
-    polymorphic(NavKey::class, Screens.PrescriptionForm::class, Screens.PrescriptionForm.serializer())
+    polymorphic(
+        NavKey::class,
+        Screens.PrescriptionForm::class,
+        Screens.PrescriptionForm.serializer()
+    )
     //dialog
     polymorphic(NavKey::class, Screens.Dialog.Error::class, Screens.Dialog.Error.serializer())
-    polymorphic(NavKey::class, Screens.Dialog.Confirmation::class, Screens.Dialog.Confirmation.serializer())
-    polymorphic(NavKey::class, Screens.Dialog.ProfilePopup::class, Screens.Dialog.ProfilePopup.serializer())
+    polymorphic(
+        NavKey::class,
+        Screens.Dialog.Confirmation::class,
+        Screens.Dialog.Confirmation.serializer()
+    )
+    polymorphic(
+        NavKey::class,
+        Screens.Dialog.ProfilePopup::class,
+        Screens.Dialog.ProfilePopup.serializer()
+    )
 }
 
 val navConfiguration = SavedStateConfiguration {

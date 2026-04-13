@@ -17,6 +17,7 @@ fun EntryProviderScope<NavKey>.authRoute(
     modifier: Modifier = Modifier
 ) {
     entryWithVM<Screens.Auth, AuthViewModel>(mainViewModel.backStack, snackBarState) {
+
         LoginScreen(
             onLoginClick = { userName, password ->
                 viewModel.login(
