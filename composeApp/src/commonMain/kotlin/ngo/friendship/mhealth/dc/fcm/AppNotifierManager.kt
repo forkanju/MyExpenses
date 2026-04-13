@@ -4,9 +4,10 @@ import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.PayloadData
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.isDebugBuild
+
 //
 //class AppNotifierManager {
 //    // Initialize the push notifier instance
@@ -75,10 +76,8 @@ class AppNotifierManager {
 
     private val pushNotifier = NotifierManager.getPushNotifier()
 
-    private val _notificationClickFlow = MutableSharedFlow<PayloadData>(
-        extraBufferCapacity = 1
-    )
-    val notificationClickFlow = _notificationClickFlow.asSharedFlow()
+    val notificationClickFlow: SharedFlow<PayloadData>
+        field = MutableSharedFlow(extraBufferCapacity = 1)
 
     init {
         if (isDebugBuild) {
@@ -94,7 +93,7 @@ class AppNotifierManager {
             override fun onNotificationClicked(data: PayloadData) {
                 println("AppNotifierManager: notification clicked = $data")
                 MainScope().launch {
-                    _notificationClickFlow.emit(data)
+                    notificationClickFlow.emit(data)
                 }
             }
         })

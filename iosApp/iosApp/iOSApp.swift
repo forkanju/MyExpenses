@@ -1,31 +1,73 @@
 import SwiftUI
+import UIKit
+import UserNotifications
 import shared
 import FirebaseCore
 import FirebaseMessaging
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
 
-      FirebaseApp.configure() //important
+        FirebaseApp.configure()
 
-      // By default showPushNotification value is true.
-      // When set showPushNotification to false foreground push  notification will not be shown.
-      // You can still get notification content using #onPushNotification listener method.
-      NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos(
-            showPushNotification: true,
-            askNotificationPermissionOnStart: true,
-            notificationSoundName: nil
-          )
-      )
+        UNUserNotificationCenter.current().delegate = self
 
-    return true
-  }
+        NotifierManager.shared.initialize(
+            configuration: NotificationPlatformConfigurationIos(
+                showPushNotification: true,
+                askNotificationPermissionOnStart: true,
+                notificationSoundName: nil
+            )
+        )
 
-  func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        application.registerForRemoteNotifications()
+
+        return true
+    }
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
         Messaging.messaging().apnsToken = deviceToken
-  }
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        print("Failed to register for remote notifications: \(error.localizedDescription)")
+    }
+
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable: Any]
+    ) async -> UIBackgroundFetchResult {
+        NotifierManager.shared.onApplicationDidReceiveRemoteNotification(userInfo: userInfo)
+        return .newData
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        completionHandler([.banner, .sound, .badge])
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let userInfo = response.notification.request.content.userInfo
+        NotifierManager.shared.onApplicationDidReceiveRemoteNotification(userInfo: userInfo)
+        completionHandler()
+    }
 }
 
 @main
