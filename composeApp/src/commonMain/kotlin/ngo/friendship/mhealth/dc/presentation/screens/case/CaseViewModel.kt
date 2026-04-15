@@ -9,6 +9,7 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
 
 class CaseViewModel(
@@ -67,6 +68,10 @@ class CaseViewModel(
         launch {
             repository.saveDoctorFeedback(formState = formState.value)
             showSuccess("Feedback saved successfully")
+            val isSuccess = repository.updateInterviewStatus(
+                interviewId = formState.value.interviewId ?: 0,
+                status = CaseTab.Answered.apiParam
+            )
             backStack.removeLastOrNull()
         }
     }
