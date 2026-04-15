@@ -29,7 +29,11 @@ fun EntryProviderScope<NavKey>.homeRoute(
     viewModel: MainViewModel
 ) {
     entry<Screens.Main> {
-        val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
+//        val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
+        val pagerState = rememberPagerState(
+            initialPage = BottomNavItems.Cases.ordinal,
+            pageCount = { BottomNavItems.entries.size }
+        )
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
