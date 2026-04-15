@@ -99,8 +99,12 @@ fun MedicineComposerCard(
             var days by remember { mutableStateOf("৭ দিন") }
             var mealTime by remember { mutableStateOf(MealTime.PORE) }
             val medicineNames = remember(medicines) {
-                medicines.map { it.brandName }
+                medicines.map {
+                    ""
+//                    it.brandName
+                }
             }
+
             var genericNameQuery by remember { mutableStateOf(TextFieldValue("")) }
             val genericNames = remember(medicines) {
                 medicines.map { it.genericName }.distinct()

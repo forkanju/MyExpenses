@@ -66,13 +66,18 @@ class CaseViewModel(
 
     fun saveDoctorFeedback() {
         launch {
-            repository.saveDoctorFeedback(formState = formState.value)
-            showSuccess("Feedback saved successfully")
-            val isSuccess = repository.updateInterviewStatus(
-                interviewId = formState.value.interviewId ?: 0,
-                status = CaseTab.Answered.apiParam
-            )
-            backStack.removeLastOrNull()
+            if (formState.value.prescriptions.size>0){
+                repository.saveDoctorFeedback(formState = formState.value)
+                showSuccess("Feedback saved successfully")
+                val isSuccess = repository.updateInterviewStatus(
+                    interviewId = formState.value.interviewId ?: 0,
+                    status = CaseTab.Answered.apiParam
+                )
+                backStack.removeLastOrNull()
+            }else{
+                showSuccess("Please add the prescriptions")
+            }
+
         }
     }
 
