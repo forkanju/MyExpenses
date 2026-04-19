@@ -62,6 +62,7 @@ fun HomePagerRoute(
                 BottomNavItems.Cases -> mainViewModel.loadInterviewList(
                     tab = mainViewModel.selectedCaseTab
                 )
+
                 BottomNavItems.Dashboard -> Unit
             }
         },
@@ -82,6 +83,7 @@ fun HomePagerRoute(
                         mainViewModel.openCase(interview)
                     },
                     onFilterClick = {
+
                     }
                 )
 

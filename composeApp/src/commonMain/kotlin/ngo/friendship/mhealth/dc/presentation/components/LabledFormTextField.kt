@@ -1,13 +1,15 @@
 package ngo.friendship.mhealth.dc.presentation.components
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,10 +38,19 @@ fun LabeledFormTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null
+    leadingIcon: @Composable (() -> Unit)? = null,
+    isAnsweredMode: Boolean = false
 ) {
+    val labelColor = if (isAnsweredMode) Color(0xFF666666) else TextPrimary
+    val fieldTextColor = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
+    val borderColor = when {
+        isError -> MaterialTheme.colorScheme.error
+        isAnsweredMode -> Color(0xFFC7C7C7)
+        else -> Color(0xFFCBD5E1)
+    }
+    val fieldBackground = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.Transparent
+
     Column(modifier = modifier.fillMaxWidth()) {
-        // Top label like "DX"
         if (label != null) {
             Text(
                 text = label,
@@ -47,14 +58,12 @@ fun LabeledFormTextField(
                     fontStyle = FontStyle.Italic,
                     fontSize = FontSize.REGULAR,
                     fontFamily = RobotoCondensedFont(),
-                    color = TextPrimary
-                ),
-                color = DarkerGray
+                    color = labelColor
+                )
             )
             Spacer(Modifier.height(6.dp))
         }
 
-        // Outlined text field
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -63,7 +72,7 @@ fun LabeledFormTextField(
                 .height(44.dp),
             enabled = enabled,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = DarkerGray
+                color = fieldTextColor
             ),
             singleLine = singleLine,
             maxLines = maxLines,
@@ -73,13 +82,10 @@ fun LabeledFormTextField(
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     shape = RoundedCornerShape(6.dp),
-                    color = Color.Transparent,
+                    color = fieldBackground,
                     border = BorderStroke(
                         width = 1.dp,
-                        color = when {
-                            isError -> MaterialTheme.colorScheme.error
-                            else -> Color(0xFFCBD5E1)
-                        }
+                        color = borderColor
                     )
                 ) {
                     Row(
@@ -88,18 +94,15 @@ fun LabeledFormTextField(
                             .padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Leading icon
                         if (leadingIcon != null) {
                             leadingIcon()
                             Spacer(Modifier.width(8.dp))
                         }
 
-                        // Text field content
                         Box(
                             modifier = Modifier.weight(1f),
                             contentAlignment = Alignment.CenterStart
                         ) {
-                            // Placeholder
                             if (value.isEmpty()) {
                                 Text(
                                     text = placeholder,
@@ -111,11 +114,9 @@ fun LabeledFormTextField(
                                     overflow = TextOverflow.Ellipsis
                                 )
                             }
-                            // Actual input
                             innerTextField()
                         }
 
-                        // Trailing icon
                         if (trailingIcon != null) {
                             Spacer(Modifier.width(8.dp))
                             trailingIcon()
@@ -125,7 +126,6 @@ fun LabeledFormTextField(
             }
         )
 
-        // Supporting text
         if (supportingText != null) {
             Spacer(Modifier.height(6.dp))
             Text(
@@ -137,4 +137,3 @@ fun LabeledFormTextField(
         }
     }
 }
-

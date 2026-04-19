@@ -40,7 +40,6 @@ fun EntryProviderScope<NavKey>.caseRoute(
                     is CaseUiEvent.ShowSnackbar -> {
                         snackBarState.showSnackbar(event.message)
                     }
-
                     CaseUiEvent.NavigateBack -> {
                         backStack.removeLastOrNull()
                     }
@@ -48,11 +47,30 @@ fun EntryProviderScope<NavKey>.caseRoute(
             }
         }
 
+//   2     PrescriptionFormScreen(
+//            formState = formState,
+//            setupData = setupData,
+//            interviewDetails = interviewDetails,
+//            medicineList = medicineList,
+//            onUpdate = viewModel::updateFormState,
+//            onSave = viewModel::saveDoctorFeedback,
+//            onFcmDetailsClick = {
+//                println("Fcm details clicked")
+//            },
+//            onCall = {
+//                println("Call clicked")
+//            },
+//            onWhatsApp = {
+//                println("WhatsApp clicked")
+//            },
+//            onBack = backStack::removeLastOrNull
+//        )
         PrescriptionFormScreen(
             formState = formState,
             setupData = setupData,
             interviewDetails = interviewDetails,
             medicineList = medicineList,
+            mode = screen.mode,
             onUpdate = viewModel::updateFormState,
             onSave = viewModel::saveDoctorFeedback,
             onFcmDetailsClick = {

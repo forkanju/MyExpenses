@@ -61,6 +61,7 @@ import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
 import ngo.friendship.mhealth.dc.theme.TextDarkerGray
 import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
+
 @Composable
 fun <T> FormDropdownField(
     label: String? = null,
@@ -72,12 +73,23 @@ fun <T> FormDropdownField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isError: Boolean = false,
-    supportingText: String? = null
+    supportingText: String? = null,
+    isAnsweredMode: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    val labelColor = if (isAnsweredMode) Color(0xFF666666) else TextDarkerGray
+    val borderColor = when {
+        isError -> MaterialTheme.colorScheme.error
+        isAnsweredMode -> Color(0xFFC7C7C7)
+        else -> UnfocusedBorderColor
+    }
+    val fieldBackground = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.Transparent
+    val dropdownBackground = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+    val textColorSelected = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
+    val iconColor = if (isAnsweredMode) Color(0xFF6A6A6A) else DarkerGray
+
     Column(modifier = modifier.fillMaxWidth()) {
-        // Top label
         if (label != null) {
             Text(
                 text = label,
@@ -85,29 +97,21 @@ fun <T> FormDropdownField(
                     fontStyle = FontStyle.Italic,
                     fontSize = 14.sp,
                     fontFamily = RobotoCondensedFont(),
-                    color = TextDarkerGray
+                    color = labelColor
                 )
             )
             Spacer(Modifier.height(6.dp))
         }
 
-        // Dropdown container
         Box(modifier = Modifier.fillMaxWidth()) {
-            // Outlined field container
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp)
                     .clickable(enabled = enabled) { expanded = true },
-                shape = RoundedCornerShape(6.dp),
-                color = Color.Transparent,
-                border = BorderStroke(
-                    1.dp,
-                    when {
-                        isError -> MaterialTheme.colorScheme.error
-                        else -> UnfocusedBorderColor
-                    }
-                )
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
+                color = fieldBackground,
+                border = BorderStroke(1.dp, borderColor)
             ) {
                 Row(
                     modifier = Modifier
@@ -116,6 +120,7 @@ fun <T> FormDropdownField(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val showText = selected?.let(getLabel)?.takeIf { it.isNotBlank() }
+
                     Text(
                         text = showText ?: placeholder,
                         modifier = Modifier.weight(1f),
@@ -124,32 +129,32 @@ fun <T> FormDropdownField(
                             fontFamily = RobotoCondensedFont(),
                             fontWeight = FontWeight.Normal
                         ),
-                        color = if (showText == null) Gray else DarkerGray,
+                        color = if (showText == null) Gray else textColorSelected,
                         fontStyle = if (showText == null) FontStyle.Italic else FontStyle.Normal,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowDown,
                         contentDescription = "Open",
-                        tint = DarkerGray
+                        tint = iconColor
                     )
                 }
             }
 
-            // Dropdown menu positioned to the right
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                offset = DpOffset(x = 0.dp, y = 4.dp), // ✅ Offset: 0 horizontal, 4dp below
+                offset = DpOffset(0.dp, 4.dp),
                 modifier = Modifier
-                    .align(Alignment.TopEnd) // ✅ Align to top-right
+                    .align(Alignment.TopEnd)
                     .widthIn(min = 150.dp, max = 250.dp)
                     .heightIn(max = 200.dp),
-                shape = RoundedCornerShape(8.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                 tonalElevation = 2.dp,
                 shadowElevation = 8.dp,
-                containerColor = Color.White,
+                containerColor = dropdownBackground,
                 border = BorderStroke(1.dp, GrayLighter)
             ) {
                 options.forEach { item ->
@@ -162,7 +167,7 @@ fun <T> FormDropdownField(
                                     fontFamily = RobotoCondensedFont(),
                                     fontWeight = FontWeight.Normal
                                 ),
-                                color = DarkerGray
+                                color = textColorSelected
                             )
                         },
                         onClick = {
@@ -181,7 +186,6 @@ fun <T> FormDropdownField(
             }
         }
 
-        // Supporting text
         if (supportingText != null) {
             Spacer(Modifier.height(6.dp))
             Text(
@@ -196,7 +200,6 @@ fun <T> FormDropdownField(
         }
     }
 }
-
 @Composable
 fun <T> FormAutoCompleteDropdownField(
     label: String? = null,
@@ -212,7 +215,8 @@ fun <T> FormAutoCompleteDropdownField(
     maxSuggestions: Int = 5,
     height: Dp = 44.dp,
     cornerRadius: Dp = 6.dp,
-    borderWidth: Dp = 1.dp
+    borderWidth: Dp = 1.dp,
+    isAnsweredMode: Boolean = false
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -250,15 +254,25 @@ fun <T> FormAutoCompleteDropdownField(
         }
     }
 
-    val shape = RoundedCornerShape(cornerRadius)
+    val shape = androidx.compose.foundation.shape.RoundedCornerShape(cornerRadius)
+
+    val labelColor = if (isAnsweredMode) Color(0xFF666666) else TextDarkerGray
+    val fieldBackground = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+    val textColor = if (enabled) {
+        if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
+    } else {
+        DarkerGray.copy(alpha = 0.45f)
+    }
+
     val strokeColor = when {
         isError -> MaterialTheme.colorScheme.error
+        isFocused && isAnsweredMode -> Color(0xFFA8A8A8)
         isFocused -> FocusedBorderColor
+        isAnsweredMode -> Color(0xFFC7C7C7)
         else -> UnfocusedBorderColor
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
-
         if (label != null) {
             Text(
                 text = label,
@@ -266,7 +280,7 @@ fun <T> FormAutoCompleteDropdownField(
                     fontStyle = FontStyle.Italic,
                     fontSize = 14.sp,
                     fontFamily = RobotoCondensedFont(),
-                    color = TextDarkerGray
+                    color = labelColor
                 )
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -293,7 +307,7 @@ fun <T> FormAutoCompleteDropdownField(
             textStyle = TextStyle(
                 fontSize = 14.sp,
                 fontFamily = RobotoCondensedFont(),
-                color = if (enabled) DarkerGray else DarkerGray.copy(alpha = 0.45f)
+                color = textColor
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             decorationBox = { innerTextField ->
@@ -301,7 +315,7 @@ fun <T> FormAutoCompleteDropdownField(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(shape)
-                        .background(Color.White)
+                        .background(fieldBackground)
                         .border(
                             border = BorderStroke(borderWidth, strokeColor),
                             shape = shape
@@ -329,8 +343,8 @@ fun <T> FormAutoCompleteDropdownField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = fieldBackground),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -361,7 +375,7 @@ fun <T> FormAutoCompleteDropdownField(
                                     fontSize = 14.sp,
                                     fontFamily = RobotoCondensedFont(),
                                     fontWeight = FontWeight.Normal,
-                                    color = DarkerGray
+                                    color = textColor
                                 )
                             )
                         }

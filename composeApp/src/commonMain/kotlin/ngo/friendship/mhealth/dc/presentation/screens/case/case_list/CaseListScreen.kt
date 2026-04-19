@@ -88,7 +88,8 @@ fun CaseListScreen(
             items(filteredList, key = { it.interviewId }) { item ->
                 CaseItem(
                     ui = item,
-                    onClick = { onCaseClick(item) }
+                    onClick = { onCaseClick(item) },
+                    isAnsweredStyle = selectedTab == CaseTab.Answered
                 )
             }
         }

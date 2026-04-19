@@ -1,3 +1,5 @@
+package ngo.friendship.mhealth.dc.presentation.components
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +32,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.presentation.components.AppLogo
 import ngo.friendship.mhealth.dc.theme.Dimen
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.Red

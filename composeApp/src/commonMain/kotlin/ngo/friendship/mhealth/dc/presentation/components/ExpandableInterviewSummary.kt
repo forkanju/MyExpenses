@@ -39,6 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,26 +52,47 @@ import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
 import ngo.friendship.mhealth.dc.theme.TextDarkerGray
 import ngo.friendship.mhealth.dc.theme.TextSecondary
 import org.jetbrains.compose.resources.painterResource
+
 @Composable
 fun SegmentedTabs(
-    selectedIndex: Int, onSelect: (Int) -> Unit, leftText: String, rightText: String
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    leftText: String,
+    rightText: String,
+    isAnsweredMode: Boolean = false
 ) {
-    Row(
-        modifier = Modifier
-    ) {
-        SegTab(text = leftText, selected = selectedIndex == 0) { onSelect(0) }
+    Row {
+        SegTab(
+            text = leftText,
+            selected = selectedIndex == 0,
+            onClick = { onSelect(0) },
+            isAnsweredMode = isAnsweredMode
+        )
         Spacer(modifier = Modifier.width(6.dp))
-        SegTab(text = rightText, selected = selectedIndex == 1) { onSelect(1) }
+        SegTab(
+            text = rightText,
+            selected = selectedIndex == 1,
+            onClick = { onSelect(1) },
+            isAnsweredMode = isAnsweredMode
+        )
     }
 }
 
 @Composable
 private fun SegTab(
-    text: String, selected: Boolean, onClick: () -> Unit
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    isAnsweredMode: Boolean = false
 ) {
+    val selectedBg = if (isAnsweredMode) Color(0xFF8A8A8A) else Color(0xFF2F5EA8)
+    val unselectedText = if (isAnsweredMode) Color(0xFF666666) else Color(0xFF5F6368)
+
     Box(
-        modifier = Modifier.background(if (selected) Color(0xFF2F5EA8) else Color.Transparent)
-            .clickable { onClick() }.padding(horizontal = 10.dp, vertical = 6.dp),
+        modifier = Modifier
+            .background(if (selected) selectedBg else Color.Transparent)
+            .clickable { onClick() }
+            .padding(horizontal = 10.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -77,7 +100,7 @@ private fun SegTab(
             fontSize = 13.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
             fontFamily = RobotoCondensedFont(),
-            color = if (selected) Color.White else Color(0xFF5F6368)
+            color = if (selected) Color.White else unselectedText
         )
     }
 }
@@ -88,7 +111,6 @@ data class QAItem(
 )
 
 @Composable
-
 fun ExpandableInterviewSummary(
     modifier: Modifier = Modifier,
     interviewItems: List<QAItem>,
@@ -98,7 +120,8 @@ fun ExpandableInterviewSummary(
     onTabSelect: (Int) -> Unit,
     onCopyClick: () -> Unit,
     onSeeFullClick: () -> Unit,
-    expandedInitially: Boolean = true
+    expandedInitially: Boolean = true,
+    isAnsweredMode: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(expandedInitially) }
 
@@ -111,28 +134,44 @@ fun ExpandableInterviewSummary(
         if (selectedTab == 0) interviewItems else prescriptionItems
     }
 
+    val cardColor = if (isAnsweredMode) Color(0xFFF5F5F5) else Color.White
+    val topBackground = if (isAnsweredMode) Color(0xFFF5F5F5) else Color.White
+    val footerColor = if (isAnsweredMode) Color(0xFF8A8A8A) else Color(0xFF2F5EA8)
+    val dividerColor = if (isAnsweredMode) Color(0xFFD8D8D8) else Color(0xFFE7E7E7)
+    val questionColor = if (isAnsweredMode) Color(0xFF7A7A7A) else TextSecondary
+    val answerColor = if (isAnsweredMode) Color(0xFF535353) else TextDarkerGray
+    val bulletColor = if (isAnsweredMode) Color(0xFF535353) else Color(0xFF2B2B2B)
+
+    val grayFilter = if (isAnsweredMode) {
+        ColorFilter.colorMatrix(
+            ColorMatrix().apply { setToSaturation(0f) }
+        )
+    } else null
+
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             tonalElevation = 2.dp,
-            shadowElevation = 4.dp
+            shadowElevation = 4.dp,
+            color = topBackground
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White),
+                    .background(topBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 SegmentedTabs(
                     selectedIndex = selectedTab,
                     onSelect = onTabSelect,
                     leftText = "Interview Summary",
-                    rightText = "System Prescription"
+                    rightText = "System Prescription",
+                    isAnsweredMode = isAnsweredMode
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -147,7 +186,8 @@ fun ExpandableInterviewSummary(
                         painter = painterResource(Resources.Icon.Symptom),
                         contentDescription = "Symptom",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        colorFilter = grayFilter
                     )
                     Image(
                         painter = painterResource(Resources.Icon.Copy),
@@ -156,7 +196,8 @@ fun ExpandableInterviewSummary(
                             .align(Alignment.TopEnd)
                             .padding(4.dp)
                             .size(22.dp)
-                            .clickable { onCopyClick() }
+                            .clickable { onCopyClick() },
+                        colorFilter = grayFilter
                     )
                 }
             }
@@ -182,7 +223,7 @@ fun ExpandableInterviewSummary(
                             "No system prescription found"
                         },
                         fontSize = 14.sp,
-                        color = TextDarkerGray,
+                        color = answerColor,
                         fontFamily = RobotoCondensedFont()
                     )
                 } else {
@@ -190,7 +231,7 @@ fun ExpandableInterviewSummary(
                         Text(
                             text = qa.question,
                             fontSize = 13.sp,
-                            color = TextSecondary,
+                            color = questionColor,
                             fontStyle = FontStyle.Italic,
                             fontWeight = FontWeight.Normal,
                             fontFamily = RobotoCondensedFont()
@@ -203,13 +244,13 @@ fun ExpandableInterviewSummary(
                                 text = "•",
                                 fontSize = 16.sp,
                                 fontFamily = RobotoCondensedFont(),
-                                color = Color(0xFF2B2B2B)
+                                color = bulletColor
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = qa.answer,
                                 fontSize = 14.sp,
-                                color = TextDarkerGray,
+                                color = answerColor,
                                 fontFamily = RobotoCondensedFont()
                             )
                         }
@@ -217,7 +258,7 @@ fun ExpandableInterviewSummary(
                         if (index != currentItems.lastIndex) {
                             Spacer(modifier = Modifier.height(10.dp))
                             HorizontalDivider(
-                                color = Color(0xFFE7E7E7),
+                                color = dividerColor,
                                 thickness = 1.dp
                             )
                             Spacer(modifier = Modifier.height(10.dp))
@@ -231,7 +272,7 @@ fun ExpandableInterviewSummary(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(36.dp)
-                .background(Color(0xFF2F5EA8))
+                .background(footerColor)
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

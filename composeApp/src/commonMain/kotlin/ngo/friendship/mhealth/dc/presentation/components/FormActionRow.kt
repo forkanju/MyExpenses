@@ -2,10 +2,12 @@ package ngo.friendship.mhealth.dc.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -20,14 +22,16 @@ fun FormActionRow(
     rightText: String,
     onLeftClick: () -> Unit,
     onRightClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false
 ) {
+    val actionColor = if (isAnsweredMode) Color(0xFF7A7A7A) else PrimaryColor
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left action (e.g., "Next follow-up:")
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable(onClick = onLeftClick)
@@ -37,7 +41,7 @@ fun FormActionRow(
                 fontSize = 14.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = RobotoCondensedFont(),
-                color = PrimaryColor,
+                color = actionColor,
                 textDecoration = TextDecoration.Underline
             )
             if (leftIcon != null) {
@@ -46,18 +50,15 @@ fun FormActionRow(
             }
         }
 
-        // Right action (e.g., "Save as a template")
         TextButton(onClick = onRightClick) {
             Text(
                 text = rightText,
                 fontSize = 14.sp,
                 fontStyle = FontStyle.Italic,
                 fontFamily = RobotoCondensedFont(),
-                color = PrimaryColor,
+                color = actionColor,
                 textDecoration = TextDecoration.Underline
             )
         }
     }
 }
-
-

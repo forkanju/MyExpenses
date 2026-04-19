@@ -66,7 +66,7 @@ class CaseViewModel(
 
     fun saveDoctorFeedback() {
         launch {
-            if (formState.value.prescriptions.size>0){
+            if (formState.value.prescriptions.isNotEmpty()){
                 repository.saveDoctorFeedback(formState = formState.value)
                 showSuccess("Feedback saved successfully")
                 val isSuccess = repository.updateInterviewStatus(

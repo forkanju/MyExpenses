@@ -1,5 +1,6 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +47,7 @@ import ngo.friendship.mhealth.dc.presentation.components.FormContainerCard
 import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.DiagnosisChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.InvestigationChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MedicineSection
@@ -74,6 +76,7 @@ fun PrescriptionFormScreen(
     setupData: SetupData,
     interviewDetails: InterviewDetails,
     medicineList: List<Medicine>,
+    mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
     onUpdate: (DoctorFeedbackFormState) -> Unit = {},
     onSave: () -> Unit = {},
     onFcmDetailsClick: () -> Unit,
@@ -83,7 +86,7 @@ fun PrescriptionFormScreen(
 ) {
     var checked by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) }
-
+    val isAnsweredMode = mode == CaseDetailsMode.ANSWERED
     var showDatePicker by remember { mutableStateOf(false) }
     var showSendMessageDialog by remember { mutableStateOf(false) }
     var customMessageState by remember {
@@ -114,6 +117,7 @@ fun PrescriptionFormScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White,
         topBar = {
             PrescriptionTopBar(
                 titlePrefix = interviewDetails.fcmInfo?.ifBlank { "Prescription" } ?: "",
@@ -129,11 +133,12 @@ fun PrescriptionFormScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .background(if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White)
                 .padding(paddingValues)
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            PatientProfileCard(benifName = interviewDetails.beneficiaryName)
+            PatientProfileCard(benefName = interviewDetails.beneficiaryName, isAnsweredMode = isAnsweredMode)
 
             ExpandableInterviewSummary(
                 modifier = Modifier.fillMaxWidth(),
@@ -144,11 +149,12 @@ fun PrescriptionFormScreen(
                 onTabSelect = { selectedTab = it },
                 onCopyClick = {},
                 onSeeFullClick = {},
-                expandedInitially = true
+                expandedInitially = true,
+                isAnsweredMode = isAnsweredMode
             )
 
-            FormContainerCard {
-                PrescriptionHeader()
+            FormContainerCard(containerColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White) {
+                PrescriptionHeader(isAnsweredMode = isAnsweredMode)
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider(modifier = Modifier.height(1.dp))
                 Spacer(modifier = Modifier.height(12.dp))
@@ -183,7 +189,8 @@ fun PrescriptionFormScreen(
                     },
                     onRemoveMedicine = { index ->
                         onUpdate(formState.copy(prescriptions = formState.prescriptions.minusAt(index)))
-                    }
+                    },
+                    isAnsweredMode = isAnsweredMode
                 )
 
                 LabeledFormTextField(
@@ -271,7 +278,7 @@ fun PrescriptionFormScreen(
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = "Calendar",
-                            tint = Color(0xFF214695),
+                            tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
                             modifier = Modifier.size(18.dp)
                         )
                     },
@@ -284,7 +291,8 @@ fun PrescriptionFormScreen(
                     },
                     onRightClick = {
                         println("Save as template")
-                    }
+                    },
+                    isAnsweredMode = isAnsweredMode
                 )
 
                 if (showDatePicker) {
@@ -322,7 +330,8 @@ fun PrescriptionFormScreen(
                                     )
                                 )
                                 showSendMessageDialog = true
-                            }
+                            },
+                            isAnsweredMode = isAnsweredMode
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -331,7 +340,8 @@ fun PrescriptionFormScreen(
                             onSendClick = onSave,
                             onShareClick = {
                                 println("Share prescription")
-                            }
+                            },
+                            isAnsweredMode = isAnsweredMode
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }

@@ -41,19 +41,27 @@ fun MedicineSection(
     medicines: List<Medicine>,
     prescriptionItems: List<PrescriptionItem>,
     onAddMedicine: (PrescriptionItem) -> Unit,
-    onRemoveMedicine: (Int) -> Unit
+    onRemoveMedicine: (Int) -> Unit,
+    isAnsweredMode: Boolean = false
 ) {
+    val itemBg = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+    val itemBorder = if (isAnsweredMode) Color(0xFFC7C7C7) else Color(0xFFCBD5E1)
+    val titleColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Color.Black
+    val subColor = if (isAnsweredMode) Color(0xFF6A6A6A) else Color.Black
+    val removeColor = if (isAnsweredMode) Color(0xFF777777) else Color.Black
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-
         MedicineComposerCard(
             medicines = medicines,
-            onAddClick = onAddMedicine
+            onAddClick = onAddMedicine,
+            isAnsweredMode = isAnsweredMode
         )
+
         prescriptionItems.forEachIndexed { index, item ->
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, Color(0xFFCBD5E1))
+                border = BorderStroke(1.dp, itemBorder),
+                color = itemBg
             ) {
                 Row(
                     modifier = Modifier
@@ -62,16 +70,18 @@ fun MedicineSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(text = item.medicineName)
+                        Text(text = item.medicineName, color = titleColor)
                         Spacer(modifier = Modifier.height(2.dp))
-                        Text(text = "Dose: ${item.dose} | Days: ${item.duration}")
+                        Text(
+                            text = "Dose: ${item.dose} | Days: ${item.duration}",
+                            color = subColor
+                        )
                     }
 
                     Text(
                         text = "Remove",
-                        modifier = Modifier.clickable {
-                            onRemoveMedicine(index)
-                        }
+                        color = removeColor,
+                        modifier = Modifier.clickable { onRemoveMedicine(index) }
                     )
                 }
             }
@@ -79,16 +89,20 @@ fun MedicineSection(
     }
 }
 
-
 @Composable
 fun MedicineComposerCard(
     medicines: List<Medicine>,
-    onAddClick: (PrescriptionItem) -> Unit
+    onAddClick: (PrescriptionItem) -> Unit,
+    isAnsweredMode: Boolean = false
 ) {
     Surface(
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(width = 1.dp, color = UnfocusedBorderColor),
-        tonalElevation = 0.dp
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (isAnsweredMode) Color(0xFFC7C7C7) else UnfocusedBorderColor
+        ),
+        tonalElevation = 0.dp,
+        color = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
     ) {
         Column(Modifier.padding(12.dp)) {
             var doseType by remember { mutableStateOf("Cap") }
@@ -98,11 +112,9 @@ fun MedicineComposerCard(
             var dose by remember { mutableStateOf("0+0+1") }
             var days by remember { mutableStateOf("৭ দিন") }
             var mealTime by remember { mutableStateOf(MealTime.PORE) }
+
             val medicineNames = remember(medicines) {
-                medicines.map {
-                    ""
-//                    it.brandName
-                }
+                medicines.map { "" }
             }
 
             var genericNameQuery by remember { mutableStateOf(TextFieldValue("")) }
@@ -120,18 +132,11 @@ fun MedicineComposerCard(
                 rightPlaceholder = "Type generic name",
                 onSuggestionSelected = { selected ->
                     genericNameQuery = selected
-                }
+                },
+                isAnsweredMode = isAnsweredMode
             )
 
             Spacer(Modifier.height(10.dp))
-
-
-            LaunchedEffect(medicines) {
-                println("MEDICINE SIZE = ${medicines.size}")
-                medicines.take(5).forEach {
-                    println("MEDICINE: ${it.brandName}")
-                }
-            }
 
             MedAutoCompleteTextField(
                 value = medicineQuery,
@@ -143,7 +148,8 @@ fun MedicineComposerCard(
                         text = selectedValue.text,
                         selection = TextRange(selectedValue.text.length)
                     )
-                }
+                },
+                isAnsweredMode = isAnsweredMode
             )
 
             Spacer(Modifier.height(10.dp))
@@ -152,14 +158,11 @@ fun MedicineComposerCard(
                 doseValue = dose,
                 doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
                 onDoseSelect = { dose = it },
-
                 daysValue = days,
                 daysItems = listOf("৩ দিন", "৫ দিন", "৭ দিন", "১০ দিন"),
                 onDaysSelect = { days = it },
-
                 toggleValue = mealTime,
                 onToggleChange = { mealTime = it },
-
                 onMessageClick = { },
                 onAddClick = {
                     val finalMedicineName = medicineQuery.text.trim().ifBlank { dropdownMedicine }
@@ -171,8 +174,6 @@ fun MedicineComposerCard(
                             duration = days
                         )
 
-                        println("ADD_MEDICINE_ITEM = $item")
-
                         onAddClick(item)
 
                         medicineQuery = TextFieldValue("")
@@ -181,7 +182,8 @@ fun MedicineComposerCard(
                         days = "৭ দিন"
                         mealTime = MealTime.PORE
                     }
-                }
+                },
+                isAnsweredMode = isAnsweredMode
             )
         }
     }

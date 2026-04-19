@@ -17,6 +17,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -34,63 +37,79 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun PatientProfileCard(
     modifier: Modifier = Modifier,
-    benifName: String,
+    benefName: String,
+    isAnsweredMode: Boolean = false
 ) {
+    val containerColor = if (isAnsweredMode) Color(0xFFF3F3F3) else Surface
+    val titleColor = if (isAnsweredMode) Color(0xFF5E5E5E) else TextDarkerGray
+    val detailsColor = if (isAnsweredMode) Color(0xFF777777) else PrimaryColor
+    val diseaseColor = if (isAnsweredMode) Color(0xFF555555) else PrimaryColor
+
+    val imageFilter = if (isAnsweredMode) {
+        ColorFilter.colorMatrix(
+            ColorMatrix().apply { setToSaturation(0f) }
+        )
+    } else null
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(90.dp),
         shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Surface
-        )
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
-
         Row(
             modifier = Modifier.padding(8.dp)
         ) {
             AvatarBadge(
                 modifier = Modifier.size(width = 50.dp, height = 62.dp),
                 idText = "567876",
+                isAnsweredStyle = isAnsweredMode,
                 photo = {
                     Image(
                         painter = painterResource(Resources.Icon.FCM),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        colorFilter = imageFilter
                     )
                 }
             )
-            Column(
-                modifier = Modifier.fillMaxSize().padding(8.dp),
-            ) {
-                Row(
 
-                ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+            ) {
+                Row {
                     Text(
-                        text = benifName,
+                        text = benefName,
                         style = TextStyle(
-                            color = TextDarkerGray,
+                            color = titleColor,
                             fontFamily = RobotoCondensedFont(),
                             fontWeight = FontWeight.Normal
                         )
                     )
+
                     Spacer(Modifier.width(4.dp))
+
                     Text(
                         text = "Details",
                         style = TextStyle(
-                            color = PrimaryColor,
+                            color = detailsColor,
                             fontFamily = RobotoCondensedFont(),
                             fontWeight = FontWeight.Normal
                         ),
                         textDecoration = TextDecoration.Underline
                     )
                 }
+
                 Spacer(Modifier.height(4.dp))
+
                 Text(
                     text = "Oral Ulcer",
                     style = TextStyle(
-                        color = PrimaryColor,
+                        color = diseaseColor,
                         fontFamily = RobotoCondensedFont(),
                         fontWeight = FontWeight.SemiBold
                     )
@@ -100,14 +119,10 @@ fun PatientProfileCard(
     }
 }
 
-
-@Preview(
-    showBackground = true,
-    name = "Simple Card Preview"
-)
+@Preview(showBackground = true, name = "Simple Card Preview")
 @Composable
 fun SimpleCardPreview() {
     MaterialTheme {
-        PatientProfileCard(benifName = "Benf Name")
+        PatientProfileCard(benefName = "Benf Name")
     }
 }

@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.serialization.SavedStateConfiguration
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 
 @Serializable
 object Screens {
@@ -17,7 +18,7 @@ object Screens {
     data object Main : NavKey
 
     @Serializable
-    data class PrescriptionForm(val interviewId: Long) : NavKey
+    data class PrescriptionForm(val interviewId: Long,val mode: CaseDetailsMode = CaseDetailsMode.NORMAL) : NavKey
 
 
     @Serializable

@@ -7,27 +7,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +21,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.theme.BottomBarUnselected
-import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
-import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
-
+import androidx.compose.ui.unit.*
+import ngo.friendship.mhealth.dc.theme.*
 
 @Composable
 fun MedAutoCompleteTextField(
@@ -69,21 +48,28 @@ fun MedAutoCompleteTextField(
     errorBorderColor: Color = MaterialTheme.colorScheme.error,
     backgroundColor: Color = Color.White,
     maxSuggestions: Int = 5,
-    onSuggestionSelected: (TextFieldValue) -> Unit = onValueChange
+    onSuggestionSelected: (TextFieldValue) -> Unit = onValueChange,
+    isAnsweredMode: Boolean = false
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val focusManager = LocalFocusManager.current
-    var suppressNextExpand by remember { mutableStateOf(false)}
+
+    var suppressNextExpand by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
     var selectingSuggestion by remember { mutableStateOf(false) }
 
     val shape = RoundedCornerShape(cornerRadius)
+
     val strokeColor = when {
         isError -> errorBorderColor
+        isAnsweredMode -> Color(0xFFC7C7C7)
         isFocused -> focusedBorderColor
         else -> borderColor
     }
+
+    val bgColor = if (isAnsweredMode) Color(0xFFF7F7F7) else backgroundColor
+    val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else textStyle.color
 
     val filteredSuggestions = remember(value, suggestions) {
         if (value.text.isBlank()) {
@@ -97,18 +83,19 @@ fun MedAutoCompleteTextField(
     }
 
     LaunchedEffect(value, isFocused, filteredSuggestions) {
-        expanded = when{
+        expanded = when {
             suppressNextExpand -> false
             !isFocused -> false
-            else-> filteredSuggestions.isNotEmpty()
+            else -> filteredSuggestions.isNotEmpty()
         }
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
+
         BasicTextField(
             value = value,
             onValueChange = {
-                if(selectingSuggestion){
+                if (selectingSuggestion) {
                     selectingSuggestion = false
                     return@BasicTextField
                 }
@@ -122,16 +109,17 @@ fun MedAutoCompleteTextField(
             enabled = enabled,
             singleLine = singleLine,
             textStyle = textStyle.copy(
-                color = if (enabled) textStyle.color else textStyle.color.copy(alpha = 0.45f)
+                color = if (enabled) textColor else textColor.copy(alpha = 0.45f)
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             interactionSource = interactionSource,
             decorationBox = { innerTextField ->
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(shape)
-                        .background(backgroundColor)
+                        .background(bgColor)
                         .border(BorderStroke(borderWidth, strokeColor), shape)
                         .padding(contentPadding),
                     contentAlignment = Alignment.CenterStart
@@ -139,7 +127,9 @@ fun MedAutoCompleteTextField(
                     if (value.text.isBlank()) {
                         Text(
                             text = placeholder,
-                            style = placeholderStyle,
+                            style = placeholderStyle.copy(
+                                color = if (isAnsweredMode) Color(0xFF8A8A8A) else placeholderStyle.color
+                            ),
                             maxLines = 1
                         )
                     }
@@ -154,13 +144,15 @@ fun MedAutoCompleteTextField(
                     .fillMaxWidth()
                     .padding(top = 4.dp),
                 shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+                ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+
                     filteredSuggestions.forEachIndexed { index, item ->
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -180,12 +172,16 @@ fun MedAutoCompleteTextField(
                         ) {
                             Text(
                                 text = item,
-                                fontSize = 13.sp
+                                fontSize = 13.sp,
+                                color = textColor
                             )
                         }
 
                         if (index != filteredSuggestions.lastIndex) {
-                            HorizontalDivider(color = Color(0xFFE7E7E7), thickness = 1.dp)
+                            HorizontalDivider(
+                                color = if (isAnsweredMode) Color(0xFFDADADA) else Color(0xFFE7E7E7),
+                                thickness = 1.dp
+                            )
                         }
                     }
                 }

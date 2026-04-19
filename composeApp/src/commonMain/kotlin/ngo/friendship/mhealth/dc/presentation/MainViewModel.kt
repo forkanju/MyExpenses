@@ -26,6 +26,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
 sealed interface MainUiEvent {
@@ -173,7 +174,7 @@ class MainViewModel(
         }
     }
 
-    fun openCase(interview: Interview) {
+    fun openCase2(interview: Interview) {
         if (!shouldUpdateToOpen(selectedCaseTab)) {
             backStack.add(Screens.PrescriptionForm(interview.interviewId))
             return
@@ -199,6 +200,54 @@ class MainViewModel(
                 }
 
                 backStack.add(Screens.PrescriptionForm(interview.interviewId))
+            } else {
+                showError("Failed to update interview status")
+            }
+        }
+    }
+
+    fun openCase(interview: Interview) {
+        val mode = if (selectedCaseTab == CaseTab.Answered) {
+            CaseDetailsMode.ANSWERED
+        } else {
+            CaseDetailsMode.NORMAL
+        }
+
+        if (!shouldUpdateToOpen(selectedCaseTab)) {
+            backStack.add(
+                Screens.PrescriptionForm(
+                    interviewId = interview.interviewId,
+                    mode = mode
+                )
+            )
+            return
+        }
+
+        launch(loading = Loading.Secondary) {
+            val isSuccess = caseRepository.updateInterviewStatus(
+                interviewId = interview.interviewId,
+                status = CaseTab.Opened.apiParam
+            )
+
+            if (isSuccess) {
+                interviewListState.value = interviewListState.value.filterNot {
+                    it.interviewId == interview.interviewId
+                }
+
+                caseTabCounts = caseTabCounts.toMutableMap().apply {
+                    val currentCount = this[selectedCaseTab] ?: 0
+                    this[selectedCaseTab] = (currentCount - 1).coerceAtLeast(0)
+
+                    val openCount = this[CaseTab.Opened] ?: 0
+                    this[CaseTab.Opened] = openCount + 1
+                }
+
+                backStack.add(
+                    Screens.PrescriptionForm(
+                        interviewId = interview.interviewId,
+                        mode = mode
+                    )
+                )
             } else {
                 showError("Failed to update interview status")
             }

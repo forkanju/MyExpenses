@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,9 +34,32 @@ import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.utils.toUiDateTime
 import org.jetbrains.compose.resources.painterResource
 
-
+/**
+ * A composable that displays a single case item in a list.
+ *
+ * @param ui The [Interview] data to be displayed.
+ * @param onClick Callback to be invoked when the item is clicked.
+ * @param isAnsweredStyle Whether to apply a grayscale/answered visual style to the item.
+ */
 @Composable
-fun CaseItem(ui: Interview, onClick: () -> Unit) {
+fun CaseItem(
+    ui: Interview,
+    onClick: () -> Unit,
+    isAnsweredStyle: Boolean = false
+) {
+    val cardContainerColor = if (isAnsweredStyle) Color.White else Color.White
+    val titleColor = Color.Black
+    val locationColor = Color.Gray
+    val questionColor = if (isAnsweredStyle) Color.Black else PrimaryColor
+    val refColor = Color.Gray
+    val timeColor = if (isAnsweredStyle) Color.Black else Color(0xFFE25555)
+
+    val grayscaleFilter = if (isAnsweredStyle) {
+        ColorFilter.colorMatrix(
+            ColorMatrix().apply { setToSaturation(0f) }
+        )
+    } else null
+
     Card(
         onClick = onClick,
         shape = RoundedCornerShape(
@@ -43,7 +68,7 @@ fun CaseItem(ui: Interview, onClick: () -> Unit) {
             bottomEnd = 12.dp,
             bottomStart = 12.dp
         ),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = cardContainerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -53,12 +78,14 @@ fun CaseItem(ui: Interview, onClick: () -> Unit) {
                     modifier = Modifier.size(width = 56.dp, height = 68.dp),
                     timeText = "00:25",
                     idText = ui.beneficiaryCode.substringAfter("-"),
+                    isAnsweredStyle = isAnsweredStyle,
                     photo = {
                         Image(
                             painter = painterResource(Resources.Icon.FCM),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            colorFilter = grayscaleFilter
                         )
                     }
                 )
@@ -72,20 +99,26 @@ fun CaseItem(ui: Interview, onClick: () -> Unit) {
                 ) {
                     Text(
                         text = "${ui.beneficiaryName} (${ui.status} | ${ui.status}y)",
-                        style = CompactTextStyle(fontWeight = FontWeight.Bold)
+                        style = CompactTextStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = titleColor
+                        )
                     )
+
                     Text(
                         text = ui.location,
                         style = CompactTextStyle(
                             fontSize = FontSize.SMALL,
-                            fontStyle = FontStyle.Italic
+                            fontStyle = FontStyle.Italic,
+                            color = locationColor
                         )
                     )
+
                     Text(
                         text = ui.questionnaireName,
                         style = CompactTextStyle(
                             fontSize = FontSize.MEDIUM,
-                            color = PrimaryColor,
+                            color = questionColor,
                             fontWeight = FontWeight.SemiBold
                         )
                     )
@@ -96,43 +129,50 @@ fun CaseItem(ui: Interview, onClick: () -> Unit) {
             DottedDivider()
             Spacer(Modifier.height(4.dp))
 
-            // Footer Section
             Text(
                 text = "Ref by: ${ui.userName}",
                 style = CompactTextStyle(
                     fontSize = FontSize.EXTRA_SMALL,
                     fontStyle = FontStyle.Italic,
-                    color = Color.Gray
+                    color = refColor
                 )
             )
+
             Spacer(Modifier.height(4.dp))
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "at",
                     style = CompactTextStyle(
                         fontSize = FontSize.EXTRA_SMALL,
                         fontStyle = FontStyle.Italic,
-                        color = Color.Gray
+                        color = refColor
                     )
                 )
+
                 Spacer(Modifier.width(4.dp))
+
                 Text(
                     text = ui.startTime.toUiDateTime(),
                     style = CompactTextStyle(
                         fontSize = FontSize.EXTRA_SMALL,
                         fontStyle = FontStyle.Italic,
-                        color = Color(0xFFE25555),
+                        color = timeColor,
                         fontWeight = FontWeight.SemiBold
                     )
                 )
+
                 Spacer(Modifier.width(4.dp))
+
                 Text(
                     text = ui.status,
-                    style = CompactTextStyle(fontSize = FontSize.EXTRA_SMALL, color = Color.Gray),
+                    style = CompactTextStyle(
+                        fontSize = FontSize.EXTRA_SMALL,
+                        color = refColor
+                    ),
                     fontStyle = FontStyle.Italic,
                 )
             }
         }
     }
 }
-

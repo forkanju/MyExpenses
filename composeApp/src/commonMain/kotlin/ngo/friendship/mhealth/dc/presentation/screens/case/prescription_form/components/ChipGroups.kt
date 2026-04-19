@@ -23,22 +23,28 @@ import ngo.friendship.mhealth.dc.domain.model.Investigation
 fun SelectedItemChip(
     text: String,
     onRemove: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false
 ) {
+    val chipBg = if (isAnsweredMode) Color(0xFFF0F0F0) else Color(0xFFF1F5F9)
+    val chipBorder = if (isAnsweredMode) Color(0xFFC8C8C8) else Color(0xFFCBD5E1)
+    val chipText = if (isAnsweredMode) Color(0xFF555555) else Color.Black
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFF1F5F9),
-        border = BorderStroke(1.dp, Color(0xFFCBD5E1))
+        color = chipBg,
+        border = BorderStroke(1.dp, chipBorder)
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = text)
+            Text(text = text, color = chipText)
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = "✕",
+                color = chipText,
                 modifier = Modifier.clickable { onRemove() }
             )
         }
@@ -48,7 +54,8 @@ fun SelectedItemChip(
 @Composable
 fun DiagnosisChipGroup(
     items: List<Diagnosis>,
-    onRemove: (Diagnosis) -> Unit
+    onRemove: (Diagnosis) -> Unit,
+    isAnsweredMode: Boolean = false
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -57,7 +64,8 @@ fun DiagnosisChipGroup(
         items.forEach { item ->
             SelectedItemChip(
                 text = item.diagName,
-                onRemove = { onRemove(item) }
+                onRemove = { onRemove(item) },
+                isAnsweredMode = isAnsweredMode
             )
         }
     }
@@ -66,7 +74,8 @@ fun DiagnosisChipGroup(
 @Composable
 fun InvestigationChipGroup(
     items: List<Investigation>,
-    onRemove: (Investigation) -> Unit
+    onRemove: (Investigation) -> Unit,
+    isAnsweredMode: Boolean = false
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -75,7 +84,8 @@ fun InvestigationChipGroup(
         items.forEach { item ->
             SelectedItemChip(
                 text = item.investigationName,
-                onRemove = { onRemove(item) }
+                onRemove = { onRemove(item) },
+                isAnsweredMode = isAnsweredMode
             )
         }
     }

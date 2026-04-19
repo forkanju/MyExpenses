@@ -1,6 +1,5 @@
 package ngo.friendship.mhealth.dc.presentation.navigation.route
 
-import CustomTopBar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -20,9 +19,11 @@ import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.components.CustomTopBar
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.BottomBar
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.theme.Resources
 
 fun EntryProviderScope<NavKey>.homeRoute(
@@ -30,6 +31,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
 ) {
     entry<Screens.Main> {
 //        val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
+        val notificationCount = viewModel.caseTabCounts[CaseTab.Pending] ?: 0
         val pagerState = rememberPagerState(
             initialPage = BottomNavItems.Cases.ordinal,
             pageCount = { BottomNavItems.entries.size }
@@ -58,7 +60,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
             topBar = {
                 CustomTopBar(
                     notificationIcon = Resources.Icon.Notification,
-                    notificationCount = 10,
+                    notificationCount = notificationCount,
                     onNotificationClick = {
                         println("Notification clicked")
                     },

@@ -15,14 +15,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun FormContainerCard(
     modifier: Modifier = Modifier,
+    containerColor: Color = Color.White,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-
     ) {
         Column(
             modifier = Modifier.padding(12.dp),

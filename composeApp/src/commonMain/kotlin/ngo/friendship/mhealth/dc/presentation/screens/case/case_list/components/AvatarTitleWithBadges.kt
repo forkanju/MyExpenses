@@ -22,19 +22,22 @@ import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.TrendBlue
 
-
 @Composable
 fun AvatarTileWithBadges(
     modifier: Modifier = Modifier,
     photo: @Composable BoxScope.() -> Unit,
     timeText: String,
-    idText: String
+    idText: String,
+    isAnsweredStyle: Boolean = false
 ) {
+    val topBadgeColor = if (isAnsweredStyle) Color.DarkGray else TrendBlue
+    val bottomOverlayColor = if (isAnsweredStyle) Color.Black.copy(alpha = 0.7f) else Color.Black.copy(alpha = 0.5f)
+
     Box(modifier = modifier.clip(RoundedCornerShape(8.dp))) {
         photo()
-        // Top Badge
+
         Surface(
-            color = TrendBlue,
+            color = topBadgeColor,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .height(14.dp)
@@ -58,13 +61,21 @@ fun AvatarTileWithBadges(
                 )
             }
         }
-        // Bottom Overlay
+
         Box(
-            modifier = Modifier.fillMaxWidth().height(20.dp).background(Color.Black.copy(0.5f))
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp)
+                .background(bottomOverlayColor)
                 .align(Alignment.BottomCenter),
             contentAlignment = Alignment.Center
         ) {
-            Text(idText, color = Color.White, fontSize = FontSize.EXTRA_SMALL, fontWeight = FontWeight.Bold)
+            Text(
+                text = idText,
+                color = Color.White,
+                fontSize = FontSize.EXTRA_SMALL,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

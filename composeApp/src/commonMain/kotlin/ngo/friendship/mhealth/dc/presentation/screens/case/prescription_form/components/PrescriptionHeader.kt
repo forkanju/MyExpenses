@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,38 +30,39 @@ fun PrescriptionHeader(
     modifier: Modifier = Modifier,
     title: String = "Prescription",
     rightText: String = "More",
+    isAnsweredMode: Boolean = false
 ) {
+    val titleColor = if (isAnsweredMode) Color(0xFF666666) else PrimaryColor
+    val rightTextColor = if (isAnsweredMode) Color(0xFF7A7A7A) else TextSecondary
+    val leftIconColor = if (isAnsweredMode) Color(0xFF666666) else PrimaryColor
+    val rightIconColor = if (isAnsweredMode) Color(0xFF8A8A8A) else IconSecondary
 
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-
         Icon(
             painter = painterResource(resource = Resources.Icon.Note),
             contentDescription = "Title Icon",
-            tint = PrimaryColor,
+            tint = leftIconColor,
             modifier = Modifier.size(32.dp)
         )
 
         Spacer(Modifier.width(4.dp))
 
-        // Title
         Text(
             text = title,
             style = TextStyle(
                 fontSize = FontSize.EXTRA_MEDIUM,
                 fontFamily = RobotoCondensedFont(),
                 fontWeight = FontWeight.Bold,
-                color = PrimaryColor,
+                color = titleColor,
             )
         )
 
         Spacer(Modifier.weight(1f))
 
-        // Right "More" Section
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -70,7 +72,7 @@ fun PrescriptionHeader(
                 fontSize = FontSize.REGULAR,
                 fontWeight = FontWeight.Normal,
                 fontFamily = RobotoCondensedFont(),
-                color = TextSecondary
+                color = rightTextColor
             )
 
             Spacer(Modifier.width(4.dp))
@@ -78,7 +80,7 @@ fun PrescriptionHeader(
             Icon(
                 painter = painterResource(resource = Resources.Icon.More),
                 contentDescription = "Action Icon",
-                tint = IconSecondary
+                tint = rightIconColor
             )
         }
     }
@@ -88,6 +90,6 @@ fun PrescriptionHeader(
 @Composable
 private fun PrescriptionHeaderPreview() {
     MaterialTheme {
-        PrescriptionHeader()
+        PrescriptionHeader(isAnsweredMode = true)
     }
 }

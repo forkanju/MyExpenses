@@ -33,26 +33,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+private val NormalPrimaryButton = Color(0xFF214695)
+private val NormalPrimaryButtonAlt = Color(0xFF1976D2)
+private val AnsweredPrimaryButton = Color(0xFF9E9E9E)
+private val AnsweredPrimaryButtonAlt = Color(0xFFB5B5B5)
+private val DisabledAnsweredButton = Color(0xFFD0D0D0)
+private val DisabledNormalButton = Color(0xFFB0BEC5)
+private val ShareIconNormal = Color(0xFF616161)
+private val ShareIconAnswered = Color(0xFF7A7A7A)
+private val ShareSurfaceNormal = Color.White
+private val ShareSurfaceAnswered = Color(0xFFF3F3F3)
+
 @Composable
 fun PrescriptionActionButtonRow(
     onSendClick: () -> Unit,
     onShareClick: () -> Unit,
     sendButtonText: String = "Send Prescription",
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false
 ) {
+    val buttonBg = if (isAnsweredMode) AnsweredPrimaryButtonAlt else NormalPrimaryButton
+    val disabledButtonBg = if (isAnsweredMode) DisabledAnsweredButton else DisabledNormalButton
+    val shareBg = if (isAnsweredMode) ShareSurfaceAnswered else ShareSurfaceNormal
+    val shareTint = if (isAnsweredMode) ShareIconAnswered else ShareIconNormal
+
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        // Main Send Button
         Button(
             onClick = onSendClick,
             enabled = enabled,
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF214695),
-                contentColor = Color.White
+                containerColor = buttonBg,
+                contentColor = Color.White,
+                disabledContainerColor = disabledButtonBg,
+                disabledContentColor = Color.White.copy(alpha = 0.7f)
             ),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier.height(32.dp)
@@ -66,12 +84,11 @@ fun PrescriptionActionButtonRow(
 
         Spacer(Modifier.width(8.dp))
 
-        // Share Icon Button with circular white background and elevation
         Surface(
             onClick = onShareClick,
             modifier = Modifier.size(36.dp),
             shape = CircleShape,
-            color = Color.White,
+            color = shareBg,
             shadowElevation = 4.dp,
             tonalElevation = 0.dp
         ) {
@@ -82,7 +99,7 @@ fun PrescriptionActionButtonRow(
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = Color(0xFF616161),
+                    tint = shareTint,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -90,27 +107,32 @@ fun PrescriptionActionButtonRow(
     }
 }
 
-// Alternative version with outlined share button
 @Composable
 fun PrescriptionActionButtonsOutlined(
     onSendClick: () -> Unit,
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier,
     sendButtonText: String = "Send Prescription",
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isAnsweredMode: Boolean = false
 ) {
+    val buttonBg = if (isAnsweredMode) AnsweredPrimaryButton else NormalPrimaryButtonAlt
+    val disabledButtonBg = if (isAnsweredMode) DisabledAnsweredButton else DisabledNormalButton
+    val outlinedIconColor = if (isAnsweredMode) ShareIconAnswered else ShareIconNormal
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Main Send Button
         Button(
             onClick = onSendClick,
             enabled = enabled,
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF1976D2),
-                contentColor = Color.White
+                containerColor = buttonBg,
+                contentColor = Color.White,
+                disabledContainerColor = disabledButtonBg,
+                disabledContentColor = Color.White.copy(alpha = 0.7f)
             ),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier.height(40.dp)
@@ -124,14 +146,13 @@ fun PrescriptionActionButtonsOutlined(
 
         Spacer(Modifier.width(8.dp))
 
-        // Share Outlined Button
         OutlinedIconButton(
             onClick = onShareClick,
             enabled = enabled,
             modifier = Modifier.size(40.dp),
             border = ButtonDefaults.outlinedButtonBorder(enabled).copy(width = 1.dp),
             colors = IconButtonDefaults.outlinedIconButtonColors(
-                contentColor = Color(0xFF616161)
+                contentColor = outlinedIconColor
             )
         ) {
             Icon(
@@ -143,7 +164,6 @@ fun PrescriptionActionButtonsOutlined(
     }
 }
 
-// Usage Examples:
 @Composable
 fun PrescriptionActionButtonsExamples() {
     Column(
@@ -152,7 +172,6 @@ fun PrescriptionActionButtonsExamples() {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Example 1: Basic version
         PrescriptionActionButtonRow(
             onSendClick = {
                 println("Send prescription")
@@ -164,7 +183,6 @@ fun PrescriptionActionButtonsExamples() {
 
         HorizontalDivider()
 
-        // Example 2: Outlined share button
         PrescriptionActionButtonsOutlined(
             onSendClick = {
                 println("Send prescription")
@@ -176,7 +194,6 @@ fun PrescriptionActionButtonsExamples() {
 
         HorizontalDivider()
 
-        // Example 3: Custom text
         PrescriptionActionButtonRow(
             sendButtonText = "Send Now",
             onSendClick = { },
@@ -185,7 +202,6 @@ fun PrescriptionActionButtonsExamples() {
 
         HorizontalDivider()
 
-        // Example 4: Disabled state
         PrescriptionActionButtonRow(
             onSendClick = { },
             onShareClick = { },
@@ -194,16 +210,22 @@ fun PrescriptionActionButtonsExamples() {
     }
 }
 
-// Bottom bar version (like in the original design)
 @Composable
 fun PrescriptionBottomBar(
     onSendClick: () -> Unit,
     onShareClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false,
+    enabled: Boolean = true
 ) {
+    val buttonBg = if (isAnsweredMode) AnsweredPrimaryButton else NormalPrimaryButtonAlt
+    val disabledButtonBg = if (isAnsweredMode) DisabledAnsweredButton else DisabledNormalButton
+    val shareTint = if (isAnsweredMode) ShareIconAnswered else ShareIconNormal
+    val containerBg = if (isAnsweredMode) Color(0xFFF5F5F5) else Color.White
+
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = Color.White,
+        color = containerBg,
         shadowElevation = 8.dp
     ) {
         Row(
@@ -213,12 +235,14 @@ fun PrescriptionBottomBar(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Main Send Button
             Button(
                 onClick = onSendClick,
+                enabled = enabled,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1976D2),
-                    contentColor = Color.White
+                    containerColor = buttonBg,
+                    contentColor = Color.White,
+                    disabledContainerColor = disabledButtonBg,
+                    disabledContentColor = Color.White.copy(alpha = 0.7f)
                 ),
                 shape = RoundedCornerShape(4.dp),
                 modifier = Modifier.height(48.dp)
@@ -232,15 +256,15 @@ fun PrescriptionBottomBar(
 
             Spacer(Modifier.width(8.dp))
 
-            // Share Icon Button
             IconButton(
                 onClick = onShareClick,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
+                enabled = enabled
             ) {
                 Icon(
                     imageVector = Icons.Default.Share,
                     contentDescription = "Share",
-                    tint = Color(0xFF616161),
+                    tint = shareTint,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -248,7 +272,6 @@ fun PrescriptionBottomBar(
     }
 }
 
-// Preview
 @Composable
 fun PrescriptionActionButtonsPreview() {
     MaterialTheme {

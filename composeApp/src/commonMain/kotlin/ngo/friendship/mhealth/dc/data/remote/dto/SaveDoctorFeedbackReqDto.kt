@@ -53,7 +53,7 @@ data class SaveDoctorFeedbackReqDto(
 
     @SerialName("param1")
     val param1: DoctorFeedbackParam1
-){
+) {
     companion object {
         fun build(
             userName: String,
@@ -84,6 +84,7 @@ data class SaveDoctorFeedbackReqDto(
     }
 }
 
+
 @Serializable
 data class DoctorFeedbackParam1(
     @SerialName("DOCTOR_FEEDBACK_OBJECT")
@@ -108,7 +109,7 @@ data class DoctorFeedbackObject(
     val investigationResult: String,
 
     @SerialName("next_follow_up_date")
-    val nextFollowUpDate: String,
+    val nextFollowUpDate: String? = null,
 
     @SerialName("investigation")
     val investigation: List<IdNameItem>,
