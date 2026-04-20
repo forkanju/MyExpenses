@@ -21,6 +21,7 @@ import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.fcm.AppNotifierManager
+import ngo.friendship.mhealth.dc.fcm.FcmTopics
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
@@ -174,37 +175,6 @@ class MainViewModel(
         }
     }
 
-    fun openCase2(interview: Interview) {
-        if (!shouldUpdateToOpen(selectedCaseTab)) {
-            backStack.add(Screens.PrescriptionForm(interview.interviewId))
-            return
-        }
-
-        launch(loading = Loading.Secondary) {
-            val isSuccess = caseRepository.updateInterviewStatus(
-                interviewId = interview.interviewId,
-                status = CaseTab.Opened.apiParam
-            )
-
-            if (isSuccess) {
-                interviewListState.value = interviewListState.value.filterNot {
-                    it.interviewId == interview.interviewId
-                }
-
-                caseTabCounts = caseTabCounts.toMutableMap().apply {
-                    val currentCount = this[selectedCaseTab] ?: 0
-                    this[selectedCaseTab] = (currentCount - 1).coerceAtLeast(0)
-
-                    val openCount = this[CaseTab.Opened] ?: 0
-                    this[CaseTab.Opened] = openCount + 1
-                }
-
-                backStack.add(Screens.PrescriptionForm(interview.interviewId))
-            } else {
-                showError("Failed to update interview status")
-            }
-        }
-    }
 
     fun openCase(interview: Interview) {
         val mode = if (selectedCaseTab == CaseTab.Answered) {
@@ -255,7 +225,14 @@ class MainViewModel(
     }
 
     fun logout() {
-        settings.clear()
-        backStack.replaceWith(Screens.Auth)
+        viewModelScope.launch {
+            val user = settings.user
+            if (user.userName.isNotEmpty()) {
+                notifierManager.unsubscribeFromTopic(FcmTopics.doctorCaseList(user.userName))
+                notifierManager.unsubscribeFromTopic(FcmTopics.doctorInterviewUpdates(user.userName))
+            }
+            settings.clear()
+            backStack.replaceWith(Screens.Auth)
+        }
     }
 }

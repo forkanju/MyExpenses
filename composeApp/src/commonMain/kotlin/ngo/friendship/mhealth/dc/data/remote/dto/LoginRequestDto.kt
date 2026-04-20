@@ -23,7 +23,7 @@ data class LoginRequestDto(
     @SerialName("lang") val lang: String = "bn",
     @SerialName("data") val data: Map<String, String> = emptyMap(),
     @SerialName("param1") val param1: Map<String, String> = emptyMap()
-){
+) {
     constructor(userName: String, password: String) : this(
         userCode = userName.md5(),
         password = password.md5(),

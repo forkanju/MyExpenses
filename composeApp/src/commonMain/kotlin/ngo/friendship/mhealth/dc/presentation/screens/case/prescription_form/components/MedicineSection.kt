@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,13 +27,15 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
 import ngo.friendship.mhealth.dc.presentation.components.MedAutoCompleteTextField
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import androidx.compose.ui.tooling.preview.Preview
 
 enum class MealTime {
     AGE,   // আগে
     PORE   // পরে
 }
-
 
 @Composable
 fun MedicineSection(
@@ -44,12 +45,6 @@ fun MedicineSection(
     onRemoveMedicine: (Int) -> Unit,
     isAnsweredMode: Boolean = false
 ) {
-    val itemBg = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
-    val itemBorder = if (isAnsweredMode) Color(0xFFC7C7C7) else Color(0xFFCBD5E1)
-    val titleColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Color.Black
-    val subColor = if (isAnsweredMode) Color(0xFF6A6A6A) else Color.Black
-    val removeColor = if (isAnsweredMode) Color(0xFF777777) else Color.Black
-
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         MedicineComposerCard(
             medicines = medicines,
@@ -58,32 +53,54 @@ fun MedicineSection(
         )
 
         prescriptionItems.forEachIndexed { index, item ->
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, itemBorder),
-                color = itemBg
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(text = item.medicineName, color = titleColor)
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "Dose: ${item.dose} | Days: ${item.duration}",
-                            color = subColor
-                        )
-                    }
+            PrescriptionItemCard(
+                item = item,
+                onRemoveClick = { onRemoveMedicine(index) },
+                isAnsweredMode = isAnsweredMode
+            )
+        }
+    }
+}
 
-                    Text(
-                        text = "Remove",
-                        color = removeColor,
-                        modifier = Modifier.clickable { onRemoveMedicine(index) }
-                    )
-                }
+@Composable
+fun PrescriptionItemCard(
+    item: PrescriptionItem,
+    onRemoveClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false
+) {
+    val itemBg = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+    val itemBorder = if (isAnsweredMode) Color(0xFFC7C7C7) else Color(0xFFCBD5E1)
+    val titleColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Color.Black
+    val subColor = if (isAnsweredMode) Color(0xFF6A6A6A) else Color.Black
+    val removeColor = if (isAnsweredMode) Color(0xFF777777) else Color.Black
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, itemBorder),
+        color = itemBg
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = item.medicineName, color = titleColor)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Dose: ${item.dose} | Days: ${item.duration}",
+                    color = subColor
+                )
+            }
+
+            if (!isAnsweredMode) {
+                Text(
+                    text = "Remove",
+                    color = removeColor,
+                    modifier = Modifier.clickable { onRemoveClick() }
+                )
             }
         }
     }
@@ -184,6 +201,66 @@ fun MedicineComposerCard(
                     }
                 },
                 isAnsweredMode = isAnsweredMode
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PrescriptionItemCardPreview() {
+    FriendshipTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("Normal Style:")
+            PrescriptionItemCard(
+                item = PrescriptionItem(
+                    medicineName = "Napa 500mg",
+                    dose = "1+0+1",
+                    duration = "৫ দিন"
+                ),
+                onRemoveClick = {},
+                isAnsweredMode = false
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text("Answered Style:")
+            PrescriptionItemCard(
+                item = PrescriptionItem(
+                    medicineName = "Amoxicillin 500",
+                    dose = "0+0+1",
+                    duration = "৭ দিন"
+                ),
+                onRemoveClick = {},
+                isAnsweredMode = true
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun MedicineComposerCardPreview() {
+    FriendshipTheme {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            MedicineComposerCard(
+                medicines = listOf(
+                    Medicine(medicineId = 1, genericName = "Paracetamol", brandName = "Napa"),
+                    Medicine(medicineId = 2, genericName = "Amoxicillin", brandName = "Moxilin")
+                ),
+                onAddClick = {}
+            )
+
+            PrescriptionItemCard(
+                item = PrescriptionItem(
+                    medicineName = "Napa 500mg",
+                    dose = "1+0+1",
+                    duration = "৫ দিন"
+                ),
+                onRemoveClick = {}
             )
         }
     }

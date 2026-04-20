@@ -34,7 +34,7 @@ fun FormActionRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable(onClick = onLeftClick)
+            modifier = Modifier.clickable(enabled = !isAnsweredMode, onClick = onLeftClick)
         ) {
             Text(
                 text = leftText,
@@ -50,7 +50,7 @@ fun FormActionRow(
             }
         }
 
-        TextButton(onClick = onRightClick) {
+        TextButton(enabled = !isAnsweredMode, onClick = onRightClick) {
             Text(
                 text = rightText,
                 fontSize = 14.sp,

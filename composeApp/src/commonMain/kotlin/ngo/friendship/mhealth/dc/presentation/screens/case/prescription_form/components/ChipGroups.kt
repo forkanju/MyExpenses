@@ -45,7 +45,7 @@ fun SelectedItemChip(
             Text(
                 text = "✕",
                 color = chipText,
-                modifier = Modifier.clickable { onRemove() }
+                modifier = Modifier.clickable(enabled = !isAnsweredMode) { onRemove() }
             )
         }
     }

@@ -73,7 +73,7 @@ fun CheckboxWithEditableText(
             tint = iconColor,
             modifier = Modifier
                 .size(22.dp)
-                .clickable(onClick = onEditClick)
+                .clickable(enabled = !isAnsweredMode, onClick = onEditClick)
         )
     }
 }

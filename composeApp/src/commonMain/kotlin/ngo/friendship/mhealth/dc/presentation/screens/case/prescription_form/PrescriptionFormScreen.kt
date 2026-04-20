@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
@@ -54,6 +55,7 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.com
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PatientProfileCard
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionActionButtonRow
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionHeader
+import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionItemCard
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionTopBar
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.SendMessageDialog
 import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addDiagnosis
@@ -138,7 +140,10 @@ fun PrescriptionFormScreen(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            PatientProfileCard(benefName = interviewDetails.beneficiaryName, isAnsweredMode = isAnsweredMode)
+            PatientProfileCard(
+                benefName = interviewDetails.beneficiaryName,
+                isAnsweredMode = isAnsweredMode
+            )
 
             ExpandableInterviewSummary(
                 modifier = Modifier.fillMaxWidth(),
@@ -167,7 +172,8 @@ fun PrescriptionFormScreen(
                     getLabel = { it.diagName },
                     onSelectedChange = { selected ->
                         onUpdate(addDiagnosis(formState, selected))
-                    }
+                    },
+                    enabled = !isAnsweredMode
                 )
 
                 if (formState.selectedDiagnoses.isNotEmpty()) {
@@ -181,17 +187,47 @@ fun PrescriptionFormScreen(
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                MedicineSection(
-                    medicines = medicineList,
-                    prescriptionItems = formState.prescriptions,
-                    onAddMedicine = { item ->
-                        onUpdate(formState.copy(prescriptions = formState.prescriptions + item))
-                    },
-                    onRemoveMedicine = { index ->
-                        onUpdate(formState.copy(prescriptions = formState.prescriptions.minusAt(index)))
-                    },
-                    isAnsweredMode = isAnsweredMode
-                )
+                if (isAnsweredMode) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        // Static items for preview/testing purposes
+                        PrescriptionItemCard(
+                            item = PrescriptionItem(
+                                medicineName = "Napa 500mg",
+                                dose = "1+0+1",
+                                duration = "৫ দিন"
+                            ),
+                            onRemoveClick = {},
+                            isAnsweredMode = true
+                        )
+                        PrescriptionItemCard(
+                            item = PrescriptionItem(
+                                medicineName = "Amoxicillin 500mg",
+                                dose = "1+1+1",
+                                duration = "৭ দিন"
+                            ),
+                            onRemoveClick = {},
+                            isAnsweredMode = true
+                        )
+                    }
+                } else {
+                    MedicineSection(
+                        medicines = medicineList,
+                        prescriptionItems = formState.prescriptions,
+                        onAddMedicine = { item ->
+                            onUpdate(formState.copy(prescriptions = formState.prescriptions + item))
+                        },
+                        onRemoveMedicine = { index ->
+                            onUpdate(
+                                formState.copy(
+                                    prescriptions = formState.prescriptions.minusAt(
+                                        index
+                                    )
+                                )
+                            )
+                        },
+                        isAnsweredMode = isAnsweredMode
+                    )
+                }
 
                 LabeledFormTextField(
                     label = "Doctor Advice",
@@ -201,7 +237,8 @@ fun PrescriptionFormScreen(
                         onUpdate(formState.copy(doctorAdvice = it))
                     },
                     isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    enabled = !isAnsweredMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -214,7 +251,8 @@ fun PrescriptionFormScreen(
                     getLabel = { it.investigationName },
                     onSelectedChange = { selected ->
                         onUpdate(addInvestigation(formState, selected))
-                    }
+                    },
+                    enabled = !isAnsweredMode
                 )
 
                 if (formState.selectedInvestigations.isNotEmpty()) {
@@ -237,7 +275,8 @@ fun PrescriptionFormScreen(
                         onUpdate(formState.copy(commentsForFcm = it))
                     },
                     isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    enabled = !isAnsweredMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -250,7 +289,8 @@ fun PrescriptionFormScreen(
                     getLabel = { it.refCenterName },
                     onSelectedChange = { selected ->
                         onUpdate(formState.copy(selectedReferralCenter = selected))
-                    }
+                    },
+                    enabled = !isAnsweredMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -263,7 +303,8 @@ fun PrescriptionFormScreen(
                         onUpdate(formState.copy(doctorNotes = it))
                     },
                     isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    enabled = !isAnsweredMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -331,6 +372,7 @@ fun PrescriptionFormScreen(
                                 )
                                 showSendMessageDialog = true
                             },
+                            enabled = !isAnsweredMode,
                             isAnsweredMode = isAnsweredMode
                         )
 
@@ -341,6 +383,7 @@ fun PrescriptionFormScreen(
                             onShareClick = {
                                 println("Share prescription")
                             },
+                            enabled = !isAnsweredMode,
                             isAnsweredMode = isAnsweredMode
                         )
                         Spacer(modifier = Modifier.height(16.dp))
