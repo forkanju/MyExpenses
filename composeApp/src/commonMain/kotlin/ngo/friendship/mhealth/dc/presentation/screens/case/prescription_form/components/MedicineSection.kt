@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -28,7 +28,6 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
 import ngo.friendship.mhealth.dc.presentation.components.MedAutoCompleteTextField
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
-import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -69,11 +68,12 @@ fun PrescriptionItemCard(
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false
 ) {
-    val itemBg = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
-    val itemBorder = if (isAnsweredMode) Color(0xFFC7C7C7) else Color(0xFFCBD5E1)
-    val titleColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Color.Black
-    val subColor = if (isAnsweredMode) Color(0xFF6A6A6A) else Color.Black
-    val removeColor = if (isAnsweredMode) Color(0xFF777777) else Color.Black
+    val colorScheme = MaterialTheme.colorScheme
+    val itemBg = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.surface
+    val itemBorder = if (isAnsweredMode) colorScheme.outlineVariant else colorScheme.outline
+    val titleColor = if (isAnsweredMode) colorScheme.onSurfaceVariant else colorScheme.onSurface
+    val subColor = if (isAnsweredMode) colorScheme.onSurfaceVariant.copy(alpha = 0.8f) else colorScheme.onSurface.copy(alpha = 0.7f)
+    val removeColor = if (isAnsweredMode) colorScheme.inverseOnSurface else colorScheme.onSurface
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -95,13 +95,11 @@ fun PrescriptionItemCard(
                 )
             }
 
-            if (!isAnsweredMode) {
-                Text(
-                    text = "Remove",
-                    color = removeColor,
-                    modifier = Modifier.clickable { onRemoveClick() }
-                )
-            }
+            Text(
+                text = "Remove",
+                color = removeColor,
+                modifier = Modifier.clickable { onRemoveClick() }
+            )
         }
     }
 }
@@ -112,14 +110,15 @@ fun MedicineComposerCard(
     onAddClick: (PrescriptionItem) -> Unit,
     isAnsweredMode: Boolean = false
 ) {
+    val colorScheme = MaterialTheme.colorScheme
     Surface(
         shape = RoundedCornerShape(10.dp),
         border = BorderStroke(
             width = 1.dp,
-            color = if (isAnsweredMode) Color(0xFFC7C7C7) else UnfocusedBorderColor
+            color = if (isAnsweredMode) colorScheme.outlineVariant else colorScheme.outline
         ),
         tonalElevation = 0.dp,
-        color = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+        color = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.surface
     ) {
         Column(Modifier.padding(12.dp)) {
             var doseType by remember { mutableStateOf("Cap") }
@@ -201,41 +200,6 @@ fun MedicineComposerCard(
                     }
                 },
                 isAnsweredMode = isAnsweredMode
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PrescriptionItemCardPreview() {
-    FriendshipTheme {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text("Normal Style:")
-            PrescriptionItemCard(
-                item = PrescriptionItem(
-                    medicineName = "Napa 500mg",
-                    dose = "1+0+1",
-                    duration = "৫ দিন"
-                ),
-                onRemoveClick = {},
-                isAnsweredMode = false
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Text("Answered Style:")
-            PrescriptionItemCard(
-                item = PrescriptionItem(
-                    medicineName = "Amoxicillin 500",
-                    dose = "0+0+1",
-                    duration = "৭ দিন"
-                ),
-                onRemoveClick = {},
-                isAnsweredMode = true
             )
         }
     }

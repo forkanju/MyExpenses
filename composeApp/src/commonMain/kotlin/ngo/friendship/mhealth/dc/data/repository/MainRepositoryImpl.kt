@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
-import ngo.friendship.mhealth.dc.domain.model.SetupData
-import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
+import ngo.friendship.mhealth.dc.domain.model.SetupData
+import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 
 class MainRepositoryImpl(
     private val api: ApiService,

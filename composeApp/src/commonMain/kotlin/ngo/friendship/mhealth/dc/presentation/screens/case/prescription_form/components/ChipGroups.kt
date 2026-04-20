@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
@@ -26,9 +26,12 @@ fun SelectedItemChip(
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false
 ) {
-    val chipBg = if (isAnsweredMode) Color(0xFFF0F0F0) else Color(0xFFF1F5F9)
-    val chipBorder = if (isAnsweredMode) Color(0xFFC8C8C8) else Color(0xFFCBD5E1)
-    val chipText = if (isAnsweredMode) Color(0xFF555555) else Color.Black
+    val colorScheme = MaterialTheme.colorScheme
+
+    // Using semantic Material3 tokens
+    val chipBg = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.background
+    val chipBorder = if (isAnsweredMode) colorScheme.outlineVariant else colorScheme.outline
+    val chipText = if (isAnsweredMode) colorScheme.onSurfaceVariant else colorScheme.onSurface
 
     Surface(
         modifier = modifier,

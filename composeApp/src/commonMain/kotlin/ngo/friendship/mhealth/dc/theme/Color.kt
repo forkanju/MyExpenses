@@ -75,23 +75,45 @@ val surfaceContainerHighDark = Color(0xFF262B26)
 val surfaceContainerHighestDark = Color(0xFF313631)
 
 
-val FocusedBorderColor = Color(0xE07DD9F1)
-val UnfocusedBorderColor = Color(0xFFCBD5E1)
-val DisabledBorderColor = Color(0xFFE0E0E0)
+// Brand Colors
+val PrimaryBlue = Color(0xFF214695)
+val PrimaryGreen = Color(0xFF60BF77)
+val SecondaryWhite = Color(0xFFFCFAFA)
 
-val PrimaryColor = Color(0xFF214695)
+// Status Colors
+val SuccessGreen = Color(0xFF4CAF50)
+val ErrorRed = Color(0xFFBA1A1A)
+val WarningOrange = Color(0xFFF24C00)
+val InfoBlue = Color(0xFF1C9FE2)
 
+// Neutral Colors
+val White = Color(0xFFFFFFFF)
+val Black = Color(0xFF000000)
+val Gray900 = Color(0xFF181D18)
+val Gray700 = Color(0xFF424242)
+val Gray500 = Color(0xFF707070)
+val Gray300 = Color(0xFFCBD5E1)
+val Gray100 = Color(0xFFF3F3F3)
+val Gray50 = Color(0xFFFAFAFA)
+
+// Answered Mode / Read-only Colors
+val AnsweredBackground = Color(0xFFEFEFEF)
+val AnsweredSurface = Color(0xFFF7F7F7)
+val AnsweredBorder = Color(0xFFC7C7C7)
+val AnsweredTextPrimary = Color(0xFF4F4F4F)
+val AnsweredTextSecondary = Color(0xFF6A6A6A)
+val AnsweredAction = Color(0xFF7A7A7A)
+
+// Existing references for backward compatibility (can be phased out)
+val PrimaryColor = PrimaryBlue
+val Gray = Gray500
+val DarkerGray = Gray700
+val Red = Color(0xFFE68367)
 val Transparent = Color.Transparent
 
-val Yellowish = Color(0xFFEEFF00)
-val Greenish = Color(0xFF4CAF50)
-
-val Orange = Color(0xFFF24C00)
-val Black = Color(0xFF000000)
-val Gray = Color(0xFF707070)
-val DarkerGray = Color(0xFF424242)
-val White = Color(0xFFFFFFFF)
-val Red = Color(0xFFE68367)
+val FocusedBorderColor = PrimaryGreen
+val UnfocusedBorderColor = Gray300
+val DisabledBorderColor = Gray100
 
 val RingBarRed = Color(0xFFF78A6C)
 val RingBarGreen = Color(0xFF4FB685)
@@ -135,9 +157,9 @@ val SurfaceLighter = GrayLighter
 
 val Surface = White
 
-val SurfaceBrand = Greenish
-val SurfaceError = Red
-val SurfaceSecondary = Orange
+val SurfaceBrand = SuccessGreen
+val SurfaceError = ErrorRed
+val SurfaceSecondary = WarningOrange
 
 
 

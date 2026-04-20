@@ -43,10 +43,11 @@ fun PatientProfileCard(
     isAnsweredMode: Boolean = false
 ) {
 
-    val containerColor = if (isAnsweredMode) Color(0xFFF5F5F5) else Surface
-    val titleColor = if (isAnsweredMode) Color(0xFF4A4A4A) else TextDarkerGray
-    val detailsColor = if (isAnsweredMode) Color(0xFF9E9E9E) else PrimaryColor
-    val diseaseColor = if (isAnsweredMode) Color(0xFF616161) else PrimaryColor
+    val colorScheme = MaterialTheme.colorScheme
+    val containerColor = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.surface
+    val titleColor = if (isAnsweredMode) colorScheme.onSurfaceVariant else colorScheme.onSurface
+    val detailsColor = if (isAnsweredMode) colorScheme.inverseOnSurface else colorScheme.primary
+    val diseaseColor = if (isAnsweredMode) colorScheme.onSurfaceVariant.copy(alpha = 0.8f) else colorScheme.primary
 
     val imageFilter = if (isAnsweredMode) {
         ColorFilter.colorMatrix(
