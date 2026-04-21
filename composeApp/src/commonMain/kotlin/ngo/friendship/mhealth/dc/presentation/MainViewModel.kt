@@ -55,7 +55,7 @@ class MainViewModel(
         NavBackStack(if (isUserLoggedIn) Screens.Main else Screens.Auth)
     }
 
-    var selectedBottomTab by mutableStateOf(BottomNavItems.Home)
+    var selectedBottomTab by mutableStateOf(BottomNavItems.Cases)
         private set
 
     val setupDataState = repository.getSetupData().stateIn(

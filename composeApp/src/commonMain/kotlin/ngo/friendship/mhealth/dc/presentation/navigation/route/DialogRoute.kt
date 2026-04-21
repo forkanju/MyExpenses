@@ -22,12 +22,44 @@ import androidx.navigation3.scene.DialogSceneStrategy
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.ConfirmAction
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screens.more.components.NewDxDialog
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileEvent
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfilePopup
 
 fun EntryProviderScope<NavKey>.dialogRoute(
     viewModel: MainViewModel
 ) {
+    entry<Screens.Dialog.NewDx>(
+        metadata = DialogSceneStrategy.dialog(
+            DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true
+            )
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.35f))
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    viewModel.backStack.removeLastOrNull()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            NewDxDialog(
+                onDismiss = { viewModel.backStack.removeLastOrNull() },
+                onCreate = { title, advices ->
+                    // Handle DX creation
+                    viewModel.backStack.removeLastOrNull()
+                }
+            )
+        }
+    }
+
     entry<Screens.Dialog.ProfilePopup>(
         metadata = DialogSceneStrategy.dialog(
             DialogProperties(

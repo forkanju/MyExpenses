@@ -21,14 +21,14 @@ class AuthViewModel(
     fun login(userName: String, password: String) {
         launch {
             loginState.value = repository.login(userName, password)
-            onLoginSuccess(loginState.value.userName)
+            onLoginSuccess(doctorId = userName)
             backStack.replaceWith(Screens.Main)
         }
     }
 
     fun onLoginSuccess(doctorId: String) {
         launch(loading = Loading.Gone) {
-//            notifierManager.subscribeToTopic(FcmTopics.CASE_LIST_UPDATES)
+            notifierManager.subscribeToTopic(FcmTopics.CASE_LIST_UPDATES)
             notifierManager.subscribeToTopic(FcmTopics.doctorCaseList(doctorId))
 
             val token = notifierManager.getDeviceToken()

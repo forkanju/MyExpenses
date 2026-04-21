@@ -30,6 +30,7 @@ fun LabeledFormTextField(
     value: String = "",
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    height: Int = 44,
     enabled: Boolean = true,
     isError: Boolean = false,
     supportingText: String? = null,
@@ -69,7 +70,7 @@ fun LabeledFormTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(44.dp),
+                .height(height.dp),
             enabled = enabled,
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = fieldTextColor
@@ -92,16 +93,20 @@ fun LabeledFormTextField(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top
                     ) {
                         if (leadingIcon != null) {
-                            leadingIcon()
+                            Box(modifier = Modifier.padding(top = if (singleLine) 0.dp else 12.dp)) {
+                                leadingIcon()
+                            }
                             Spacer(Modifier.width(8.dp))
                         }
 
                         Box(
-                            modifier = Modifier.weight(1f),
-                            contentAlignment = Alignment.CenterStart
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(vertical = if (singleLine) 0.dp else 12.dp),
+                            contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart
                         ) {
                             if (value.isEmpty()) {
                                 Text(
@@ -119,7 +124,9 @@ fun LabeledFormTextField(
 
                         if (trailingIcon != null) {
                             Spacer(Modifier.width(8.dp))
-                            trailingIcon()
+                            Box(modifier = Modifier.padding(top = if (singleLine) 0.dp else 12.dp)) {
+                                trailingIcon()
+                            }
                         }
                     }
                 }

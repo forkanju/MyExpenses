@@ -13,7 +13,7 @@ import ngo.friendship.mhealth.dc.presentation.MainUiEvent
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListScreen
-import ngo.friendship.mhealth.dc.presentation.screens.main.dashboard.HealthDashboardScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.HealthDashboardScreen
 import ngo.friendship.mhealth.dc.presentation.screens.main.home.HomeScreen
 
 @Composable
@@ -87,7 +87,11 @@ fun HomePagerRoute(
                     }
                 )
 
-                BottomNavItems.Dashboard -> HealthDashboardScreen()
+                BottomNavItems.Dashboard -> HealthDashboardScreen(
+                    onNavigate = { route ->
+                        mainViewModel.backStack.add(route)
+                    }
+                )
             }
         }
     }

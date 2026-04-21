@@ -13,6 +13,7 @@ data class DashboardCardData(
     val secondaryActionText: String? = null,
     val isCentered: Boolean = false,
     val iconTint: Color = Color.White,
+    val onClick: (() -> Unit)? = null
 )
 
 data class SectionData(

@@ -20,6 +20,27 @@ object Screens {
     @Serializable
     data class PrescriptionForm(val interviewId: Long,val mode: CaseDetailsMode = CaseDetailsMode.NORMAL) : NavKey
 
+    @Serializable
+    data object PrescriptionTemplateList : NavKey
+
+    @Serializable
+    data object DxList : NavKey
+
+    @Serializable
+    data object MedicineList : NavKey
+
+    @Serializable
+    data object AdviceTemplateList : NavKey
+
+    @Serializable
+    data object InvestigationsList : NavKey
+
+    @Serializable
+    data object LocalTreatment : NavKey
+
+    @Serializable
+    data class LocalTreatmentDetails(val patientId: String) : NavKey
+
 
     @Serializable
     object Dialog {
@@ -41,6 +62,9 @@ object Screens {
 
         @Serializable
         data object ProfilePopup : NavKey
+
+        @Serializable
+        data object NewDx : NavKey
     }
 
 }
@@ -61,6 +85,13 @@ val navKeySerializersModule = SerializersModule {
         Screens.PrescriptionForm::class,
         Screens.PrescriptionForm.serializer()
     )
+    polymorphic(NavKey::class, Screens.PrescriptionTemplateList::class, Screens.PrescriptionTemplateList.serializer())
+    polymorphic(NavKey::class, Screens.DxList::class, Screens.DxList.serializer())
+    polymorphic(NavKey::class, Screens.MedicineList::class, Screens.MedicineList.serializer())
+    polymorphic(NavKey::class, Screens.AdviceTemplateList::class, Screens.AdviceTemplateList.serializer())
+    polymorphic(NavKey::class, Screens.InvestigationsList::class, Screens.InvestigationsList.serializer())
+    polymorphic(NavKey::class, Screens.LocalTreatment::class, Screens.LocalTreatment.serializer())
+    polymorphic(NavKey::class, Screens.LocalTreatmentDetails::class, Screens.LocalTreatmentDetails.serializer())
     //dialog
     polymorphic(NavKey::class, Screens.Dialog.Error::class, Screens.Dialog.Error.serializer())
     polymorphic(
@@ -72,6 +103,11 @@ val navKeySerializersModule = SerializersModule {
         NavKey::class,
         Screens.Dialog.ProfilePopup::class,
         Screens.Dialog.ProfilePopup.serializer()
+    )
+    polymorphic(
+        NavKey::class,
+        Screens.Dialog.NewDx::class,
+        Screens.Dialog.NewDx.serializer()
     )
 }
 

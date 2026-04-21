@@ -1,5 +1,6 @@
-package ngo.friendship.mhealth.dc.presentation.screens.main.dashboard
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +18,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation3.runtime.NavKey
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.DashboardCard
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.DashboardCardData
@@ -26,10 +30,12 @@ import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Hand
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Report
 import ngo.friendship.mhealth.dc.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun HealthDashboardScreen(
+    onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier
 ) {
 // This is the "Single Source of Truth" data list
@@ -67,6 +73,7 @@ fun HealthDashboardScreen(
             )
         ),
         SectionData(
+
             title = "Resource lab",
             cards = listOf(
                 DashboardCardData(
@@ -75,35 +82,40 @@ fun HealthDashboardScreen(
                     Report,
                     PrimaryColor,
                     "Create new",
-                    "Import from global"
+                    "Import from global",
+                    onClick = { onNavigate(Screens.PrescriptionTemplateList) }
                 ),
                 DashboardCardData(
                     "Add DX",
                     "List 800+",
                     Report,
                     Color(0xFFF0914E),
-                    "Create new"
+                    "Create new",
+                    onClick = { onNavigate(Screens.DxList) }
                 ),
                 DashboardCardData(
                     "Medicine List",
                     "Medicine 800+",
                     Report,
                     Color(0xFF4BB652),
-                    "Create new"
+                    "Create new",
+                    onClick = { onNavigate(Screens.MedicineList) }
                 ),
                 DashboardCardData(
                     "Advice templates",
                     "Advice 32+",
                     Report,
                     Color(0xFF707070),
-                    "Create new"
+                    "Create new",
+                    onClick = { onNavigate(Screens.AdviceTemplateList) }
                 ),
                 DashboardCardData(
                     "Investigations templates",
                     "Templates 32+",
                     Report,
                     Color(0xFF707070),
-                    "Create new"
+                    "Create new",
+                    onClick = { onNavigate(Screens.InvestigationsList) }
                 )
             )
         )
@@ -183,16 +195,20 @@ fun HealthDashboardScreen(
                     )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                LocalTreatmentCard()
+                LocalTreatmentCard(
+                    onClick = { onNavigate(Screens.LocalTreatment) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun LocalTreatmentCard() {
+fun LocalTreatmentCard(onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -248,5 +264,13 @@ fun LocalTreatmentCard() {
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HealthDashboardScreenPreview() {
+    FriendshipTheme {
+        HealthDashboardScreen(onNavigate = {})
     }
 }

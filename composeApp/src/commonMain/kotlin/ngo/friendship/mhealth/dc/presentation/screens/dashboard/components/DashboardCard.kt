@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.screens.dashboard.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -44,7 +45,15 @@ fun DashboardCard(data: DashboardCardData, modifier: Modifier = Modifier) {
 
     Card(
         // fillMaxHeight is crucial for the card to stretch to the parent's Intrinsic height
-        modifier = modifier.fillMaxHeight(),
+        modifier = modifier
+            .fillMaxHeight()
+            .then(
+                if (data.onClick != null) {
+                    Modifier.clickable { data.onClick.invoke() }
+                } else {
+                    Modifier
+                }
+            ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         shape = RoundedCornerShape(8.dp),

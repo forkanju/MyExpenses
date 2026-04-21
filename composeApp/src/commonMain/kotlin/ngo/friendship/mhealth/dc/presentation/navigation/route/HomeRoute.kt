@@ -18,6 +18,7 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import kotlinx.coroutines.launch
+import ngo.friendship.mhealth.dc.presentation.MainUiEvent
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.components.CustomTopBar
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
@@ -33,10 +34,19 @@ fun EntryProviderScope<NavKey>.homeRoute(
 //        val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
         val notificationCount = viewModel.caseTabCounts[CaseTab.Pending] ?: 0
         val pagerState = rememberPagerState(
-            initialPage = BottomNavItems.Cases.ordinal,
+            initialPage = viewModel.selectedBottomTab.ordinal,
             pageCount = { BottomNavItems.entries.size }
         )
         val scope = rememberCoroutineScope()
+
+        LaunchedEffect(Unit) {
+            viewModel.uiEvent.collect { event ->
+                if (event is MainUiEvent.OpenCasesTab) {
+                    viewModel.selectBottomTab(BottomNavItems.Cases)
+                    viewModel.clearOpenCasesEvent()
+                }
+            }
+        }
 
         LaunchedEffect(Unit) {
             snapshotFlow { pagerState.currentPage }.collect { page ->

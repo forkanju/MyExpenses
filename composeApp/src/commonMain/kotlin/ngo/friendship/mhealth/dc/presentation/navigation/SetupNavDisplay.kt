@@ -24,6 +24,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.caseRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.moreRoute
 import ngo.friendship.mhealth.dc.theme.Dimen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -84,6 +85,10 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         )
                         homeRoute(
                             viewModel = viewModel
+                        )
+
+                        moreRoute(
+                            mainViewModel = viewModel
                         )
 
                         caseRoute(
