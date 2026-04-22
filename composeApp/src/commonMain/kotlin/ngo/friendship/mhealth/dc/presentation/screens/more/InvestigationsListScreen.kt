@@ -4,11 +4,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -17,19 +21,24 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 @Composable
 fun InvestigationsListScreen(
     onBack: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
     var selectedFilter by remember { mutableStateOf("All") }
+    var searchQuery by remember { mutableStateOf("") }
     val filters = listOf("All", "Recent Used", "Recent Updated")
     
     val investigationItems = listOf(
@@ -44,34 +53,19 @@ fun InvestigationsListScreen(
     )
 
     Scaffold(
+        modifier = Modifier.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
+        },
         topBar = {
-            Column(modifier = Modifier.background(PrimaryBlue)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                    Text(
-                        text = "Investigations List",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Search", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White, modifier = Modifier.padding(horizontal = 8.dp))
-                    }
-                }
-            }
+            CommonTopBar(
+                title = "Investigations List",
+                onBack = onBack,
+                showSearch = true,
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -79,7 +73,7 @@ fun InvestigationsListScreen(
                 containerColor = PrimaryBlue,
                 contentColor = Color.White,
                 shape = CircleShape,
-                modifier = Modifier.padding(bottom = 40.dp, end = 16.dp)
+                modifier = Modifier.padding(bottom = 85.dp, end = 34.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
@@ -122,13 +116,13 @@ fun InvestigationsListScreen(
 fun InvestigationFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(5.dp),
         color = if (isSelected) PrimaryBlue else Color.White,
         border = if (isSelected) null else BorderStroke(1.dp, Color.Gray)
     ) {
         Text(
             text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 1.dp),
             fontSize = 12.sp,
             color = if (isSelected) Color.White else Color.Gray
         )

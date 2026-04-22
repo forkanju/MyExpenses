@@ -1,11 +1,8 @@
 package ngo.friendship.mhealth.dc.data.local
 
 import androidx.room3.*
-import ngo.friendship.mhealth.dc.data.local.dao.SetupDataDao
-import ngo.friendship.mhealth.dc.domain.model.Diagnosis
-import ngo.friendship.mhealth.dc.domain.model.Investigation
-import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
-import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
+import ngo.friendship.mhealth.dc.data.local.dao.*
+import ngo.friendship.mhealth.dc.domain.model.*
 
 @Database(
     entities = [
@@ -13,12 +10,14 @@ import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
         Investigation::class,
         Diagnosis::class,
         ReferralCenter::class,
+        UserProfile::class
     ],
     version = 1
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun setupDataDao(): SetupDataDao
+    abstract fun userProfileDao(): UserProfileDao
 }
 
 // The Room compiler generates the `actual` implementations.

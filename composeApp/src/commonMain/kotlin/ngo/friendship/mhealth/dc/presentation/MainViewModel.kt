@@ -64,6 +64,12 @@ class MainViewModel(
         initialValue = SetupData()
     )
 
+    val userProfileState = repository.getUserProfile().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = null
+    )
+
     val interviewListState: StateFlow<List<Interview>>
         field = MutableStateFlow(emptyList())
 

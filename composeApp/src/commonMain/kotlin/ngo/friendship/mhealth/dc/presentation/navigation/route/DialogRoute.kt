@@ -23,8 +23,11 @@ import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.ConfirmAction
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.more.components.NewDxDialog
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileEvent
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfilePopup
+import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileUiState
 
 fun EntryProviderScope<NavKey>.dialogRoute(
     viewModel: MainViewModel
@@ -81,7 +84,12 @@ fun EntryProviderScope<NavKey>.dialogRoute(
                 },
             contentAlignment = Alignment.Center
         ) {
+            val userProfile by viewModel.userProfileState.collectAsStateWithLifecycle()
             ProfilePopup(
+                uiState = ProfileUiState(
+                    name = userProfile?.userName ?: "Doctor Center",
+                    designation = userProfile?.location ?: "Friendship NGO"
+                ),
                 onDismiss = { viewModel.backStack.removeLastOrNull() },
                 onEvent = { event ->
                     when (event) {

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.components.FilterChip
 import ngo.friendship.mhealth.dc.presentation.screens.more.components.NewMedicineDialog
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
@@ -33,6 +34,8 @@ fun MedicineListScreen(
     var selectedFilter by remember { mutableStateOf("All") }
     val filters = listOf("All", "Recent Used", "Recent Updated")
     var showNewMedicineDialog by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+
 
     val medicineItems = listOf(
         MedicineItemData("Pantoprazole 20 mg", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
@@ -44,38 +47,13 @@ fun MedicineListScreen(
 
     Scaffold(
         topBar = {
-            Column(modifier = Modifier.background(PrimaryBlue)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                    Text(
-                        text = "Medicine List",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Search", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = Color.White,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                    }
-                }
-            }
+            CommonTopBar(
+                title = "Medicine List",
+                onBack = onBack,
+                showSearch = true,
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(

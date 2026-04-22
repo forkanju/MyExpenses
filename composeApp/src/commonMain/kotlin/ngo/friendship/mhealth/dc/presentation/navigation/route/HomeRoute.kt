@@ -18,6 +18,8 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.MainUiEvent
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.components.CustomTopBar
@@ -33,11 +35,17 @@ fun EntryProviderScope<NavKey>.homeRoute(
     entry<Screens.Main> {
 //        val pagerState = rememberPagerState(pageCount = { BottomNavItems.entries.size })
         val notificationCount = viewModel.caseTabCounts[CaseTab.Pending] ?: 0
+        val userProfile by viewModel.userProfileState.collectAsStateWithLifecycle()
         val pagerState = rememberPagerState(
             initialPage = viewModel.selectedBottomTab.ordinal,
             pageCount = { BottomNavItems.entries.size }
         )
         val scope = rememberCoroutineScope()
+
+        LaunchedEffect(userProfile) {
+            println("HomeRoute: userProfile changed: $userProfile")
+            println("HomeRoute: userName: ${userProfile?.userName}, location: ${userProfile?.location}")
+        }
 
         LaunchedEffect(Unit) {
             viewModel.uiEvent.collect { event ->
@@ -74,8 +82,8 @@ fun EntryProviderScope<NavKey>.homeRoute(
                     onNotificationClick = {
                         println("Notification clicked")
                     },
-                    userName = "Dr. Ahmed Imtiaz Abir",
-                    userSubtitle = "Doctor Center, Head Office",
+                    userName = userProfile?.userName ?: "Doctor Center",
+                    userSubtitle = userProfile?.location ?: "Friendship NGO",
                     profileIcon = Resources.Icon.Profile,
                     onProfileClick = { viewModel.backStack.add(Screens.Dialog.ProfilePopup) }
                 )

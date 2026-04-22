@@ -7,7 +7,7 @@ import ngo.friendship.mhealth.dc.domain.model.User
 fun LoginResponseDto.Data.toDomain(password: String): User {
     return User(
         userId = userId ?: -1,
-        userName = userName.orEmpty(),
+        userName = userLoginId ?: "",
         password = password,
         userKey = userKey.orEmpty(),
         profileImage = profileImage.orEmpty(),

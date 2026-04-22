@@ -48,10 +48,10 @@ import org.jetbrains.compose.resources.painterResource
 
 
 data class ProfileUiState(
-    val profileImageRes: Int? = null, // Set your actual drawable res here
-    val name: String = "Dr. Ahmed Imtiaz Abir",
-    val designation: String = "Doctor Center, Head Office",
-    val versionInfo: String = "20.214",
+    val profileImageRes: String? = null,
+    val name: String = "",
+    val designation: String = "",
+    val versionInfo: String = "1.0.0",
     val copyrightText: String = "Copyright ©Friendship.ngo"
 )
 

@@ -23,6 +23,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileResDto
 import ngo.friendship.mhealth.dc.domain.network.processFormDataRequest
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.utils.Constants
@@ -89,6 +91,13 @@ class ApiService(
     suspend fun updateInterviewStatus(
         request: UpdateInterviewStatusReqDto
     ): UpdateInterviewStatusResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun getUserProfile(
+        request: UserProfileReqDto
+    ): UserProfileResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
     )

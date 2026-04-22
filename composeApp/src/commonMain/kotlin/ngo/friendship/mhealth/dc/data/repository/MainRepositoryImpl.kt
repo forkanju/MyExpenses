@@ -8,9 +8,12 @@ import kotlinx.coroutines.flow.flowOn
 import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
+import kotlinx.coroutines.flow.emitAll
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.SetupData
+import ngo.friendship.mhealth.dc.domain.model.UserProfile
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 
 class MainRepositoryImpl(
@@ -19,6 +22,7 @@ class MainRepositoryImpl(
     appDatabase: AppDatabase
 ) : MainRepository {
     private val setupDataDao = appDatabase.setupDataDao()
+    private val userProfileDao = appDatabase.userProfileDao()
 
     override fun getSetupData(): Flow<SetupData> = flow {
         emit(getCachedSetupData())
@@ -33,6 +37,39 @@ class MainRepositoryImpl(
             setupDataDao.insertAll(it)
             emit(it)
         }
+    }.flowOn(Dispatchers.IO)
+
+    override fun getUserProfile(): Flow<UserProfile?> = flow {
+        // 1. Emit current local data if available
+        try {
+            // We use a separate collect or combine if we want continuous DB updates, 
+            // but for a simple refresh we can emitAll or use a more complex pattern.
+            // For debugging, let's just make sure the API call actually runs.
+        } catch (e: Exception) {}
+
+        // Start collecting from DB and emit to the UI
+        // We use emitAll to keep the flow alive with DB changes
+        // But we need to trigger the API call as well.
+        
+        // Trigger API refresh in background or before emitAll
+        try {
+             val response = api.getUserProfile(
+                UserProfileReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password
+                )
+            )
+            println("MainRepositoryImpl: API UserProfile Response: $response")
+            response.data?.fcmProfile?.toDomain()?.also {
+                println("MainRepositoryImpl: Saving UserProfile to DB: $it")
+                userProfileDao.deleteProfile()
+                userProfileDao.insertUserProfile(it)
+            }
+        } catch (e: Exception) {
+            println("MainRepositoryImpl: API Error: ${e.message}")
+        }
+
+        emitAll(userProfileDao.getUserProfile())
     }.flowOn(Dispatchers.IO)
 
     suspend fun getCachedSetupData(): SetupData {
