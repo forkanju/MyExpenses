@@ -18,7 +18,16 @@ object Screens {
     data object Main : NavKey
 
     @Serializable
-    data class PrescriptionForm(val interviewId: Long,val mode: CaseDetailsMode = CaseDetailsMode.NORMAL) : NavKey
+    data class PrescriptionForm(
+        val interviewId: Long,
+        val mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
+        val source: String = SOURCE_CASE_LIST
+    ) : NavKey {
+        companion object {
+            const val SOURCE_CASE_LIST = "case_list"
+            const val SOURCE_TEMPLATE_LIST = "template_list"
+        }
+    }
 
     @Serializable
     data object PrescriptionTemplateList : NavKey
@@ -62,9 +71,6 @@ object Screens {
 
         @Serializable
         data object ProfilePopup : NavKey
-
-        @Serializable
-        data object NewDx : NavKey
     }
 
 }
@@ -103,11 +109,6 @@ val navKeySerializersModule = SerializersModule {
         NavKey::class,
         Screens.Dialog.ProfilePopup::class,
         Screens.Dialog.ProfilePopup.serializer()
-    )
-    polymorphic(
-        NavKey::class,
-        Screens.Dialog.NewDx::class,
-        Screens.Dialog.NewDx.serializer()
     )
 }
 

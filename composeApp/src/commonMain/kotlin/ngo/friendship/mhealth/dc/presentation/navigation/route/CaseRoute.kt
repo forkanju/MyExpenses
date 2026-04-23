@@ -53,6 +53,7 @@ fun EntryProviderScope<NavKey>.caseRoute(
             interviewDetails = interviewDetails,
             medicineList = medicineList,
             mode = screen.mode,
+            source = screen.source,
             onUpdate = viewModel::updateFormState,
             onSave = viewModel::saveDoctorFeedback,
             onFcmDetailsClick = {

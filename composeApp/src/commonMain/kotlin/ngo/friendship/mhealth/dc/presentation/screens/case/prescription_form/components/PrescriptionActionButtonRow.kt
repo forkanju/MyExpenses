@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 
 private val NormalPrimaryButton = Color(0xFF214695)
 private val NormalPrimaryButtonAlt = Color(0xFF1976D2)
@@ -61,7 +63,7 @@ fun PrescriptionActionButtonRow(
     Row(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
         Button(
             onClick = onSendClick,
@@ -73,7 +75,9 @@ fun PrescriptionActionButtonRow(
                 disabledContentColor = Color.White.copy(alpha = 0.7f)
             ),
             shape = RoundedCornerShape(4.dp),
-            modifier = Modifier.height(32.dp)
+            modifier = Modifier
+                .height(36.dp)
+                .weight(.6f)
         ) {
             Text(
                 text = sendButtonText,
@@ -272,22 +276,31 @@ fun PrescriptionBottomBar(
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun PrescriptionActionButtonsPreview() {
-    MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color(0xFFF5F5F5)
+fun PrescriptionActionButtonRowPreview() {
+    FriendshipTheme {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                PrescriptionBottomBar(
-                    onSendClick = { },
-                    onShareClick = { }
-                )
-            }
+            PrescriptionActionButtonRow(
+                onSendClick = {},
+                onShareClick = {},
+                sendButtonText = "Send Prescription"
+            )
+            PrescriptionActionButtonRow(
+                onSendClick = {},
+                onShareClick = {},
+                sendButtonText = "Send Prescription",
+                isAnsweredMode = true
+            )
+            PrescriptionActionButtonRow(
+                onSendClick = {},
+                onShareClick = {},
+                sendButtonText = "Send Prescription",
+                enabled = false
+            )
         }
     }
 }

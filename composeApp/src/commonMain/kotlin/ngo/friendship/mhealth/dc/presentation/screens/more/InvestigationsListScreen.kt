@@ -28,17 +28,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screens.more.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
 fun InvestigationsListScreen(
+    viewModel: MainViewModel,
     onBack: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     var selectedFilter by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
+    var showNewInvestigationDialog by remember { mutableStateOf(false) }
     val filters = listOf("All", "Recent Used", "Recent Updated")
     
     val investigationItems = listOf(
@@ -52,68 +57,85 @@ fun InvestigationsListScreen(
         InvestigationItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
     )
 
-    Scaffold(
-        modifier = Modifier.pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                focusManager.clearFocus()
-            })
-        },
-        topBar = {
-            CommonTopBar(
-                title = "Investigations List",
-                onBack = onBack,
-                showSearch = true,
-                searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { },
-                containerColor = PrimaryBlue,
-                contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier.padding(bottom = 85.dp, end = 34.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier.pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    focusManager.clearFocus()
+                })
+            },
+            topBar = {
+                CommonTopBar(
+                    title = "Investigations List",
+                    onBack = onBack,
+                    showSearch = true,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        showNewInvestigationDialog = true
+                    },
+                    containerColor = PrimaryBlue,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 24.dp, end = 24.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
+            }
+        ) { paddingValues ->
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        filters.forEach { filter ->
+                            CommonFilterChip(
+                                text = filter,
+                                isSelected = selectedFilter == filter,
+                                onClick = { selectedFilter = filter }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(investigationItems) { item ->
+                            InvestigationExpandableItem(item)
+                            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                        }
+                    }
+                }
             }
         }
-    ) { paddingValues ->
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    filters.forEach { filter ->
-                        InvestigationFilterChip(
-                            text = filter,
-                            isSelected = selectedFilter == filter,
-                            onClick = { selectedFilter = filter }
-                        )
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(investigationItems) { item ->
-                        InvestigationExpandableItem(item)
-                        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
-                    }
+        if (showNewInvestigationDialog) {
+            CommonNewItemDialog(
+                dialogTitle = "New Investigation",
+                titleLabel = "Investigation title",
+                contentLabel = "Advices",
+                onDismiss = { showNewInvestigationDialog = false },
+                onCreate = { title: String, content: String ->
+                    // TODO: Handle creation logic
+                    showNewInvestigationDialog = false
                 }
-            }
+            )
         }
     }
 }
 
 @Composable
-fun InvestigationFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
+fun CommonFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Surface(
         modifier = Modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(5.dp),
@@ -175,7 +197,7 @@ fun InvestigationExpandableItem(item: InvestigationItemData) {
 @Preview(showBackground = true)
 @Composable
 fun InvestigationsListScreenPreview() {
-    FriendshipTheme {
-        InvestigationsListScreen(onBack = {})
-    }
+    // FriendshipTheme {
+    //    InvestigationsListScreen(onBack = {})
+    // }
 }

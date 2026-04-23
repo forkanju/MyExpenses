@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +17,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -46,7 +44,8 @@ import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 @Composable
 fun PrescriptionTemplateListScreen(
     templates: List<PrescriptionTemplate>,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onAddTemplate: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
 
@@ -62,10 +61,11 @@ fun PrescriptionTemplateListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Handle Add */ },
+                onClick = onAddTemplate,
                 containerColor = PrimaryBlue,
                 contentColor = Color.White,
-                shape = CircleShape
+                shape = CircleShape,
+                modifier = Modifier.padding(bottom = 24.dp, end = 24.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
@@ -77,34 +77,7 @@ fun PrescriptionTemplateListScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "See All Prescription",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Search",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -197,7 +170,8 @@ fun PrescriptionTemplateListScreenPreview() {
                     0xFFF78A6C
                 )
             ),
-            onBack = {}
+            onBack = {},
+            onAddTemplate = {}
         )
     }
 }

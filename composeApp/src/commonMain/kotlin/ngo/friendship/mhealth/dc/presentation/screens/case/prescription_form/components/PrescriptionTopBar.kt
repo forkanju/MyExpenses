@@ -33,10 +33,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.theme.PrimaryColor
+import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.theme.onSurfaceVariantLight
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +46,7 @@ fun PrescriptionTopBar(
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit,
+    showActions: Boolean = true,
 ) {
     TopAppBar(
         navigationIcon = {
@@ -54,7 +54,7 @@ fun PrescriptionTopBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = onSurfaceVariantLight
+                    tint = Color.White
                 )
             }
         },
@@ -70,47 +70,53 @@ fun PrescriptionTopBar(
                     modifier = Modifier.weight(1f, fill = false),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Normal,
-                        letterSpacing = 0.sp
+                        fontSize = 18.sp,
+                        letterSpacing = 0.sp,
+                        color = Color.White
                     )
                 )
 
 
-                Spacer(Modifier.width(6.dp))
+                if (showActions) {
+                    Spacer(Modifier.width(6.dp))
 
-                Text(
-                    text = "(Details)",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    fontFamily = RobotoCondensedFont(),
-                    letterSpacing = 0.sp,
-                    color = PrimaryColor,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(
-                            indication = ripple(bounded = true),
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) { onFcmDetailsClick() }
-                        .padding(horizontal = 4.dp)
-                )
+                    Text(
+                        text = "(Details)",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = RobotoCondensedFont(),
+                        letterSpacing = 0.sp,
+                        color = Color.White,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(
+                                indication = ripple(bounded = true),
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) { onFcmDetailsClick() }
+                            .padding(horizontal = 4.dp)
+                    )
+                }
 
             }
         },
         actions = {
-            CircleActionIcon(
-                painter = painterResource(Resources.Icon.Call),
-                contentDescription = "Call",
-                onClick = onCall
-            )
-            CircleActionIcon(
-                painter = painterResource(Resources.Icon.Wapp),
-                contentDescription = "WhatsApp",
-                onClick = onWhatsApp
-            )
-            Spacer(Modifier.width(6.dp))
+            if (showActions) {
+                CircleActionIcon(
+                    painter = painterResource(Resources.Icon.Call),
+                    contentDescription = "Call",
+                    onClick = onCall
+                )
+                CircleActionIcon(
+                    painter = painterResource(Resources.Icon.Wapp),
+                    contentDescription = "WhatsApp",
+                    onClick = onWhatsApp
+                )
+                Spacer(Modifier.width(6.dp))
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White
+            containerColor = PrimaryBlue
         )
     )
 }

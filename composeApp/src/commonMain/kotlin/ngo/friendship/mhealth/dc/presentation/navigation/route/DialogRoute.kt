@@ -11,20 +11,19 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.ConfirmAction
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.more.components.NewDxDialog
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileEvent
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfilePopup
 import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileUiState
@@ -32,37 +31,6 @@ import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileUiState
 fun EntryProviderScope<NavKey>.dialogRoute(
     viewModel: MainViewModel
 ) {
-    entry<Screens.Dialog.NewDx>(
-        metadata = DialogSceneStrategy.dialog(
-            DialogProperties(
-                usePlatformDefaultWidth = false,
-                dismissOnClickOutside = true,
-                dismissOnBackPress = true
-            )
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.35f))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    viewModel.backStack.removeLastOrNull()
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            NewDxDialog(
-                onDismiss = { viewModel.backStack.removeLastOrNull() },
-                onCreate = { title, advices ->
-                    // Handle DX creation
-                    viewModel.backStack.removeLastOrNull()
-                }
-            )
-        }
-    }
-
     entry<Screens.Dialog.ProfilePopup>(
         metadata = DialogSceneStrategy.dialog(
             DialogProperties(

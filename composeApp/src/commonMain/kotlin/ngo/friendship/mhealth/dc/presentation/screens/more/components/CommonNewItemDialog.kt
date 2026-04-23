@@ -34,12 +34,15 @@ import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
-fun NewDxDialog(
+fun CommonNewItemDialog(
+    dialogTitle: String,
+    titleLabel: String,
+    contentLabel: String,
     onDismiss: () -> Unit,
     onCreate: (String, String) -> Unit
 ) {
-    var dxTitle by remember { mutableStateOf("") }
-    var advices by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf("") }
+    var content by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -72,7 +75,7 @@ fun NewDxDialog(
                     .padding(bottom = 12.dp)
             ) {
                 Text(
-                    text = "New DX",
+                    text = dialogTitle,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(10.dp)
@@ -82,19 +85,19 @@ fun NewDxDialog(
 
                 Column(modifier = Modifier.padding(10.dp)) {
                     LabeledFormTextField(
-                        label = "DX Title",
+                        label = titleLabel,
                         placeholder = "",
-                        value = dxTitle,
-                        onValueChange = { dxTitle = it }
+                        value = title,
+                        onValueChange = { title = it }
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
 
                     LabeledFormTextField(
-                        label = "Advices",
+                        label = contentLabel,
                         placeholder = "Type",
-                        value = advices,
-                        onValueChange = { advices = it },
+                        value = content,
+                        onValueChange = { content = it },
                         height = 200,
                         singleLine = false,
                         maxLines = 15
@@ -103,7 +106,7 @@ fun NewDxDialog(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = { onCreate(dxTitle, advices) },
+                        onClick = { onCreate(title, content) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp),
@@ -120,9 +123,12 @@ fun NewDxDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun NewDxDialogPreview() {
+fun CommonNewItemDialogPreview() {
     FriendshipTheme {
-        NewDxDialog(
+        CommonNewItemDialog(
+            dialogTitle = "New DX",
+            titleLabel = "DX Title",
+            contentLabel = "Advices",
             onDismiss = {},
             onCreate = { _, _ -> }
         )

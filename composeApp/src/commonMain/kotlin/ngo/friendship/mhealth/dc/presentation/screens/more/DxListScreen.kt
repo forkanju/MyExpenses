@@ -38,21 +38,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.presentation.components.FilterChip
-import ngo.friendship.mhealth.dc.presentation.screens.more.components.NewDxDialog
+import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screens.more.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
 fun DxListScreen(
+    viewModel: MainViewModel,
     onBack: () -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf("All") }
     val filters = listOf("All", "Recent Used", "Recent Updated")
 
-    var showNewDxDialog by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
-
+    var showNewDxDialog by remember { mutableStateOf(false) }
 
     val dxItems = listOf(
         DxItemData(
@@ -67,29 +68,31 @@ fun DxListScreen(
         DxItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
     )
 
-    Scaffold(
-        topBar = {
-            CommonTopBar(
-                title = "DX List",
-                onBack = onBack,
-                showSearch = true,
-                searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showNewDxDialog = true },
-                containerColor = PrimaryBlue,
-                contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier.padding(bottom = 40.dp, end = 16.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                CommonTopBar(
+                    title = "DX List",
+                    onBack = onBack,
+                    showSearch = true,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        showNewDxDialog = true
+                    },
+                    containerColor = PrimaryBlue,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 24.dp, end = 24.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
             }
-        }
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        ) { paddingValues ->
             Card(
                 modifier = Modifier
                     .fillMaxSize()
@@ -102,7 +105,7 @@ fun DxListScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         filters.forEach { filter ->
-                            FilterChip(
+                            CommonFilterChip(
                                 text = filter,
                                 isSelected = selectedFilter == filter,
                                 onClick = { selectedFilter = filter }
@@ -120,16 +123,19 @@ fun DxListScreen(
                     }
                 }
             }
+        }
 
-            if (showNewDxDialog) {
-                NewDxDialog(
-                    onDismiss = { showNewDxDialog = false },
-                    onCreate = { title, advice ->
-                        // Handle creation logic here
-                        showNewDxDialog = false
-                    }
-                )
-            }
+        if (showNewDxDialog) {
+            CommonNewItemDialog(
+                dialogTitle = "New DX",
+                titleLabel = "DX Title",
+                contentLabel = "Advices",
+                onDismiss = { showNewDxDialog = false },
+                onCreate = { title: String, content: String ->
+                    // TODO: Handle creation logic
+                    showNewDxDialog = false
+                }
+            )
         }
     }
 }
@@ -181,7 +187,8 @@ fun DxExpandableItem(item: DxItemData) {
 @Preview(showBackground = true)
 @Composable
 fun DxListScreenPreview() {
-    FriendshipTheme {
-        DxListScreen(onBack = {})
-    }
+    // Note: MainViewModel is complex to mock in a simple preview, usually better to use a Stateless version or local state for UI-only previews.
+    // FriendshipTheme {
+    //     DxListScreen(onBack = {})
+    // }
 }

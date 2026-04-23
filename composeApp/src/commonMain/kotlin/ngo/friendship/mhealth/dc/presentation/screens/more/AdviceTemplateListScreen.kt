@@ -3,6 +3,7 @@ package ngo.friendship.mhealth.dc.presentation.screens.more
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,17 +38,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.presentation.components.FilterChip
+import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screens.more.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
 fun AdviceTemplateListScreen(
+    viewModel: MainViewModel,
     onBack: () -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf("All") }
     val filters = listOf("All", "Recent Used", "Recent Updated")
     var searchQuery by remember { mutableStateOf("") }
+    var showNewAdviceDialog by remember { mutableStateOf(false) }
 
     val adviceItems = listOf(
         AdviceItemData(
@@ -65,57 +70,74 @@ fun AdviceTemplateListScreen(
         AdviceItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
     )
 
-    Scaffold(
-        topBar = {
-            CommonTopBar(
-                title = "Advice Templates",
-                onBack = onBack,
-                showSearch = true,
-                searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { },
-                containerColor = PrimaryBlue,
-                contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier.padding(bottom = 40.dp, end = 16.dp)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                CommonTopBar(
+                    title = "Advice Templates",
+                    onBack = onBack,
+                    showSearch = true,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it }
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        showNewAdviceDialog = true
+                    },
+                    containerColor = PrimaryBlue,
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier.padding(bottom = 24.dp, end = 24.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
+            }
+        ) { paddingValues ->
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        filters.forEach { filter ->
+                            CommonFilterChip(
+                                text = filter,
+                                isSelected = selectedFilter == filter,
+                                onClick = { selectedFilter = filter }
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(adviceItems) { item ->
+                            AdviceExpandableItem(item)
+                            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                        }
+                    }
+                }
             }
         }
-    ) { paddingValues ->
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    filters.forEach { filter ->
-                        FilterChip(
-                            text = filter,
-                            isSelected = selectedFilter == filter,
-                            onClick = { selectedFilter = filter }
-                        )
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(adviceItems) { item ->
-                        AdviceExpandableItem(item)
-                        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
-                    }
+        if (showNewAdviceDialog) {
+            CommonNewItemDialog(
+                dialogTitle = "New Advice",
+                titleLabel = "Advice Title",
+                contentLabel = "Advices",
+                onDismiss = { showNewAdviceDialog = false },
+                onCreate = { title: String, content: String ->
+                    // TODO: Handle creation logic
+                    showNewAdviceDialog = false
                 }
-            }
+            )
         }
     }
 }
@@ -166,7 +188,7 @@ fun AdviceExpandableItem(item: AdviceItemData) {
 @Preview(showBackground = true)
 @Composable
 fun AdviceTemplateListScreenPreview() {
-    FriendshipTheme {
-        AdviceTemplateListScreen(onBack = {})
-    }
+    // FriendshipTheme {
+    //    AdviceTemplateListScreen(onBack = {})
+    // }
 }

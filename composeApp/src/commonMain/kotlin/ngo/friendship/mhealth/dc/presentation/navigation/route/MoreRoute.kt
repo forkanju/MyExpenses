@@ -17,30 +17,42 @@ fun EntryProviderScope<NavKey>.moreRoute(
         val templates by viewModel.templates.collectAsStateWithLifecycle()
         PrescriptionTemplateListScreen(
             templates = templates,
-            onBack = { mainViewModel.backStack.removeLastOrNull() }
+            onBack = { mainViewModel.backStack.removeLastOrNull() },
+            onAddTemplate = {
+                mainViewModel.backStack.add(
+                    Screens.PrescriptionForm(
+                        interviewId = -1L,
+                        source = "template_list"
+                    )
+                )
+            }
         )
     }
 
     entry<Screens.DxList> {
         DxListScreen(
+            viewModel = mainViewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }
 
     entry<Screens.MedicineList> {
         MedicineListScreen(
+            viewModel = mainViewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }
 
     entry<Screens.AdviceTemplateList> {
         AdviceTemplateListScreen(
+            viewModel = mainViewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }
 
     entry<Screens.InvestigationsList> {
         InvestigationsListScreen(
+            viewModel = mainViewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }

@@ -35,6 +35,7 @@ class CaseViewModel(
     }
 
     fun loadInterviewDetails(interviewId: Long) {
+        if (interviewId == -1L) return
         launch(onEnd = {
             if (interviewDetailsState.value.interviewId == -1L)
                 backStack.removeLastOrNull()
@@ -49,7 +50,7 @@ class CaseViewModel(
             val result = repository.getQuestionAnswerData()
             questionAnswerState.value = result
             formState.value = formState.value.copy(
-                interviewId = interviewId,
+                interviewId = if (interviewId == -1L) null else interviewId,
                 questionAnswers = result.questionAnswerJson,
                 questionAnswers2 = result.questionAnswerJson2
             )

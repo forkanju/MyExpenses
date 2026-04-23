@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
+import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.theme.*
 
 @Composable
@@ -40,28 +41,10 @@ fun LocalTreatmentScreen(
 
     Scaffold(
         topBar = {
-            Column(modifier = Modifier.background(PrimaryBlue)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                    Text(
-                        text = "Local treatment",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
+            CommonTopBar(
+                title = "Local treatment",
+                onBack = onBack
+            )
         },
         floatingActionButton = {
             FloatingActionButton(

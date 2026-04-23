@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -41,6 +42,7 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.presentation.components.CheckboxWithEditableText
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.components.ExpandableInterviewSummary
 import ngo.friendship.mhealth.dc.presentation.components.FormActionRow
 import ngo.friendship.mhealth.dc.presentation.components.FormAutoCompleteDropdownField
@@ -79,6 +81,7 @@ fun PrescriptionFormScreen(
     interviewDetails: InterviewDetails,
     medicineList: List<Medicine>,
     mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
+    source: String = Screens.PrescriptionForm.SOURCE_CASE_LIST,
     onUpdate: (DoctorFeedbackFormState) -> Unit = {},
     onSave: () -> Unit = {},
     onFcmDetailsClick: () -> Unit,
@@ -89,6 +92,7 @@ fun PrescriptionFormScreen(
     var checked by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) }
     val isAnsweredMode = mode == CaseDetailsMode.ANSWERED
+    val isFromTemplate = source == Screens.PrescriptionForm.SOURCE_TEMPLATE_LIST
     var showDatePicker by remember { mutableStateOf(false) }
     var showSendMessageDialog by remember { mutableStateOf(false) }
     var customMessageState by remember {
@@ -122,11 +126,12 @@ fun PrescriptionFormScreen(
         containerColor = if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White,
         topBar = {
             PrescriptionTopBar(
-                titlePrefix = interviewDetails.fcmInfo?.ifBlank { "Prescription" } ?: "",
+                titlePrefix = if (isFromTemplate) "Prescription Template" else (interviewDetails.fcmInfo?.ifBlank { "Prescription" } ?: ""),
                 onFcmDetailsClick = onFcmDetailsClick,
                 onCall = onCall,
                 onWhatsApp = onWhatsApp,
-                onBack = onBack
+                onBack = onBack,
+                showActions = !isFromTemplate
             )
         }
     ) { paddingValues ->
@@ -140,23 +145,25 @@ fun PrescriptionFormScreen(
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            PatientProfileCard(
-                benefName = interviewDetails.beneficiaryName,
-                isAnsweredMode = isAnsweredMode
-            )
+            if (!isFromTemplate) {
+                PatientProfileCard(
+                    benefName = interviewDetails.beneficiaryName,
+                    isAnsweredMode = isAnsweredMode
+                )
 
-            ExpandableInterviewSummary(
-                modifier = Modifier.fillMaxWidth(),
-                interviewItems = interviewQaItems,
-                prescriptionItems = systemPrescriptionItems,
-                uploadedText = interviewDetails.startTime,
-                selectedTab = selectedTab,
-                onTabSelect = { selectedTab = it },
-                onCopyClick = {},
-                onSeeFullClick = {},
-                expandedInitially = true,
-                isAnsweredMode = isAnsweredMode
-            )
+                ExpandableInterviewSummary(
+                    modifier = Modifier.fillMaxWidth(),
+                    interviewItems = interviewQaItems,
+                    prescriptionItems = systemPrescriptionItems,
+                    uploadedText = interviewDetails.startTime,
+                    selectedTab = selectedTab,
+                    onTabSelect = { selectedTab = it },
+                    onCopyClick = {},
+                    onSeeFullClick = {},
+                    expandedInitially = true,
+                    isAnsweredMode = isAnsweredMode
+                )
+            }
 
             FormContainerCard(containerColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White) {
                 PrescriptionHeader(isAnsweredMode = isAnsweredMode)
@@ -309,34 +316,36 @@ fun PrescriptionFormScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                FormActionRow(
-                    leftText = if (formState.nextFollowUpDate.isBlank()) {
-                        "Next follow-up:"
-                    } else {
-                        "Next follow-up: ${formState.nextFollowUpDate}"
-                    },
-                    leftIcon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendar",
-                            tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    },
-                    rightText = "",//Save as a template
-                    onLeftClick = {
-                        showDatePicker = true
-                        println("Open date picker")
+                if (!isFromTemplate) {
+                    FormActionRow(
+                        leftText = if (formState.nextFollowUpDate.isBlank()) {
+                            "Next follow-up:"
+                        } else {
+                            "Next follow-up: ${formState.nextFollowUpDate}"
+                        },
+                        leftIcon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Calendar",
+                                tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        },
+                        rightText = "",//Save as a template
+                        onLeftClick = {
+                            showDatePicker = true
+                            println("Open date picker")
 //                        formState = formState.copy(nextFollowUpDate = "2026-04-10")
-                        println("Selected next follow-up date: ${formState.nextFollowUpDate}")
-                    },
-                    onRightClick = {
-                        println("Save as template")
-                    },
-                    isAnsweredMode = isAnsweredMode
-                )
+                            println("Selected next follow-up date: ${formState.nextFollowUpDate}")
+                        },
+                        onRightClick = {
+                            println("Save as template")
+                        },
+                        isAnsweredMode = isAnsweredMode
+                    )
+                }
 
-                if (showDatePicker) {
+                if (showDatePicker && !isFromTemplate) {
                     AppDatePickerDialog(
                         initialDate = formState.nextFollowUpDate,
                         onDateSelected = { selectedDate ->
@@ -349,45 +358,57 @@ fun PrescriptionFormScreen(
                     )
                 }
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
+                if (!isFromTemplate) {
                     Column(
-                        modifier = Modifier.wrapContentWidth(),
-                        horizontalAlignment = Alignment.Start
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        CheckboxWithEditableText(
-                            text = "Prescription with SMS",
-                            checked = checked,
-                            onCheckedChange = { checked = it },
-                            onEditClick = {
-                                customMessageState = customMessageState.copy(
-                                    messageText = buildDefaultSmsMessage
-                                        (
-                                        interviewDetails = interviewDetails,
-                                        prescriptions = formState.prescriptions
+                        Column(
+                            modifier = Modifier.wrapContentWidth(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            CheckboxWithEditableText(
+                                text = "Prescription with SMS",
+                                checked = checked,
+                                onCheckedChange = { checked = it },
+                                onEditClick = {
+                                    customMessageState = customMessageState.copy(
+                                        messageText = buildDefaultSmsMessage(
+                                            interviewDetails = interviewDetails,
+                                            prescriptions = formState.prescriptions
+                                        )
                                     )
-                                )
-                                showSendMessageDialog = true
-                            },
-                            enabled = !isAnsweredMode,
-                            isAnsweredMode = isAnsweredMode
-                        )
+                                    showSendMessageDialog = true
+                                },
+                                enabled = !isAnsweredMode,
+                                isAnsweredMode = isAnsweredMode
+                            )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
-                        PrescriptionActionButtonRow(
-                            onSendClick = onSave,
-                            onShareClick = {
-                                println("Share prescription")
-                            },
-                            enabled = !isAnsweredMode,
-                            isAnsweredMode = isAnsweredMode
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
+                            PrescriptionActionButtonRow(
+                                onSendClick = onSave,
+                                onShareClick = {
+                                    println("Share prescription")
+                                },
+                                enabled = !isAnsweredMode,
+                                isAnsweredMode = isAnsweredMode
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                     }
+                } else {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    PrescriptionActionButtonRow(
+                        onSendClick = onSave,
+                        onShareClick = {
+                            println("Share template")
+                        },
+                        sendButtonText = "Save Template",
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
+                    )
                 }
             }
         }
