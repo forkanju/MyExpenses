@@ -40,7 +40,7 @@ fun MedAutoCompleteTextField(
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
     textStyle: TextStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
     placeholderStyle: TextStyle = LocalTextStyle.current.copy(
-        fontSize = 13.sp,
+        fontSize = 11.sp,
         color = BottomBarUnselected
     ),
     borderColor: Color = UnfocusedBorderColor,

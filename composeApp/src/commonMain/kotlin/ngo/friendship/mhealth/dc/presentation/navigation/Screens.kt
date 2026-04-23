@@ -48,6 +48,9 @@ object Screens {
     data object LocalTreatment : NavKey
 
     @Serializable
+    data object LocalPrescriptionForm : NavKey
+
+    @Serializable
     data class LocalTreatmentDetails(val patientId: String) : NavKey
 
 
@@ -97,6 +100,7 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.AdviceTemplateList::class, Screens.AdviceTemplateList.serializer())
     polymorphic(NavKey::class, Screens.InvestigationsList::class, Screens.InvestigationsList.serializer())
     polymorphic(NavKey::class, Screens.LocalTreatment::class, Screens.LocalTreatment.serializer())
+    polymorphic(NavKey::class, Screens.LocalPrescriptionForm::class, Screens.LocalPrescriptionForm.serializer())
     polymorphic(NavKey::class, Screens.LocalTreatmentDetails::class, Screens.LocalTreatmentDetails.serializer())
     //dialog
     polymorphic(NavKey::class, Screens.Dialog.Error::class, Screens.Dialog.Error.serializer())

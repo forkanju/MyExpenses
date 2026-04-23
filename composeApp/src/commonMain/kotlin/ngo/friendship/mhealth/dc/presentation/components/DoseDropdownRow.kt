@@ -212,7 +212,7 @@ fun GenericNameAutoCompleteTextField(
                     contentAlignment = Alignment.CenterStart
                 ) {
                     if (value.text.isEmpty()) {
-                        Text(placeholder, color = Gray)
+                        Text(placeholder, color = Gray, fontSize = 11.sp)
                     }
                     it()
                 }

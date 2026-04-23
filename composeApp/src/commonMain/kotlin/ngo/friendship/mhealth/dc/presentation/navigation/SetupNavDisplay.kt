@@ -1,5 +1,9 @@
 package ngo.friendship.mhealth.dc.presentation.navigation
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -58,19 +62,52 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         DialogSceneStrategy()
                     ),
                     transitionSpec = {
-                        // Slide in from right when navigating forward
-                        slideInHorizontally(initialOffsetX = { it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { -it })
+                        // Material 3 Forward: Slide in from right with fade, slide out to left with fade
+                        (slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(
+                                durationMillis = 400,
+                                easing = FastOutSlowInEasing
+                            )
+                        ) + fadeIn(animationSpec = tween(400))).togetherWith(
+                            slideOutHorizontally(
+                                targetOffsetX = { -it / 3 },
+                                animationSpec = tween(
+                                    durationMillis = 400,
+                                    easing = FastOutSlowInEasing
+                                )
+                            ) + fadeOut(animationSpec = tween(400))
+                        )
                     },
                     popTransitionSpec = {
-                        // Slide in from left when navigating back
-                        slideInHorizontally(initialOffsetX = { -it + 1000 }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { it })
+                        // Material 3 Backward: Slide in from left with fade, slide out to right with fade
+                        (slideInHorizontally(
+                            initialOffsetX = { -it / 3 },
+                            animationSpec = tween(
+                                durationMillis = 400,
+                                easing = FastOutSlowInEasing
+                            )
+                        ) + fadeIn(animationSpec = tween(400))).togetherWith(
+                            slideOutHorizontally(
+                                targetOffsetX = { it },
+                                animationSpec = tween(
+                                    durationMillis = 400,
+                                    easing = FastOutSlowInEasing
+                                )
+                            ) + fadeOut(animationSpec = tween(400))
+                        )
                     },
-                    predictivePopTransitionSpec = {
-                        // Slide in from left when navigating back
-                        slideInHorizontally(initialOffsetX = { -it + 1000 }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { it })
+                    predictivePopTransitionSpec = { offset ->
+                        // Predictive back: Interactive slide that follows the gesture offset
+                        (slideInHorizontally(
+                            initialOffsetX = { -it / 3 + offset },
+                            animationSpec = tween(durationMillis = 0)
+                        ) + fadeIn()).togetherWith(
+                            slideOutHorizontally(
+                                targetOffsetX = { offset },
+                                animationSpec = tween(durationMillis = 0)
+                            ) + fadeOut()
+                        )
                     },
                     entryProvider = entryProvider {
                         dialogRoute(

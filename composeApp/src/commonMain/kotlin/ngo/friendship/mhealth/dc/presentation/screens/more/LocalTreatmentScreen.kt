@@ -30,7 +30,8 @@ import ngo.friendship.mhealth.dc.theme.*
 @Composable
 fun LocalTreatmentScreen(
     onBack: () -> Unit,
-    onNavigateToDetails: () -> Unit
+    onNavigateToDetails: () -> Unit,
+    onAddClick: () -> Unit
 ) {
     val items = listOf(
         LocalTreatmentItemData("Nayamot Ullah Ahmed", "M | 43y", "01918967530 | Education (HO)", "Fiver", "15:02, 10 Nov 2025", "MK", "4811", Color(0xFF60BF77)),
@@ -48,7 +49,7 @@ fun LocalTreatmentScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { },
+                onClick = onAddClick,
                 containerColor = PrimaryBlue,
                 contentColor = Color.White,
                 shape = CircleShape,
@@ -233,6 +234,6 @@ fun LocalTreatmentItem(
 @Composable
 fun LocalTreatmentScreenPreview() {
     FriendshipTheme {
-        LocalTreatmentScreen(onBack = {}, onNavigateToDetails = {})
+        LocalTreatmentScreen(onBack = {}, onNavigateToDetails = {}, onAddClick = {})
     }
 }

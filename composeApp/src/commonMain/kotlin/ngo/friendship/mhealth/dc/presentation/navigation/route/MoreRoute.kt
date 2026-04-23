@@ -1,6 +1,9 @@
 package ngo.friendship.mhealth.dc.presentation.navigation.route
 
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import ngo.friendship.mhealth.dc.domain.model.SetupData
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -60,7 +63,23 @@ fun EntryProviderScope<NavKey>.moreRoute(
     entry<Screens.LocalTreatment> {
         LocalTreatmentScreen(
             onBack = { mainViewModel.backStack.removeLastOrNull() },
-            onNavigateToDetails = { mainViewModel.backStack.add(Screens.LocalTreatmentDetails(patientId = "")) }
+            onNavigateToDetails = { mainViewModel.backStack.add(Screens.LocalTreatmentDetails(patientId = "")) },
+            onAddClick = { mainViewModel.backStack.add(Screens.LocalPrescriptionForm) }
+        )
+    }
+
+    entry<Screens.LocalPrescriptionForm> {
+        val viewModel = koinViewModel<CaseViewModel>()
+        val setupData by mainViewModel.setupDataState.collectAsState()
+        val medicineList by viewModel.medicineListState.collectAsState()
+        LocalPrescriptionFormScreen(
+            onBack = { mainViewModel.backStack.removeLastOrNull() },
+            setupData = setupData,
+            medicineList = medicineList,
+            onSave = { state ->
+                // Handle save
+                mainViewModel.backStack.removeLastOrNull()
+            }
         )
     }
 

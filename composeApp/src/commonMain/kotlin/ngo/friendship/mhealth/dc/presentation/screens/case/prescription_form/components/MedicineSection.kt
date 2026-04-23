@@ -129,13 +129,19 @@ fun MedicineComposerCard(
             var days by remember { mutableStateOf("৭ দিন") }
             var mealTime by remember { mutableStateOf(MealTime.PORE) }
 
-            val medicineNames = remember(medicines) {
-                medicines.map { "" }
-            }
-
             var genericNameQuery by remember { mutableStateOf(TextFieldValue("")) }
             val genericNames = remember(medicines) {
                 medicines.map { it.genericName }.distinct()
+            }
+
+            val medicineNames = remember(medicines, genericNameQuery.text) {
+                if (genericNameQuery.text.isEmpty()) {
+                    medicines.map { it.brandName }.distinct()
+                } else {
+                    medicines.filter {
+                        it.genericName.equals(genericNameQuery.text, ignoreCase = true)
+                    }.map { it.brandName }.distinct()
+                }
             }
 
             DoseAndDrugAutoCompleteRow(
