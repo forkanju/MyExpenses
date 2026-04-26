@@ -15,9 +15,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.TrendRowUi
 import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
+import ngo.friendship.mhealth.dc.theme.RingBarGreen
 import ngo.friendship.mhealth.dc.theme.TextSecondary
+import ngo.friendship.mhealth.dc.theme.TrendBlue
+import ngo.friendship.mhealth.dc.theme.TrendRed
 
 @Composable
 fun TrendTableCard(
@@ -83,4 +88,24 @@ private fun RowScope.TableCell(
         color = valueColor,
         textAlign = if (weight == 1.2f) TextAlign.Start else TextAlign.Center
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TrendTableCardPreview() {
+    FriendshipTheme {
+        TrendTableCard(
+            header1 = "In 30m",
+            header2 = "After 30m",
+            header3 = "After 2h",
+            rows = listOf(
+                TrendRowUi("Loose Stool", 10, 5, 2),
+                TrendRowUi("Fever", 8, 4, 3),
+                TrendRowUi("Cough", 15, 7, 5),
+                TrendRowUi("Total", 33, 16, 10)
+            ),
+            colors = Triple(RingBarGreen, TrendBlue, TrendRed),
+            modifier = Modifier.padding(16.dp)
+        )
+    }
 }

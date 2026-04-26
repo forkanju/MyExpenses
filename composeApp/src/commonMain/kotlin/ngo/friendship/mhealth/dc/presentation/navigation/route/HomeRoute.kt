@@ -7,19 +7,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.MainUiEvent
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.components.CustomTopBar
@@ -80,7 +80,8 @@ fun EntryProviderScope<NavKey>.homeRoute(
                     notificationIcon = Resources.Icon.Notification,
                     notificationCount = notificationCount,
                     onNotificationClick = {
-                        println("Notification clicked")
+                        viewModel.selectBottomTab(BottomNavItems.Cases)
+                        viewModel.selectCaseTab(CaseTab.Pending)
                     },
                     userName = userProfile?.userName ?: "Doctor Center",
                     userSubtitle = userProfile?.location ?: "Friendship NGO",

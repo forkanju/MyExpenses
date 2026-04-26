@@ -29,12 +29,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.theme.Dimen
 import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.Red
+import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.AppLogoWhite
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -89,7 +92,8 @@ fun CustomTopBar(
         ) {
             Column(
                 horizontalAlignment = Alignment.End,
-                modifier = Modifier.widthIn(max = 120.dp),) {
+                modifier = Modifier.widthIn(max = 120.dp),
+            ) {
                 Text(
                     text = userName,
                     color = Color.White,
@@ -180,3 +184,33 @@ fun DynamicCountBadge(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun DynamicCountBadgePreview() {
+    FriendshipTheme {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            DynamicCountBadge(count = 5)
+            DynamicCountBadge(count = 99)
+            DynamicCountBadge(count = 100)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CustomTopBarPreview() {
+    FriendshipTheme {
+        CustomTopBar(
+            notificationIcon = Resources.Icon.Notification,
+            notificationCount = 5,
+            onNotificationClick = {},
+            userName = "Dr. John Doe",
+            userSubtitle = "Medical Officer",
+            profileIcon = Resources.Icon.Profile,
+            onProfileClick = {}
+        )
+    }
+}

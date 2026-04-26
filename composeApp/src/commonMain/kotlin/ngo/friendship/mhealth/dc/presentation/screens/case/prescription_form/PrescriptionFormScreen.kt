@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -272,6 +271,19 @@ fun PrescriptionFormScreen(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LabeledFormTextField(
+                    label = "Investigation Result",
+                    placeholder = "Result",
+                    value = formState.investigationResult,
+                    onValueChange = {
+                        onUpdate(formState.copy(investigationResult = it))
+                    },
+                    isError = false,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    enabled = !isAnsweredMode
+                )
                 Spacer(modifier = Modifier.height(12.dp))
 
                 LabeledFormTextField(

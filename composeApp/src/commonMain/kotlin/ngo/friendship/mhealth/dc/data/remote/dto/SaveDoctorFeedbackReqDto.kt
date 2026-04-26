@@ -157,12 +157,12 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
     return DoctorFeedbackObject(
         interviewId = interviewId,
         doctorFindings = doctorNotes,
-        adviceMessageForFcm = listOfNotNull(
-            doctorAdvice.takeIf { it.isNotBlank() },
-            commentsForFcm.takeIf { it.isNotBlank() }
-        ).joinToString("\n"),
+        adviceMessageForFcm = commentsForFcm,
         refCenterId = selectedReferralCenter?.refCenterId.toString(),
-        investigationResult = investigationResult,
+        investigationResult = listOfNotNull(
+            investigationResult.takeIf { it.isNotBlank() },
+            doctorAdvice.takeIf { it.isNotBlank() }
+        ).joinToString("\n"),
         nextFollowUpDate = nextFollowUpDate,
         investigation = selectedInvestigations.map {
             IdNameItem(

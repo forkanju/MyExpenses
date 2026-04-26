@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.BasicToDo" parent="Theme.MaterialComponents.Light" />
+</resources>

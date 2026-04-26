@@ -7,6 +7,8 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewListReqDto
@@ -98,6 +100,13 @@ class ApiService(
     suspend fun getUserProfile(
         request: UserProfileReqDto
     ): UserProfileResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun getDashboardData(
+        request: DashboardDataReqDto
+    ): DashboardDataResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
     )

@@ -17,9 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.SegmentUi
 import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
+import ngo.friendship.mhealth.dc.theme.RingBarGreen
+import ngo.friendship.mhealth.dc.theme.TrendBlue
+import ngo.friendship.mhealth.dc.theme.TrendRed
 
 
 @Composable
@@ -67,6 +72,21 @@ fun SegmentedBarCard(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SegmentedBarCardPreview() {
+    FriendshipTheme {
+        SegmentedBarCard(
+            segments = listOf(
+                SegmentUi("in30", 40f, RingBarGreen),
+                SegmentUi("after30", 35f, TrendBlue),
+                SegmentUi("after2h", 25f, TrendRed)
+            ),
+            modifier = Modifier.padding(16.dp)
+        )
     }
 }
 

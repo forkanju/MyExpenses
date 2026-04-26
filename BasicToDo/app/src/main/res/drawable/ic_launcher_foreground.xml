@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Checklist symbol centered in the 66dp safe zone (21dp margin from 108dp) -->
+    <!-- The safe zone is from 21 to 87 on both axes. -->
+
+    <!-- Clipboard/Paper background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,25h38c2.2,0 4,1.8 4,4v50c0,2.2 -1.8,4 -4,4h-38c-2.2,0 -4,-1.8 -4,-4v-50c0,-2.2 1.8,-4 4,-4z" />
+
+    <!-- Clipboard clip -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M48,22h12v6h-12z" />
+
+    <!-- Checkmark -->
+    <path
+        android:fillColor="#6200EE"
+        android:pathData="M45,55l6,6l12,-12"
+        android:strokeWidth="4"
+        android:strokeColor="#6200EE"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+
+    <!-- Decorative lines for tasks -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M40,35h28M40,42h28M40,65h28"
+        android:strokeWidth="2"
+        android:strokeColor="#BDBDBD"
+        android:strokeLineCap="round" />
+
+</vector>
