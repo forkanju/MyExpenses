@@ -22,7 +22,6 @@ fun HomePagerRoute(
     mainViewModel: MainViewModel,
     modifier: Modifier
 ) {
-    val interviewList by mainViewModel.interviewListState.collectAsStateWithLifecycle()
     val isLoading by mainViewModel.loadingSecondaryFlow.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -48,10 +47,6 @@ fun HomePagerRoute(
     LaunchedEffect(pagerState.currentPage) {
         val currentTab = BottomNavItems.entries[pagerState.currentPage]
         mainViewModel.selectBottomTab(currentTab)
-
-        if (currentTab == BottomNavItems.Cases) {
-            mainViewModel.initializeCases()
-        }
     }
 
     PullToRefreshBox(
@@ -59,9 +54,10 @@ fun HomePagerRoute(
         onRefresh = {
             when (BottomNavItems.entries[pagerState.currentPage]) {
                 BottomNavItems.Home -> Unit
-                BottomNavItems.Cases -> mainViewModel.loadInterviewList(
-                    tab = mainViewModel.selectedCaseTab
-                )
+                BottomNavItems.Cases -> {
+                    // Refresh is now handled internally by CaseListViewModel
+                    // or can be triggered via a shared event if needed.
+                }
 
                 BottomNavItems.Dashboard -> Unit
             }
@@ -75,15 +71,8 @@ fun HomePagerRoute(
                 BottomNavItems.Home -> HomeScreen()
 
                 BottomNavItems.Cases -> CaseListScreen(
-                    interviewList = interviewList,
-                    selectedTab = mainViewModel.selectedCaseTab,
-                    tabCounts = mainViewModel.caseTabCounts,
-                    onTabSelect = mainViewModel::selectCaseTab,
-                    onCaseClick = { interview ->
+                    onNavigateToDetails = { interview ->
                         mainViewModel.openCase(interview)
-                    },
-                    onFilterClick = {
-
                     }
                 )
 

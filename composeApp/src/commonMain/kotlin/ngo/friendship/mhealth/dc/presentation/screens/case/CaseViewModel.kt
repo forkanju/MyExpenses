@@ -1,89 +1,197 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case
 
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
-import ngo.friendship.mhealth.dc.domain.model.Medicine
-import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addDiagnosis
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addInvestigation
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeDiagnosis
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeInvestigation
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.utils.minusAt
 
 class CaseViewModel(
     private val repository: CaseRepository
 ) : BaseViewModel() {
+    private val _uiEvent = Channel<CaseUiEvent>(Channel.BUFFERED)
+    val uiEvent = _uiEvent.receiveAsFlow()
 
-    val uiEvent: SharedFlow<CaseUiEvent>
-        field = MutableSharedFlow(replay = 1)
-    val interviewDetailsState: StateFlow<InterviewDetails>
-        field = MutableStateFlow(InterviewDetails())
-
-    val medicineListState: StateFlow<List<Medicine>>
-        field = MutableStateFlow(listOf())
-
-    val questionAnswerState: StateFlow<QuestionAnswerJson>
-        field = MutableStateFlow(QuestionAnswerJson())
-
-    val formState: StateFlow<DoctorFeedbackFormState>
-        field = MutableStateFlow(DoctorFeedbackFormState())
+    private val _state = MutableStateFlow(CaseUiState())
+    val state = _state.asStateFlow()
 
     init {
-        loadMedicineList()
+        onIntent(CaseIntent.LoadMedicineList())
     }
 
-    fun loadInterviewDetails(interviewId: Long) {
+    fun onIntent(intent: CaseIntent) {
+        when (intent) {
+            is CaseIntent.LoadInterviewDetails -> loadInterviewDetails(intent.interviewId)
+            is CaseIntent.LoadQuestionAnswerData -> loadQuestionAnswerData(intent.interviewId)
+            is CaseIntent.LoadMedicineList -> loadMedicineList(intent.type)
+            CaseIntent.SaveDoctorFeedback -> saveDoctorFeedback()
+            is CaseIntent.UpdateFormState -> updateFormState(intent.state)
+            is CaseIntent.AddDiagnosis -> {
+                updateFormState(addDiagnosis(_state.value.formState, intent.diagnosis))
+            }
+
+            is CaseIntent.RemoveDiagnosis -> {
+                updateFormState(removeDiagnosis(_state.value.formState, intent.diagnosis))
+            }
+
+            is CaseIntent.AddPrescription -> {
+                updateFormState(_state.value.formState.copy(prescriptions = _state.value.formState.prescriptions + intent.item))
+            }
+
+            is CaseIntent.RemovePrescription -> {
+                updateFormState(
+                    _state.value.formState.copy(
+                        prescriptions = _state.value.formState.prescriptions.minusAt(
+                            intent.index
+                        )
+                    )
+                )
+            }
+
+            is CaseIntent.UpdateDoctorAdvice -> {
+                updateFormState(_state.value.formState.copy(doctorAdvice = intent.advice))
+            }
+
+            is CaseIntent.AddInvestigation -> {
+                updateFormState(addInvestigation(_state.value.formState, intent.investigation))
+            }
+
+            is CaseIntent.RemoveInvestigation -> {
+                updateFormState(removeInvestigation(_state.value.formState, intent.investigation))
+            }
+
+            is CaseIntent.UpdateInvestigationResult -> {
+                updateFormState(_state.value.formState.copy(investigationResult = intent.result))
+            }
+
+            is CaseIntent.UpdateCommentsForFcm -> {
+                updateFormState(_state.value.formState.copy(commentsForFcm = intent.comments))
+            }
+
+            is CaseIntent.UpdateReferralCenter -> {
+                updateFormState(_state.value.formState.copy(selectedReferralCenter = intent.center))
+            }
+
+            is CaseIntent.UpdateDoctorNotes -> {
+                updateFormState(_state.value.formState.copy(doctorNotes = intent.notes))
+            }
+
+            is CaseIntent.UpdateFollowUpDate -> {
+                updateFormState(_state.value.formState.copy(nextFollowUpDate = intent.date))
+            }
+
+            CaseIntent.ToggleDatePicker -> {
+                _state.update { it.copy(isDatePickerVisible = !it.isDatePickerVisible) }
+            }
+
+            is CaseIntent.SetSummaryTab -> {
+                _state.update { it.copy(selectedSummaryTab = intent.index) }
+            }
+
+            CaseIntent.ToggleSendMessageDialog -> {
+                _state.update { it.copy(isSendMessageDialogVisible = !it.isSendMessageDialogVisible) }
+            }
+
+            is CaseIntent.UpdateCustomMessage -> {
+                _state.update { it.copy(customMessageState = intent.messageState) }
+            }
+
+            is CaseIntent.TogglePrescriptionSms -> {
+                _state.update { it.copy(isPrescriptionWithSmsChecked = intent.checked) }
+            }
+
+            is CaseIntent.UpdatePatientName -> {
+                _state.update { it.copy(patientName = intent.name) }
+            }
+
+            is CaseIntent.UpdateGender -> {
+                _state.update { it.copy(selectedGender = intent.gender) }
+            }
+
+            is CaseIntent.UpdateAge -> {
+                _state.update { it.copy(age = intent.age) }
+            }
+
+            is CaseIntent.UpdateOfficeId -> {
+                _state.update { it.copy(officeId = intent.id) }
+            }
+
+            is CaseIntent.UpdateSector -> {
+                _state.update { it.copy(sector = intent.sector) }
+            }
+
+            is CaseIntent.UpdateInterviewNote -> {
+                _state.update { it.copy(interviewNote = intent.note) }
+            }
+        }
+    }
+
+    private fun loadInterviewDetails(interviewId: Long) {
         if (interviewId == -1L) return
         launch(onEnd = {
-            if (interviewDetailsState.value.interviewId == -1L)
-                backStack.removeLastOrNull()
+            if (_state.value.interviewDetails.interviewId == -1L)
+                launch { _uiEvent.send(CaseUiEvent.NavigateBack) }
         }) {
-            interviewDetailsState.value = InterviewDetails()
-            interviewDetailsState.value = repository.getInterviewDetails(interviewId = interviewId)
+            _state.update { it.copy(interviewDetails = InterviewDetails()) }
+            val details = repository.getInterviewDetails(interviewId = interviewId)
+            _state.update { it.copy(interviewDetails = details) }
         }
     }
 
-    fun loadQuestionAnswerData(interviewId: Long) {
+    private fun loadQuestionAnswerData(interviewId: Long) {
         launch {
             val result = repository.getQuestionAnswerData()
-            questionAnswerState.value = result
-            formState.value = formState.value.copy(
-                interviewId = if (interviewId == -1L) null else interviewId,
-                questionAnswers = result.questionAnswerJson,
-                questionAnswers2 = result.questionAnswerJson2
-            )
+            _state.update {
+                it.copy(
+                    questionAnswerData = result,
+                    formState = it.formState.copy(
+                        interviewId = if (interviewId == -1L) null else interviewId,
+                        questionAnswers = result.questionAnswerJson,
+                        questionAnswers2 = result.questionAnswerJson2
+                    )
+                )
+            }
         }
     }
 
-    fun loadMedicineList(
+    private fun loadMedicineList(
         type: String = "Tab"
     ) {
         launch(loading = Loading.Gone) {
-            medicineListState.value = repository.getMedicineList(type = type)
+            val list = repository.getMedicineList(type = type)
+            _state.update { it.copy(medicineList = list) }
         }
     }
 
-    fun saveDoctorFeedback() {
+    private fun saveDoctorFeedback() {
         launch {
-            if (formState.value.prescriptions.isNotEmpty()){
-                repository.saveDoctorFeedback(formState = formState.value)
+            if (_state.value.formState.prescriptions.isNotEmpty()) {
+                _state.update { it.copy(isSaving = true) }
+                repository.saveDoctorFeedback(formState = _state.value.formState)
                 showSuccess("Feedback saved successfully")
-                val isSuccess = repository.updateInterviewStatus(
-                    interviewId = formState.value.interviewId ?: 0,
+                repository.updateInterviewStatus(
+                    interviewId = _state.value.formState.interviewId ?: 0,
                     status = CaseTab.Answered.apiParam
                 )
-                backStack.removeLastOrNull()
-            }else{
+                _state.update { it.copy(isSaving = false) }
+                _uiEvent.send(CaseUiEvent.NavigateBack)
+            } else {
                 showSuccess("Please add the prescriptions")
             }
-
         }
     }
 
-    fun updateFormState(state: DoctorFeedbackFormState) {
-        formState.value = state
+    private fun updateFormState(state: DoctorFeedbackFormState) {
+        _state.update { it.copy(formState = state) }
     }
-
 }

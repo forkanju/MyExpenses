@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components
+package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

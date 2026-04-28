@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more
+package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,29 +26,19 @@ import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.components.FormAutoCompleteDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.FormContainerCard
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.AppDatePickerDialog
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.*
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseIntent
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.*
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
-import ngo.friendship.mhealth.dc.utils.minusAt
 
 @Composable
-fun LocalPrescriptionFormScreen(
-    onBack: () -> Unit,
+fun LocalCaseDetailScreen(
+    state: CaseUiState,
     setupData: SetupData,
-    medicineList: List<Medicine>,
-    onSave: (DoctorFeedbackFormState) -> Unit
+    onIntent: (CaseIntent) -> Unit,
+    onBack: () -> Unit,
+    onSave: () -> Unit
 ) {
-    var formState by remember { mutableStateOf(DoctorFeedbackFormState()) }
-    var patientName by remember { mutableStateOf("") }
-    var selectedGender by remember { mutableStateOf("Male") }
-    var age by remember { mutableStateOf("") }
-    var officeId by remember { mutableStateOf("") }
-    var sector by remember { mutableStateOf("ISM") }
-    var mobile by remember { mutableStateOf("") }
-    var interviewNote by remember { mutableStateOf("") }
-    var showDatePicker by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             CommonTopBar(
@@ -72,8 +62,8 @@ fun LocalPrescriptionFormScreen(
                     LabeledFormTextField(
                         label = "Name",
                         placeholder = "Type name",
-                        value = patientName,
-                        onValueChange = { patientName = it }
+                        value = state.patientName,
+                        onValueChange = { onIntent(CaseIntent.UpdatePatientName(it)) }
                     )
 
                     Row(
@@ -99,30 +89,30 @@ fun LocalPrescriptionFormScreen(
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxHeight()
-                                            .background(if (selectedGender == "Male") PrimaryBlue else Color.Transparent)
-                                            .clickable { selectedGender = "Male" },
+                                            .background(if (state.selectedGender == "Male") PrimaryBlue else Color.Transparent)
+                                            .clickable { onIntent(CaseIntent.UpdateGender("Male")) },
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             Icons.Default.Male,
                                             contentDescription = null,
                                             modifier = Modifier.size(16.dp),
-                                            tint = if (selectedGender == "Male") Color.White else Color.Gray
+                                            tint = if (state.selectedGender == "Male") Color.White else Color.Gray
                                         )
                                     }
                                     Box(
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxHeight()
-                                            .background(if (selectedGender == "Female") PrimaryBlue else Color.Transparent)
-                                            .clickable { selectedGender = "Female" },
+                                            .background(if (state.selectedGender == "Female") PrimaryBlue else Color.Transparent)
+                                            .clickable { onIntent(CaseIntent.UpdateGender("Female")) },
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
                                             Icons.Default.Female,
                                             contentDescription = null,
                                             modifier = Modifier.size(16.dp),
-                                            tint = if (selectedGender == "Female") Color.White else Color.Gray
+                                            tint = if (state.selectedGender == "Female") Color.White else Color.Gray
                                         )
                                     }
                                 }
@@ -133,8 +123,8 @@ fun LocalPrescriptionFormScreen(
                             modifier = Modifier.weight(0.325f),
                             label = "Age",
                             placeholder = "00",
-                            value = age,
-                            onValueChange = { age = it },
+                            value = state.age,
+                            onValueChange = { onIntent(CaseIntent.UpdateAge(it)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
 
@@ -142,8 +132,8 @@ fun LocalPrescriptionFormScreen(
                             modifier = Modifier.weight(0.325f),
                             label = "Office ID",
                             placeholder = "0000",
-                            value = officeId,
-                            onValueChange = { officeId = it },
+                            value = state.officeId,
+                            onValueChange = { onIntent(CaseIntent.UpdateOfficeId(it)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
@@ -164,7 +154,7 @@ fun LocalPrescriptionFormScreen(
                                     .padding(horizontal = 8.dp),
                                 contentAlignment = Alignment.CenterStart
                             ) {
-                                Text(sector, fontSize = 14.sp)
+                                Text(state.sector, fontSize = 14.sp)
                             }
                         }
 
@@ -172,8 +162,8 @@ fun LocalPrescriptionFormScreen(
                             modifier = Modifier.weight(0.5f),
                             label = "Mobile",
                             placeholder = "01xxxxxxxxx",
-                            value = mobile,
-                            onValueChange = { mobile = it },
+                            value = state.formState.mobile,
+                            onValueChange = { onIntent(CaseIntent.UpdateFormState(state.formState.copy(mobile = it))) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                         )
                     }
@@ -186,8 +176,8 @@ fun LocalPrescriptionFormScreen(
                     Text("Interview", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = PrimaryBlue)
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
-                        value = interviewNote,
-                        onValueChange = { interviewNote = it },
+                        value = state.interviewNote,
+                        onValueChange = { onIntent(CaseIntent.UpdateInterviewNote(it)) },
                         modifier = Modifier.fillMaxWidth().height(150.dp),
                         placeholder = { Text("Type here...") },
                         shape = RoundedCornerShape(8.dp),
@@ -199,7 +189,7 @@ fun LocalPrescriptionFormScreen(
                 }
             }
 
-            // Prescription Section (Reusing components from PrescriptionFormScreen)
+            // Prescription Section
             FormContainerCard {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     PrescriptionHeader(isAnsweredMode = false)
@@ -212,27 +202,27 @@ fun LocalPrescriptionFormScreen(
                         selected = null,
                         getLabel = { it.diagName },
                         onSelectedChange = { selected ->
-                            formState = addDiagnosis(formState, selected)
+                            onIntent(CaseIntent.AddDiagnosis(selected))
                         }
                     )
 
-                    if (formState.selectedDiagnoses.isNotEmpty()) {
+                    if (state.formState.selectedDiagnoses.isNotEmpty()) {
                         DiagnosisChipGroup(
-                            items = formState.selectedDiagnoses,
+                            items = state.formState.selectedDiagnoses,
                             onRemove = { item ->
-                                formState = removeDiagnosis(formState, item)
+                                onIntent(CaseIntent.RemoveDiagnosis(item))
                             }
                         )
                     }
 
                     MedicineSection(
-                        medicines = medicineList,
-                        prescriptionItems = formState.prescriptions,
+                        medicines = state.medicineList,
+                        prescriptionItems = state.formState.prescriptions,
                         onAddMedicine = { item ->
-                            formState = formState.copy(prescriptions = formState.prescriptions + item)
+                            onIntent(CaseIntent.AddPrescription(item))
                         },
                         onRemoveMedicine = { index ->
-                            formState = formState.copy(prescriptions = formState.prescriptions.minusAt(index))
+                            onIntent(CaseIntent.RemovePrescription(index))
                         },
                         isAnsweredMode = false
                     )
@@ -240,8 +230,8 @@ fun LocalPrescriptionFormScreen(
                     LabeledFormTextField(
                         label = "Doctor advice",
                         placeholder = "Select advice",
-                        value = formState.doctorAdvice,
-                        onValueChange = { formState = formState.copy(doctorAdvice = it) }
+                        value = state.formState.doctorAdvice,
+                        onValueChange = { onIntent(CaseIntent.UpdateDoctorAdvice(it)) }
                     )
 
                     FormAutoCompleteDropdownField(
@@ -251,15 +241,15 @@ fun LocalPrescriptionFormScreen(
                         selected = null,
                         getLabel = { it.investigationName },
                         onSelectedChange = { selected ->
-                            formState = addInvestigation(formState, selected)
+                            onIntent(CaseIntent.AddInvestigation(selected))
                         }
                     )
 
-                    if (formState.selectedInvestigations.isNotEmpty()) {
+                    if (state.formState.selectedInvestigations.isNotEmpty()) {
                         InvestigationChipGroup(
-                            items = formState.selectedInvestigations,
+                            items = state.formState.selectedInvestigations,
                             onRemove = { item ->
-                                formState = removeInvestigation(formState, item)
+                                onIntent(CaseIntent.RemoveInvestigation(item))
                             }
                         )
                     }
@@ -267,8 +257,8 @@ fun LocalPrescriptionFormScreen(
                     LabeledFormTextField(
                         label = "Doctor notes",
                         placeholder = "Type",
-                        value = formState.doctorNotes,
-                        onValueChange = { formState = formState.copy(doctorNotes = it) }
+                        value = state.formState.doctorNotes,
+                        onValueChange = { onIntent(CaseIntent.UpdateDoctorNotes(it)) }
                     )
 
                     Row(
@@ -281,12 +271,12 @@ fun LocalPrescriptionFormScreen(
                             modifier = Modifier.padding(vertical = 8.dp)
                         ) {
                             Text(
-                                text = if (formState.nextFollowUpDate.isBlank()) "Next follow-up: " else "Next follow-up: ${formState.nextFollowUpDate}",
+                                text = if (state.formState.nextFollowUpDate.isBlank()) "Next follow-up: " else "Next follow-up: ${state.formState.nextFollowUpDate}",
                                 fontSize = 14.sp,
                                 color = PrimaryBlue,
                                 fontWeight = FontWeight.Bold
                             )
-                            IconButton(onClick = { showDatePicker = true }) {
+                            IconButton(onClick = { onIntent(CaseIntent.ToggleDatePicker) }) {
                                 Icon(Icons.Default.DateRange, contentDescription = null, tint = PrimaryBlue, modifier = Modifier.size(20.dp))
                             }
                         }
@@ -295,7 +285,7 @@ fun LocalPrescriptionFormScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     PrescriptionActionButtonRow(
-                        onSendClick = { onSave(formState) },
+                        onSendClick = onSave,
                         onShareClick = { /* Share */ },
                         sendButtonText = "Save"
                     )
@@ -303,13 +293,13 @@ fun LocalPrescriptionFormScreen(
             }
         }
 
-        if (showDatePicker) {
+        if (state.isDatePickerVisible) {
             AppDatePickerDialog(
-                initialDate = formState.nextFollowUpDate,
+                initialDate = state.formState.nextFollowUpDate,
                 onDateSelected = { selectedDate ->
-                    formState = formState.copy(nextFollowUpDate = selectedDate)
+                    onIntent(CaseIntent.UpdateFollowUpDate(selectedDate))
                 },
-                onDismiss = { showDatePicker = false }
+                onDismiss = { onIntent(CaseIntent.ToggleDatePicker) }
             )
         }
     }

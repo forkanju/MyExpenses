@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.NavKey
 import org.koin.compose.viewmodel.koinViewModel
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.LocalCaseDetailScreen
 import ngo.friendship.mhealth.dc.presentation.screens.more.*
 
 fun EntryProviderScope<NavKey>.moreRoute(
@@ -23,9 +24,9 @@ fun EntryProviderScope<NavKey>.moreRoute(
             onBack = { mainViewModel.backStack.removeLastOrNull() },
             onAddTemplate = {
                 mainViewModel.backStack.add(
-                    Screens.PrescriptionForm(
+                    Screens.CaseDetail(
                         interviewId = -1L,
-                        source = "template_list"
+                        source = Screens.CaseDetail.SOURCE_TEMPLATE_LIST
                     )
                 )
             }
@@ -70,13 +71,14 @@ fun EntryProviderScope<NavKey>.moreRoute(
 
     entry<Screens.LocalPrescriptionForm> {
         val viewModel = koinViewModel<CaseViewModel>()
+        val state by viewModel.state.collectAsStateWithLifecycle()
         val setupData by mainViewModel.setupDataState.collectAsState()
-        val medicineList by viewModel.medicineListState.collectAsState()
-        LocalPrescriptionFormScreen(
-            onBack = { mainViewModel.backStack.removeLastOrNull() },
+        LocalCaseDetailScreen(
+            state = state,
             setupData = setupData,
-            medicineList = medicineList,
-            onSave = { state ->
+            onIntent = viewModel::onIntent,
+            onBack = { mainViewModel.backStack.removeLastOrNull() },
+            onSave = {
                 // Handle save
                 mainViewModel.backStack.removeLastOrNull()
             }

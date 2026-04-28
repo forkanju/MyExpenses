@@ -1,5 +1,6 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components
+package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
 
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -8,8 +9,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
-import kotlin.time.Instant
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
 
 fun addDiagnosis(
     state: DoctorFeedbackFormState,

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form
+package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,10 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +38,6 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.presentation.components.CheckboxWithEditableText
-import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.components.ExpandableInterviewSummary
 import ngo.friendship.mhealth.dc.presentation.components.FormActionRow
 import ngo.friendship.mhealth.dc.presentation.components.FormAutoCompleteDropdownField
@@ -49,64 +45,32 @@ import ngo.friendship.mhealth.dc.presentation.components.FormContainerCard
 import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.DiagnosisChipGroup
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.InvestigationChipGroup
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.MedicineSection
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PatientProfileCard
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionActionButtonRow
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionHeader
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionItemCard
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.PrescriptionTopBar
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.SendMessageDialog
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addDiagnosis
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.addInvestigation
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.buildDefaultSmsMessage
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.removeDiagnosis
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.removeInvestigation
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.toDateString
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.components.toEpochMillisOrNull
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.CustomMessageState
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseIntent
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.*
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
-import ngo.friendship.mhealth.dc.utils.minusAt
 
 
 @Composable
-fun PrescriptionFormScreen(
+fun CaseDetailScreen(
     modifier: Modifier = Modifier,
-    formState: DoctorFeedbackFormState,
+    state: CaseUiState,
     setupData: SetupData,
-    interviewDetails: InterviewDetails,
-    medicineList: List<Medicine>,
     mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
-    source: String = Screens.PrescriptionForm.SOURCE_CASE_LIST,
-    onUpdate: (DoctorFeedbackFormState) -> Unit = {},
-    onSave: () -> Unit = {},
+    source: String = Screens.CaseDetail.SOURCE_CASE_LIST,
+    onIntent: (CaseIntent) -> Unit = {},
     onFcmDetailsClick: () -> Unit,
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit
 ) {
-    var checked by remember { mutableStateOf(false) }
-    var selectedTab by remember { mutableStateOf(0) }
     val isAnsweredMode = mode == CaseDetailsMode.ANSWERED
-    val isFromTemplate = source == Screens.PrescriptionForm.SOURCE_TEMPLATE_LIST
-    var showDatePicker by remember { mutableStateOf(false) }
-    var showSendMessageDialog by remember { mutableStateOf(false) }
-    var customMessageState by remember {
-        mutableStateOf(
-            CustomMessageState(
-                messageText = "",
-                isFcmChecked = true,
-                isBeneficiaryChecked = true,
-                phoneNumber = ""
-            )
-        )
-    }
+    val isFromTemplate = source == Screens.CaseDetail.SOURCE_TEMPLATE_LIST
 
-    val interviewQaItems = remember(interviewDetails.details) {
-        interviewDetails.details.map {
+    val interviewQaItems = remember(state.interviewDetails.details) {
+        state.interviewDetails.details.map {
             QAItem(
                 question = it.questionName,
                 answer = it.answer
@@ -114,8 +78,8 @@ fun PrescriptionFormScreen(
         }
     }
 
-    val systemPrescriptionItems = remember(interviewDetails.sysPrescriptionList) {
-        interviewDetails.sysPrescriptionList.map {
+    val systemPrescriptionItems = remember(state.interviewDetails.sysPrescriptionList) {
+        state.interviewDetails.sysPrescriptionList.map {
             QAItem("Medicine", it.prescription)
         }
     }
@@ -125,7 +89,8 @@ fun PrescriptionFormScreen(
         containerColor = if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White,
         topBar = {
             PrescriptionTopBar(
-                titlePrefix = if (isFromTemplate) "Prescription Template" else (interviewDetails.fcmInfo?.ifBlank { "Prescription" } ?: ""),
+                titlePrefix = if (isFromTemplate) "Prescription Template" else (state.interviewDetails.fcmInfo?.ifBlank { "Prescription" }
+                    ?: ""),
                 onFcmDetailsClick = onFcmDetailsClick,
                 onCall = onCall,
                 onWhatsApp = onWhatsApp,
@@ -146,7 +111,7 @@ fun PrescriptionFormScreen(
         ) {
             if (!isFromTemplate) {
                 PatientProfileCard(
-                    benefName = interviewDetails.beneficiaryName,
+                    benefName = state.interviewDetails.beneficiaryName,
                     isAnsweredMode = isAnsweredMode
                 )
 
@@ -154,9 +119,9 @@ fun PrescriptionFormScreen(
                     modifier = Modifier.fillMaxWidth(),
                     interviewItems = interviewQaItems,
                     prescriptionItems = systemPrescriptionItems,
-                    uploadedText = interviewDetails.startTime,
-                    selectedTab = selectedTab,
-                    onTabSelect = { selectedTab = it },
+                    uploadedText = state.interviewDetails.startTime,
+                    selectedTab = state.selectedSummaryTab,
+                    onTabSelect = { onIntent(CaseIntent.SetSummaryTab(it)) },
                     onCopyClick = {},
                     onSeeFullClick = {},
                     expandedInitially = true,
@@ -177,17 +142,17 @@ fun PrescriptionFormScreen(
                     selected = null,//selectedDiagnosis
                     getLabel = { it.diagName },
                     onSelectedChange = { selected ->
-                        onUpdate(addDiagnosis(formState, selected))
+                        onIntent(CaseIntent.AddDiagnosis(selected))
                     },
                     enabled = !isAnsweredMode
                 )
 
-                if (formState.selectedDiagnoses.isNotEmpty()) {
+                if (state.formState.selectedDiagnoses.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     DiagnosisChipGroup(
-                        items = formState.selectedDiagnoses,
+                        items = state.formState.selectedDiagnoses,
                         onRemove = { item ->
-                            onUpdate(removeDiagnosis(formState, item))
+                            onIntent(CaseIntent.RemoveDiagnosis(item))
                         }
                     )
                 }
@@ -217,19 +182,13 @@ fun PrescriptionFormScreen(
                     }
                 } else {
                     MedicineSection(
-                        medicines = medicineList,
-                        prescriptionItems = formState.prescriptions,
+                        medicines = state.medicineList,
+                        prescriptionItems = state.formState.prescriptions,
                         onAddMedicine = { item ->
-                            onUpdate(formState.copy(prescriptions = formState.prescriptions + item))
+                            onIntent(CaseIntent.AddPrescription(item))
                         },
                         onRemoveMedicine = { index ->
-                            onUpdate(
-                                formState.copy(
-                                    prescriptions = formState.prescriptions.minusAt(
-                                        index
-                                    )
-                                )
-                            )
+                            onIntent(CaseIntent.RemovePrescription(index))
                         },
                         isAnsweredMode = isAnsweredMode
                     )
@@ -238,9 +197,9 @@ fun PrescriptionFormScreen(
                 LabeledFormTextField(
                     label = "Doctor Advice",
                     placeholder = "Advice",
-                    value = formState.doctorAdvice,
+                    value = state.formState.doctorAdvice,
                     onValueChange = {
-                        onUpdate(formState.copy(doctorAdvice = it))
+                        onIntent(CaseIntent.UpdateDoctorAdvice(it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -256,17 +215,17 @@ fun PrescriptionFormScreen(
                     selected = null,
                     getLabel = { it.investigationName },
                     onSelectedChange = { selected ->
-                        onUpdate(addInvestigation(formState, selected))
+                        onIntent(CaseIntent.AddInvestigation(selected))
                     },
                     enabled = !isAnsweredMode
                 )
 
-                if (formState.selectedInvestigations.isNotEmpty()) {
+                if (state.formState.selectedInvestigations.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     InvestigationChipGroup(
-                        items = formState.selectedInvestigations,
+                        items = state.formState.selectedInvestigations,
                         onRemove = { item ->
-                            onUpdate(removeInvestigation(formState, item))
+                            onIntent(CaseIntent.RemoveInvestigation(item))
                         }
                     )
                 }
@@ -276,9 +235,9 @@ fun PrescriptionFormScreen(
                 LabeledFormTextField(
                     label = "Investigation Result",
                     placeholder = "Result",
-                    value = formState.investigationResult,
+                    value = state.formState.investigationResult,
                     onValueChange = {
-                        onUpdate(formState.copy(investigationResult = it))
+                        onIntent(CaseIntent.UpdateInvestigationResult(it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -289,9 +248,9 @@ fun PrescriptionFormScreen(
                 LabeledFormTextField(
                     label = "Comments for FCM",
                     placeholder = "Comment",
-                    value = formState.commentsForFcm,
+                    value = state.formState.commentsForFcm,
                     onValueChange = {
-                        onUpdate(formState.copy(commentsForFcm = it))
+                        onIntent(CaseIntent.UpdateCommentsForFcm(it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -304,10 +263,10 @@ fun PrescriptionFormScreen(
                     label = "Refer to others",
                     placeholder = "Select",
                     options = setupData.referralCenters,
-                    selected = formState.selectedReferralCenter,
+                    selected = state.formState.selectedReferralCenter,
                     getLabel = { it.refCenterName },
                     onSelectedChange = { selected ->
-                        onUpdate(formState.copy(selectedReferralCenter = selected))
+                        onIntent(CaseIntent.UpdateReferralCenter(selected))
                     },
                     enabled = !isAnsweredMode
                 )
@@ -317,9 +276,9 @@ fun PrescriptionFormScreen(
                 LabeledFormTextField(
                     label = "Doctor notes",
                     placeholder = "Note",
-                    value = formState.doctorNotes,
+                    value = state.formState.doctorNotes,
                     onValueChange = {
-                        onUpdate(formState.copy(doctorNotes = it))
+                        onIntent(CaseIntent.UpdateDoctorNotes(it))
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -330,10 +289,10 @@ fun PrescriptionFormScreen(
 
                 if (!isFromTemplate) {
                     FormActionRow(
-                        leftText = if (formState.nextFollowUpDate.isBlank()) {
+                        leftText = if (state.formState.nextFollowUpDate.isBlank()) {
                             "Next follow-up:"
                         } else {
-                            "Next follow-up: ${formState.nextFollowUpDate}"
+                            "Next follow-up: ${state.formState.nextFollowUpDate}"
                         },
                         leftIcon = {
                             Icon(
@@ -345,10 +304,7 @@ fun PrescriptionFormScreen(
                         },
                         rightText = "",//Save as a template
                         onLeftClick = {
-                            showDatePicker = true
-                            println("Open date picker")
-//                        formState = formState.copy(nextFollowUpDate = "2026-04-10")
-                            println("Selected next follow-up date: ${formState.nextFollowUpDate}")
+                            onIntent(CaseIntent.ToggleDatePicker)
                         },
                         onRightClick = {
                             println("Save as template")
@@ -357,15 +313,14 @@ fun PrescriptionFormScreen(
                     )
                 }
 
-                if (showDatePicker && !isFromTemplate) {
+                if (state.isDatePickerVisible && !isFromTemplate) {
                     AppDatePickerDialog(
-                        initialDate = formState.nextFollowUpDate,
+                        initialDate = state.formState.nextFollowUpDate,
                         onDateSelected = { selectedDate ->
-                            onUpdate(formState.copy(nextFollowUpDate = selectedDate))
-                            println("Selected next follow-up date: ${formState.nextFollowUpDate}")
+                            onIntent(CaseIntent.UpdateFollowUpDate(selectedDate))
                         },
                         onDismiss = {
-                            showDatePicker = false
+                            onIntent(CaseIntent.ToggleDatePicker)
                         }
                     )
                 }
@@ -382,16 +337,20 @@ fun PrescriptionFormScreen(
                         ) {
                             CheckboxWithEditableText(
                                 text = "Prescription with SMS",
-                                checked = checked,
-                                onCheckedChange = { checked = it },
+                                checked = state.isPrescriptionWithSmsChecked,
+                                onCheckedChange = { onIntent(CaseIntent.TogglePrescriptionSms(it)) },
                                 onEditClick = {
-                                    customMessageState = customMessageState.copy(
-                                        messageText = buildDefaultSmsMessage(
-                                            interviewDetails = interviewDetails,
-                                            prescriptions = formState.prescriptions
+                                    onIntent(
+                                        CaseIntent.UpdateCustomMessage(
+                                            state.customMessageState.copy(
+                                                messageText = buildDefaultSmsMessage(
+                                                    interviewDetails = state.interviewDetails,
+                                                    prescriptions = state.formState.prescriptions
+                                                )
+                                            )
                                         )
                                     )
-                                    showSendMessageDialog = true
+                                    onIntent(CaseIntent.ToggleSendMessageDialog)
                                 },
                                 enabled = !isAnsweredMode,
                                 isAnsweredMode = isAnsweredMode
@@ -400,7 +359,7 @@ fun PrescriptionFormScreen(
                             Spacer(modifier = Modifier.height(4.dp))
 
                             PrescriptionActionButtonRow(
-                                onSendClick = onSave,
+                                onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
                                 onShareClick = {
                                     println("Share prescription")
                                 },
@@ -413,7 +372,7 @@ fun PrescriptionFormScreen(
                 } else {
                     Spacer(modifier = Modifier.height(24.dp))
                     PrescriptionActionButtonRow(
-                        onSendClick = onSave,
+                        onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
                         onShareClick = {
                             println("Share template")
                         },
@@ -425,15 +384,13 @@ fun PrescriptionFormScreen(
             }
         }
 
-        if (showSendMessageDialog) {
+        if (state.isSendMessageDialogVisible) {
             SendMessageDialog(
-                initialState = customMessageState,
-                onDismiss = { showSendMessageDialog = false },
+                initialState = state.customMessageState,
+                onDismiss = { onIntent(CaseIntent.ToggleSendMessageDialog) },
                 onUpdateClick = { updatedState ->
-                    customMessageState = updatedState
-                    showSendMessageDialog = false
-
-                    println("updatedState = $updatedState")
+                    onIntent(CaseIntent.UpdateCustomMessage(updatedState))
+                    onIntent(CaseIntent.ToggleSendMessageDialog)
                 }
             )
         }
@@ -443,69 +400,70 @@ fun PrescriptionFormScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PrescriptionFormScreenPrev() {
+fun CaseDetailScreenPrev() {
     FriendshipTheme {
-        PrescriptionFormScreen(
+        CaseDetailScreen(
+            state = CaseUiState(
+                interviewDetails = InterviewDetails(
+                    interviewId = 1,
+                    beneficiaryId = 12345,
+                    beneficiaryName = "John Doe",
+                    beneficiaryCode = "B12345",
+                    location = "123 Main Street, Springfield, IL",
+                    status = "Completed",
+                    startTime = "2026-04-03 10:00 AM",
+                    questionnaireId = 2,
+                    questionnaireName = "Health Assessment",
+                    stCaption = "Screening Completed",
+                    printCaption = "For Prescription Fulfillment",
+                    userName = "Dr. Smith",
+                    isNotification = true,
+                    priority = 1,
+                    fcmInfo = "fcm_token_1234567890",
+                    waitingFor = "Lab Results",
+                    stName = "Routine Checkup",
+                    description = "Patient is waiting for lab results for further consultation.",
+                    details = listOf(
+                        InterviewAnswer(
+                            questionId = 1,
+                            questionName = "Do you have any allergies?",
+                            answer = "No"
+                        ),
+                        InterviewAnswer(
+                            questionId = 2,
+                            questionName = "Are you currently taking any medication?",
+                            answer = "Yes, Blood Pressure medication"
+                        )
+                    )
+                ),
+                medicineList = listOf(
+                    Medicine(
+                        medicineId = 101,
+                        genericName = "Paracetamol",
+                        brandName = "Tylenol",
+                        type = "Pain Reliever",
+                        boxSize = 20,
+                        unitType = "Tablets"
+                    ),
+                    Medicine(
+                        medicineId = 102,
+                        genericName = "Amlodipine",
+                        brandName = "Norvasc",
+                        type = "Antihypertensive",
+                        boxSize = 30,
+                        unitType = "Tablets"
+                    )
+                )
+            ),
             setupData = SetupData(
                 diagnoses = listOf(),
                 investigations = listOf(),
                 referralCenters = listOf()
             ),
-            interviewDetails = InterviewDetails(
-                interviewId = 1,
-                beneficiaryId = 12345,
-                beneficiaryName = "John Doe",
-                beneficiaryCode = "B12345",
-                location = "123 Main Street, Springfield, IL",
-                status = "Completed",
-                startTime = "2026-04-03 10:00 AM",
-                questionnaireId = 2,
-                questionnaireName = "Health Assessment",
-                stCaption = "Screening Completed",
-                printCaption = "For Prescription Fulfillment",
-                userName = "Dr. Smith",
-                isNotification = true,
-                priority = 1,
-                fcmInfo = "fcm_token_1234567890",
-                waitingFor = "Lab Results",
-                stName = "Routine Checkup",
-                description = "Patient is waiting for lab results for further consultation.",
-                details = listOf(
-                    InterviewAnswer(
-                        questionId = 1,
-                        questionName = "Do you have any allergies?",
-                        answer = "No"
-                    ),
-                    InterviewAnswer(
-                        questionId = 2,
-                        questionName = "Are you currently taking any medication?",
-                        answer = "Yes, Blood Pressure medication"
-                    )
-                )
-            ),
-            medicineList = listOf(
-                Medicine(
-                    medicineId = 101,
-                    genericName = "Paracetamol",
-                    brandName = "Tylenol",
-                    type = "Pain Reliever",
-                    boxSize = 20,
-                    unitType = "Tablets"
-                ),
-                Medicine(
-                    medicineId = 102,
-                    genericName = "Amlodipine",
-                    brandName = "Norvasc",
-                    type = "Antihypertensive",
-                    boxSize = 30,
-                    unitType = "Tablets"
-                )
-            ),
             onFcmDetailsClick = {},
             onCall = {},
             onWhatsApp = {},
-            onBack = {},
-            formState = DoctorFeedbackFormState()
+            onBack = {}
         )
     }
 }

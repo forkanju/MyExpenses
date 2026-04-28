@@ -36,26 +36,59 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val dashboardData by viewModel.dashboardState
-
     val statusSummary = dashboardData?.data?.statusSummary
     val timeSummary = dashboardData?.data?.timeSummary
     val total = statusSummary?.total ?: 0
 
     val stats = listOf(
-        StatRingUi("Pending", statusSummary?.pending ?: 0, RingBarRed, max = total.coerceAtLeast(1)),
-        StatRingUi("Answered", statusSummary?.answered ?: 0, RingBarGreen, max = total.coerceAtLeast(1)),
-        StatRingUi("Referred", statusSummary?.referred ?: 0, RingBarBlue, max = total.coerceAtLeast(1))
+        StatRingUi(
+            label = "Pending",
+            value = statusSummary?.pending ?: 0,
+            color = RingBarRed,
+            max = total.coerceAtLeast(minimumValue = 1)
+        ),
+        StatRingUi(
+            label = "Answered",
+            value = statusSummary?.answered ?: 0,
+            color = RingBarGreen,
+            max = total.coerceAtLeast(minimumValue = 1)
+        ),
+        StatRingUi(
+            label = "Referred",
+            value = statusSummary?.referred ?: 0,
+            color = RingBarBlue,
+            max = total.coerceAtLeast(minimumValue = 1)
+        )
     )
 
     val trendRows = listOf(
-        TrendRowUi("Total", timeSummary?.in30Min ?: 0, timeSummary?.after30Min ?: 0, timeSummary?.after2Hours ?: 0)
+        TrendRowUi(
+            name = "Total",
+            in30Min = timeSummary?.in30Min ?: 0,
+            after30Min = timeSummary?.after30Min ?: 0,
+            after2Hours = timeSummary?.after2Hours ?: 0
+        )
     )
 
-    val totalTime = ((timeSummary?.in30Min ?: 0) + (timeSummary?.after30Min ?: 0) + (timeSummary?.after2Hours ?: 0)).coerceAtLeast(1).toFloat()
+    val totalTime =
+        ((timeSummary?.in30Min ?: 0) + (timeSummary?.after30Min ?: 0) + (timeSummary?.after2Hours
+            ?: 0)).coerceAtLeast(minimumValue = 1).toFloat()
     val segments = listOf(
-        SegmentUi("in30", (timeSummary?.in30Min ?: 0) / totalTime * 100f, RingBarGreen),
-        SegmentUi("after30", (timeSummary?.after30Min ?: 0) / totalTime * 100f, TrendBlue),
-        SegmentUi("after2h", (timeSummary?.after2Hours ?: 0) / totalTime * 100f, TrendRed)
+        SegmentUi(
+            label = "in30",
+            percent = (timeSummary?.in30Min ?: 0) / totalTime * 100f,
+            color = RingBarGreen
+        ),
+        SegmentUi(
+            label = "after30",
+            percent = (timeSummary?.after30Min ?: 0) / totalTime * 100f,
+            color = TrendBlue
+        ),
+        SegmentUi(
+            label = "after2h",
+            percent = (timeSummary?.after2Hours ?: 0) / totalTime * 100f,
+            color = TrendRed
+        )
     )
 
     val byServices = dashboardData?.data?.topQuestionnaires?.map {
@@ -92,7 +125,7 @@ fun HomeScreenContent(
     byArea: List<KeyValueUi>
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(all = 12.dp),
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -116,10 +149,16 @@ fun HomeScreenContent(
             SegmentedBarCard(segments)
         }
         item {
-            SectionTitle("Cases")
+            SectionTitle(text = "Cases")
             TwoCardsRow(
-                left = { mod -> KeyValueListCard("By services", byServices, modifier = mod) },
-                right = { mod -> KeyValueListCard("By area", byArea, modifier = mod) }
+                left = { mod ->
+                    KeyValueListCard(
+                        title ="By services",
+                        items = byServices,
+                        modifier = mod
+                    )
+                },
+                right = { mod -> KeyValueListCard(title = "By area", items = byArea, modifier = mod) }
             )
         }
     }
@@ -142,17 +181,17 @@ private fun HomeScreenPreview() {
             title = "Sun Apr 26 14:00:33 BDT 2026",
             totalCaseText = "Total Case: 1",
             stats = listOf(
-                StatRingUi("Pending", 1, RingBarRed, max = 1),
-                StatRingUi("Answered", 0, RingBarGreen, max = 1),
-                StatRingUi("Referred", 0, RingBarBlue, max = 1)
+                StatRingUi(label = "Pending", value = 1, color = RingBarRed, max = 1),
+                StatRingUi(label = "Answered", value = 0, color = RingBarGreen, max = 1),
+                StatRingUi(label = "Referred", value = 0, color = RingBarBlue, max = 1)
             ),
             trendRows = listOf(
-                TrendRowUi("Total", 0, 0, 0)
+                TrendRowUi("Total", in30Min = 0, after30Min = 0, after2Hours = 0)
             ),
             segments = listOf(
-                SegmentUi("in30", 0f, RingBarGreen),
-                SegmentUi("after30", 0f, TrendBlue),
-                SegmentUi("after2h", 0f, TrendRed)
+                SegmentUi(label = "in30", percent = 0f, color = RingBarGreen),
+                SegmentUi(label = "after30", percent = 0f, color = TrendBlue),
+                SegmentUi(label = "after2h", percent = 0f, color = TrendRed)
             ),
             byServices = listOf(
                 KeyValueUi("Loose Stool", 1)
@@ -170,9 +209,9 @@ private fun StatRingRowPreview() {
     FriendshipTheme {
         StatRingRow(
             items = listOf(
-                StatRingUi("Pending", 45, RingBarRed, max = 100),
-                StatRingUi("Answered", 75, RingBarGreen, max = 100),
-                StatRingUi("Referred", 10, RingBarBlue, max = 100)
+                StatRingUi(label = "Pending", value = 45, color = RingBarRed, max = 100),
+                StatRingUi(label = "Answered", value = 75, color = RingBarGreen, max = 100),
+                StatRingUi(label = "Referred", value = 10, color = RingBarBlue, max = 100)
             )
         )
     }

@@ -13,6 +13,7 @@ import ngo.friendship.mhealth.dc.fcm.AppNotifierManager
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.auth.AuthViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.home.HomeViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.more.MoreViewModel
 import org.koin.core.module.Module
@@ -27,6 +28,7 @@ val viewModelModule = module {
     viewModelOf(constructor = ::AuthViewModel)
     viewModelOf(constructor = ::MainViewModel)
     viewModelOf(constructor = ::CaseViewModel)
+    viewModelOf(constructor = ::CaseListViewModel)
     viewModelOf(constructor = ::MoreViewModel)
     viewModelOf(constructor = ::HomeViewModel)
 }

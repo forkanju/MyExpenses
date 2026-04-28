@@ -1,4 +1,4 @@
-@file:JvmName("PrescriptionRouteKt")
+@file:JvmName("CaseRouteKt")
 
 package ngo.friendship.mhealth.dc.presentation.navigation.route
 
@@ -11,27 +11,26 @@ import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiEvent
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.PrescriptionFormScreen
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.CaseDetailScreen
 import kotlin.jvm.JvmName
 
 fun EntryProviderScope<NavKey>.caseRoute(
     mainViewModel: MainViewModel,
     snackBarState: SnackbarHostState
 ) {
-    entryWithVM<Screens.PrescriptionForm, CaseViewModel>(
-        backStack = mainViewModel.backStack,
+    entryWithVM<Screens.CaseDetail, CaseViewModel>(
+        backStack = mainViewModel.backStack as androidx.navigation3.runtime.NavBackStack<NavKey>,
         snackBarState = snackBarState
     ) { screen ->
-        val interviewDetails by viewModel.interviewDetailsState.collectAsState()
+        val state by viewModel.state.collectAsState()
         val setupData by mainViewModel.setupDataState.collectAsState()
-        val medicineList by viewModel.medicineListState.collectAsState()
-        val formState by viewModel.formState.collectAsState()
 
         LaunchedEffect(screen.interviewId) {
-            viewModel.loadInterviewDetails(screen.interviewId)
-            viewModel.loadQuestionAnswerData(screen.interviewId)
+            viewModel.onIntent(CaseIntent.LoadInterviewDetails(screen.interviewId))
+            viewModel.onIntent(CaseIntent.LoadQuestionAnswerData(screen.interviewId))
         }
 
         LaunchedEffect(Unit) {
@@ -47,15 +46,12 @@ fun EntryProviderScope<NavKey>.caseRoute(
             }
         }
 
-        PrescriptionFormScreen(
-            formState = formState,
+        CaseDetailScreen(
+            state = state,
             setupData = setupData,
-            interviewDetails = interviewDetails,
-            medicineList = medicineList,
             mode = screen.mode,
             source = screen.source,
-            onUpdate = viewModel::updateFormState,
-            onSave = viewModel::saveDoctorFeedback,
+            onIntent = viewModel::onIntent,
             onFcmDetailsClick = {
                 println("Fcm details clicked")
             },

@@ -18,7 +18,7 @@ object Screens {
     data object Main : NavKey
 
     @Serializable
-    data class PrescriptionForm(
+    data class CaseDetail(
         val interviewId: Long,
         val mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
         val source: String = SOURCE_CASE_LIST
@@ -91,8 +91,8 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.Main::class, Screens.Main.serializer())
     polymorphic(
         NavKey::class,
-        Screens.PrescriptionForm::class,
-        Screens.PrescriptionForm.serializer()
+        Screens.CaseDetail::class,
+        Screens.CaseDetail.serializer()
     )
     polymorphic(NavKey::class, Screens.PrescriptionTemplateList::class, Screens.PrescriptionTemplateList.serializer())
     polymorphic(NavKey::class, Screens.DxList::class, Screens.DxList.serializer())

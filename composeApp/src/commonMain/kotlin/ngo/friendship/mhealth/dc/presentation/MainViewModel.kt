@@ -7,6 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -49,7 +50,7 @@ class MainViewModel(
     val isUserLoggedIn
         get() = settings.isUserLoggedIn
 
-    override var backStack by savedStateHandle.saved(
+    override var backStack by savedStateHandle.saved<NavBackStack<NavKey>>(
         configuration = navConfiguration
     ) {
         NavBackStack(if (isUserLoggedIn) Screens.Main else Screens.Auth)
@@ -163,6 +164,7 @@ class MainViewModel(
                 appVersion = appVersion,
                 type = tab.apiParam
             )
+            println("DEBUG: Case List received for ${tab.name} = ${list.size} items")
 
             interviewListState.value = list
 
@@ -191,7 +193,7 @@ class MainViewModel(
 
         if (!shouldUpdateToOpen(selectedCaseTab)) {
             backStack.add(
-                Screens.PrescriptionForm(
+                Screens.CaseDetail(
                     interviewId = interview.interviewId,
                     mode = mode
                 )
@@ -219,7 +221,7 @@ class MainViewModel(
                 }
 
                 backStack.add(
-                    Screens.PrescriptionForm(
+                    Screens.CaseDetail(
                         interviewId = interview.interviewId,
                         mode = mode
                     )

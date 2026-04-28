@@ -17,7 +17,7 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
-import ngo.friendship.mhealth.dc.presentation.screens.case.prescription_form.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
@@ -36,6 +36,10 @@ class CaseRepositoryImpl(
             ),
             appVersion = appVersion
         )
+
+        println("DEBUG: API Response Code = ${response.responseCode}")
+        println("DEBUG: Interview List from API = ${response.data?.interviewList?.size}")
+
 
         return response.data
             ?.interviewList
