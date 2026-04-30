@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.HomeTopRow
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.KeyValueListCard
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.SectionTitle
@@ -35,81 +36,17 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-    val dashboardData by viewModel.dashboardState
-    val statusSummary = dashboardData?.data?.statusSummary
-    val timeSummary = dashboardData?.data?.timeSummary
-    val total = statusSummary?.total ?: 0
-
-    val stats = listOf(
-        StatRingUi(
-            label = "Pending",
-            value = statusSummary?.pending ?: 0,
-            color = RingBarRed,
-            max = total.coerceAtLeast(minimumValue = 1)
-        ),
-        StatRingUi(
-            label = "Answered",
-            value = statusSummary?.answered ?: 0,
-            color = RingBarGreen,
-            max = total.coerceAtLeast(minimumValue = 1)
-        ),
-        StatRingUi(
-            label = "Referred",
-            value = statusSummary?.referred ?: 0,
-            color = RingBarBlue,
-            max = total.coerceAtLeast(minimumValue = 1)
-        )
-    )
-
-    val trendRows = listOf(
-        TrendRowUi(
-            name = "Total",
-            in30Min = timeSummary?.in30Min ?: 0,
-            after30Min = timeSummary?.after30Min ?: 0,
-            after2Hours = timeSummary?.after2Hours ?: 0
-        )
-    )
-
-    val totalTime =
-        ((timeSummary?.in30Min ?: 0) + (timeSummary?.after30Min ?: 0) + (timeSummary?.after2Hours
-            ?: 0)).coerceAtLeast(minimumValue = 1).toFloat()
-    val segments = listOf(
-        SegmentUi(
-            label = "in30",
-            percent = (timeSummary?.in30Min ?: 0) / totalTime * 100f,
-            color = RingBarGreen
-        ),
-        SegmentUi(
-            label = "after30",
-            percent = (timeSummary?.after30Min ?: 0) / totalTime * 100f,
-            color = TrendBlue
-        ),
-        SegmentUi(
-            label = "after2h",
-            percent = (timeSummary?.after2Hours ?: 0) / totalTime * 100f,
-            color = TrendRed
-        )
-    )
-
-    val byServices = dashboardData?.data?.topQuestionnaires?.map {
-        KeyValueUi(it.questionnaireTitle ?: "", it.totalCount ?: 0)
-    } ?: emptyList()
-
-    val byArea = dashboardData?.data?.topUpazila?.map {
-        KeyValueUi(it.upazilaName ?: "", it.totalService ?: 0)
-    } ?: emptyList()
-
-    val responseTimeText = dashboardData?.responseTime ?: "Today"
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     HomeScreenContent(
         modifier = modifier,
-        title = "Today",
-        totalCaseText = "Total Case: $total",
-        stats = stats,
-        trendRows = trendRows,
-        segments = segments,
-        byServices = byServices,
-        byArea = byArea
+        title = state.title,
+        totalCaseText = state.totalCaseText,
+        stats = state.stats,
+        trendRows = state.trendRows,
+        segments = state.segments,
+        byServices = state.byServices,
+        byArea = state.byArea
     )
 }
 

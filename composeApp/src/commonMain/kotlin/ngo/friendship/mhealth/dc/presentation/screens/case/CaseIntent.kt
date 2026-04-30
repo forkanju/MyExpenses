@@ -6,6 +6,7 @@ import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.MedicineComposerState
 
 sealed interface CaseIntent {
     data class LoadInterviewDetails(val interviewId: Long) : CaseIntent
@@ -13,6 +14,7 @@ sealed interface CaseIntent {
     data class LoadMedicineList(val type: String = "Tab") : CaseIntent
     data object SaveDoctorFeedback : CaseIntent
     data class UpdateFormState(val state: DoctorFeedbackFormState) : CaseIntent
+    data class UpdateMedicineComposerState(val state: MedicineComposerState) : CaseIntent
     
     // Finer grained intents for MVI if preferred, but starting with these to match existing ViewModel
     data class AddDiagnosis(val diagnosis: Diagnosis) : CaseIntent

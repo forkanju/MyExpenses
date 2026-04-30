@@ -1,35 +1,54 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Medicine
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
-import ngo.friendship.mhealth.dc.presentation.components.MedAutoCompleteTextField
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.MedicineComposerState
+import ngo.friendship.mhealth.dc.theme.DarkerGray
+import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import androidx.compose.ui.tooling.preview.Preview
+import ngo.friendship.mhealth.dc.theme.Gray
+import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 enum class MealTime {
     AGE,   // আগে
@@ -42,13 +61,19 @@ fun MedicineSection(
     prescriptionItems: List<PrescriptionItem>,
     onAddMedicine: (PrescriptionItem) -> Unit,
     onRemoveMedicine: (Int) -> Unit,
-    isAnsweredMode: Boolean = false
+    medicineBrandTypeList: List<String> = emptyList(),
+    isAnsweredMode: Boolean = false,
+    composerState: MedicineComposerState = MedicineComposerState(),
+    onComposerStateChange: (MedicineComposerState) -> Unit = {}
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         MedicineComposerCard(
             medicines = medicines,
             onAddClick = onAddMedicine,
-            isAnsweredMode = isAnsweredMode
+            medicineBrandTypeList = medicineBrandTypeList,
+            isAnsweredMode = isAnsweredMode,
+            state = composerState,
+            onStateChange = onComposerStateChange
         )
 
         prescriptionItems.forEachIndexed { index, item ->
@@ -72,8 +97,11 @@ fun PrescriptionItemCard(
     val itemBg = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.surface
     val itemBorder = if (isAnsweredMode) colorScheme.outlineVariant else colorScheme.outline
     val titleColor = if (isAnsweredMode) colorScheme.onSurfaceVariant else colorScheme.onSurface
-    val subColor = if (isAnsweredMode) colorScheme.onSurfaceVariant.copy(alpha = 0.8f) else colorScheme.onSurface.copy(alpha = 0.7f)
-    val removeColor = if (isAnsweredMode) colorScheme.inverseOnSurface else colorScheme.onSurface
+    val subColor =
+        if (isAnsweredMode) colorScheme.onSurfaceVariant.copy(alpha = 0.8f) else colorScheme.onSurface.copy(
+            alpha = 0.7f
+        )
+    val removeColor = if (isAnsweredMode) colorScheme.inverseOnSurface else colorScheme.error
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -83,23 +111,33 @@ fun PrescriptionItemCard(
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = item.medicineName, color = titleColor)
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Dose: ${item.dose} | Days: ${item.duration}",
-                    color = subColor
+                    text = item.medicineName,
+                    color = titleColor,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                val mealTimeText = item.mealTime?.let { " | $it" } ?: ""
+                Text(
+                    text = "Dose: ${item.dose} | Days: ${item.duration}$mealTimeText",
+                    color = subColor,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            Text(
-                text = "Remove",
-                color = removeColor,
-                modifier = Modifier.clickable { onRemoveClick() }
-            )
+            if (!isAnsweredMode) {
+                IconButton(onClick = onRemoveClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove",
+                        tint = removeColor
+                    )
+                }
+            }
         }
     }
 }
@@ -108,7 +146,10 @@ fun PrescriptionItemCard(
 fun MedicineComposerCard(
     medicines: List<Medicine>,
     onAddClick: (PrescriptionItem) -> Unit,
-    isAnsweredMode: Boolean = false
+    medicineBrandTypeList: List<String> = emptyList(),
+    isAnsweredMode: Boolean = false,
+    state: MedicineComposerState = MedicineComposerState(),
+    onStateChange: (MedicineComposerState) -> Unit = {}
 ) {
     val colorScheme = MaterialTheme.colorScheme
     Surface(
@@ -121,88 +162,86 @@ fun MedicineComposerCard(
         color = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.surface
     ) {
         Column(Modifier.padding(12.dp)) {
-            var doseType by remember { mutableStateOf("Cap") }
-            var dropdownMedicine by remember { mutableStateOf("Amoxicillin 500") }
-            var medicineQuery by remember { mutableStateOf(TextFieldValue("")) }
+            LaunchedEffect(medicineBrandTypeList) {
+                if (state.doseType.isEmpty() && medicineBrandTypeList.isNotEmpty()) {
+                    onStateChange(state.copy(doseType = medicineBrandTypeList.first()))
+                }
+            }
 
-            var dose by remember { mutableStateOf("0+0+1") }
-            var days by remember { mutableStateOf("৭ দিন") }
-            var mealTime by remember { mutableStateOf(MealTime.PORE) }
-
-            var genericNameQuery by remember { mutableStateOf(TextFieldValue("")) }
             val genericNames = remember(medicines) {
                 medicines.map { it.genericName }.distinct()
             }
 
-            val medicineNames = remember(medicines, genericNameQuery.text) {
-                if (genericNameQuery.text.isEmpty()) {
-                    medicines.map { it.brandName }.distinct()
-                } else {
-                    medicines.filter {
-                        it.genericName.equals(genericNameQuery.text, ignoreCase = true)
-                    }.map { it.brandName }.distinct()
-                }
-            }
-
             DoseAndDrugAutoCompleteRow(
-                leftValue = doseType,
-                leftItems = listOf("Cap", "Tab", "Syrup"),
-                onLeftSelect = { doseType = it },
-                rightValue = genericNameQuery,
-                onRightValueChange = { genericNameQuery = it },
+                leftValue = state.doseType,
+                leftItems = medicineBrandTypeList.ifEmpty { listOf("Cap", "Tab", "Syrup") },
+                onLeftSelect = { onStateChange(state.copy(doseType = it)) },
+                rightValue = state.genericNameQuery,
+                onRightValueChange = { onStateChange(state.copy(genericNameQuery = it)) },
                 suggestions = genericNames,
                 rightPlaceholder = "Type generic name",
                 onSuggestionSelected = { selected ->
-                    genericNameQuery = selected
+                    onStateChange(state.copy(genericNameQuery = selected))
                 },
                 isAnsweredMode = isAnsweredMode
             )
 
             Spacer(Modifier.height(10.dp))
 
-            MedAutoCompleteTextField(
-                value = medicineQuery,
-                onValueChange = { medicineQuery = it },
-                suggestions = medicineNames,
+            MedTextField(
+                value = state.medicineQuery,
+                onValueChange = { onStateChange(state.copy(medicineQuery = it)) },
                 placeholder = "Type medicine name",
-                onSuggestionSelected = { selectedValue ->
-                    medicineQuery = TextFieldValue(
-                        text = selectedValue.text,
-                        selection = TextRange(selectedValue.text.length)
-                    )
-                },
                 isAnsweredMode = isAnsweredMode
             )
 
             Spacer(Modifier.height(10.dp))
 
             PrescriptionActionRowAligned(
-                doseValue = dose,
+                doseValue = state.dose,
                 doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
-                onDoseSelect = { dose = it },
-                daysValue = days,
+                onDoseSelect = { onStateChange(state.copy(dose = it)) },
+                daysValue = state.days,
                 daysItems = listOf("৩ দিন", "৫ দিন", "৭ দিন", "১০ দিন"),
-                onDaysSelect = { days = it },
-                toggleValue = mealTime,
-                onToggleChange = { mealTime = it },
+                onDaysSelect = { onStateChange(state.copy(days = it)) },
+                toggleValue = state.mealTime,
+                onToggleChange = { onStateChange(state.copy(mealTime = it)) },
                 onMessageClick = { },
                 onAddClick = {
-                    val finalMedicineName = medicineQuery.text.trim().ifBlank { dropdownMedicine }
+                    val genericName = state.genericNameQuery.text.trim()
+                    val brandName = state.medicineQuery.text.trim()
+                    val type = state.doseType
 
-                    if (finalMedicineName.isNotBlank()) {
+                    if (type.isBlank()) {
+                        SnackbarController.sendEvent("Please select a medicine type")
+                    } else if (genericName.isBlank()) {
+                        SnackbarController.sendEvent("Please enter a generic name")
+                    } else if (brandName.isBlank()) {
+                        SnackbarController.sendEvent("Please enter a medicine name")
+                    } else {
+                        val finalMedicineName = "$type: $genericName ($brandName)"
+                        val mealTimeText = when (state.mealTime) {
+                            MealTime.AGE -> "আগে"
+                            MealTime.PORE -> "পরে"
+                        }
                         val item = PrescriptionItem(
                             medicineName = finalMedicineName,
-                            dose = dose,
-                            duration = days
+                            dose = state.dose,
+                            duration = state.days,
+                            mealTime = mealTimeText
                         )
 
                         onAddClick(item)
 
-                        medicineQuery = TextFieldValue("")
-                        dropdownMedicine = "Amoxicillin 500"
-                        dose = "0+0+1"
-                        days = "৭ দিন"
-                        mealTime = MealTime.PORE
+                        onStateChange(
+                            state.copy(
+                                medicineQuery = TextFieldValue(""),
+                                genericNameQuery = TextFieldValue(""),
+                                dose = "0+0+1",
+                                days = "৭ দিন",
+                                mealTime = MealTime.PORE
+                            )
+                        )
                     }
                 },
                 isAnsweredMode = isAnsweredMode
@@ -211,17 +250,72 @@ fun MedicineComposerCard(
     }
 }
 
+@Composable
+fun MedTextField(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    val borderColor = when {
+        isAnsweredMode -> Color(0xFFC7C7C7)
+        isFocused -> FocusedBorderColor
+        else -> UnfocusedBorderColor
+    }
+
+    val bgColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
+    val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
+
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(32.dp),
+        textStyle = TextStyle(color = textColor, fontSize = 13.sp),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        interactionSource = interactionSource,
+        decorationBox = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(bgColor)
+                    .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(6.dp))
+                    .padding(horizontal = 12.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (value.text.isEmpty()) {
+                    Text(placeholder, color = Gray, fontSize = 11.sp)
+                }
+                it()
+            }
+        }
+    )
+}
+
 @Preview
 @Composable
 fun MedicineComposerCardPreview() {
     FriendshipTheme {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            var state by remember { mutableStateOf(MedicineComposerState()) }
             MedicineComposerCard(
                 medicines = listOf(
                     Medicine(medicineId = 1, genericName = "Paracetamol", brandName = "Napa"),
                     Medicine(medicineId = 2, genericName = "Amoxicillin", brandName = "Moxilin")
                 ),
-                onAddClick = {}
+                medicineBrandTypeList = listOf("Cap", "Tab", "Syrup", "Injection"),
+                onAddClick = {},
+                state = state,
+                onStateChange = { state = it }
             )
 
             PrescriptionItemCard(

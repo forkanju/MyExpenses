@@ -23,14 +23,17 @@ class CaseListViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
+        loadAllTabCounts()
         loadInterviews()
     }
 
     fun onIntent(intent: CaseListIntent) {
         when (intent) {
             is CaseListIntent.SelectTab -> {
-                _state.value = _state.value.copy(selectedTab = intent.tab)
-                loadInterviews()
+                if (_state.value.selectedTab != intent.tab) {
+                    _state.value = _state.value.copy(selectedTab = intent.tab)
+                    loadInterviews()
+                }
             }
             is CaseListIntent.Search -> {
                 _state.value = _state.value.copy(searchQuery = intent.query)
@@ -53,12 +56,15 @@ class CaseListViewModel(
 
     private fun loadInterviews() {
         viewModelScope.launch {
+            println("DEBUG: CaseListViewModel.loadInterviews() started for tab=${_state.value.selectedTab}")
             _state.value = _state.value.copy(isLoading = true)
             try {
-                // Mapping CaseTab to API type string if necessary
-                val type = _state.value.selectedTab.name.uppercase() 
-                val interviews = repository.getInterviewList(appVersion = 1, type = type)
+                // Mapping CaseTab to API type string using apiParam
+                val type = _state.value.selectedTab.apiParam 
+                println("DEBUG: CaseListViewModel calling repository for type=$type")
+                val interviews = repository.getInterviewList(appVersion = 3069, type = type)
                 
+                println("DEBUG: CaseListViewModel received ${interviews.size} interviews")
                 _state.value = _state.value.copy(
                     interviews = interviews,
                     isLoading = false
@@ -66,6 +72,8 @@ class CaseListViewModel(
                 filterInterviews()
                 updateTabCounts()
             } catch (e: Exception) {
+                println("DEBUG: CaseListViewModel error: ${e.message}")
+                e.printStackTrace()
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = e.message ?: "Failed to load cases"
@@ -97,5 +105,20 @@ class CaseListViewModel(
         val currentCounts = _state.value.tabCounts.toMutableMap()
         currentCounts[_state.value.selectedTab] = _state.value.interviews.size
         _state.value = _state.value.copy(tabCounts = currentCounts)
+    }
+
+    private fun loadAllTabCounts() {
+        viewModelScope.launch {
+            val counts = _state.value.tabCounts.toMutableMap()
+            CaseTab.entries.forEach { tab ->
+                try {
+                    val list = repository.getInterviewList(appVersion = 3069, type = tab.apiParam)
+                    counts[tab] = list.size
+                } catch (e: Exception) {
+                    counts[tab] = 0
+                }
+            }
+            _state.value = _state.value.copy(tabCounts = counts)
+        }
     }
 }

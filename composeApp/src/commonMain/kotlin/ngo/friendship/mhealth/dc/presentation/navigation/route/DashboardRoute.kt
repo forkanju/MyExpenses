@@ -11,9 +11,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.LocalCaseDetailScreen
-import ngo.friendship.mhealth.dc.presentation.screens.more.*
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.*
 
-fun EntryProviderScope<NavKey>.moreRoute(
+fun EntryProviderScope<NavKey>.dashboardRoute(
     mainViewModel: MainViewModel
 ) {
     entry<Screens.PrescriptionTemplateList> {
@@ -34,15 +34,17 @@ fun EntryProviderScope<NavKey>.moreRoute(
     }
 
     entry<Screens.DxList> {
+        val viewModel = koinViewModel<DxListViewModel>()
         DxListScreen(
-            viewModel = mainViewModel,
+            viewModel = viewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }
 
     entry<Screens.MedicineList> {
+        val viewModel = koinViewModel<MedicineListViewModel>()
         MedicineListScreen(
-            viewModel = mainViewModel,
+            viewModel = viewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }

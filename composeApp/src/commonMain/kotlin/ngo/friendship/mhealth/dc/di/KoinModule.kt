@@ -14,8 +14,11 @@ import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.auth.AuthViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.home.HomeViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.more.MoreViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MoreViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -29,6 +32,9 @@ val viewModelModule = module {
     viewModelOf(constructor = ::MainViewModel)
     viewModelOf(constructor = ::CaseViewModel)
     viewModelOf(constructor = ::CaseListViewModel)
+    viewModelOf(constructor = ::DashboardViewModel)
+    viewModelOf(constructor = ::DxListViewModel)
+    viewModelOf(constructor = ::MedicineListViewModel)
     viewModelOf(constructor = ::MoreViewModel)
     viewModelOf(constructor = ::HomeViewModel)
 }

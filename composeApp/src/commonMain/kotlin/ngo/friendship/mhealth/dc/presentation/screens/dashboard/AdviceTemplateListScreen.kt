@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -40,39 +40,42 @@ import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.more.components.CommonNewItemDialog
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonFilterChip
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
-fun DxListScreen(
+fun AdviceTemplateListScreen(
     viewModel: MainViewModel,
     onBack: () -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf("All") }
     val filters = listOf("All", "Recent Used", "Recent Updated")
-
     var searchQuery by remember { mutableStateOf("") }
-    var showNewDxDialog by remember { mutableStateOf(false) }
+    var showNewAdviceDialog by remember { mutableStateOf(false) }
 
-    val dxItems = listOf(
-        DxItemData(
+    val adviceItems = listOf(
+        AdviceItemData(
             "ANC", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25", listOf(
-                "1. Found via glucose tolerance test; managed with diet/insulin.",
-                "2. Positive tests for HIV, Hepatitis B, Syphilis, Rubella (needs management to protect baby)."
+                "১. প্রতিদিন ২-৩ লিটার পানি ......",
+                "২. প্রসাব আটকে রাখবেন না, ......",
+                "৩. সহবাস করার আগে অবশ্যই ......",
+                "৪. পরিষ্কার পরিচ্ছন্নতা বজায় ......",
+                "৫. প্রসাব করার সময় পুরা প্রসাব......"
             )
         ),
-        DxItemData("Fever", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        DxItemData("Oral Ulcer RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        DxItemData("UTI", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        DxItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
+        AdviceItemData("Fever", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
+        AdviceItemData("Oral Ulcer RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
+        AdviceItemData("UTI", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
+        AdviceItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
                 CommonTopBar(
-                    title = "DX List",
+                    title = "Advice Templates",
                     onBack = onBack,
                     showSearch = true,
                     searchQuery = searchQuery,
@@ -82,7 +85,7 @@ fun DxListScreen(
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        showNewDxDialog = true
+                        showNewAdviceDialog = true
                     },
                     containerColor = PrimaryBlue,
                     contentColor = Color.White,
@@ -116,8 +119,8 @@ fun DxListScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(dxItems) { item ->
-                            DxExpandableItem(item)
+                        items(adviceItems) { item ->
+                            AdviceExpandableItem(item)
                             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                         }
                     }
@@ -125,31 +128,30 @@ fun DxListScreen(
             }
         }
 
-        if (showNewDxDialog) {
+        if (showNewAdviceDialog) {
             CommonNewItemDialog(
-                dialogTitle = "New DX",
-                titleLabel = "DX Title",
+                dialogTitle = "New Advice",
+                titleLabel = "Advice Title",
                 contentLabel = "Advices",
-                onDismiss = { showNewDxDialog = false },
+                onDismiss = { showNewAdviceDialog = false },
                 onCreate = { title: String, content: String ->
                     // TODO: Handle creation logic
-                    showNewDxDialog = false
+                    showNewAdviceDialog = false
                 }
             )
         }
     }
 }
 
-
-data class DxItemData(
+data class AdviceItemData(
     val title: String,
     val subtitle: String,
     val details: List<String> = emptyList()
 )
 
 @Composable
-fun DxExpandableItem(item: DxItemData) {
-    var expanded by remember { mutableStateOf(item.title == "ANC") } // Default ANC expanded as per screenshot
+fun AdviceExpandableItem(item: AdviceItemData) {
+    var expanded by remember { mutableStateOf(item.title == "ANC") }
 
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Row(
@@ -186,9 +188,8 @@ fun DxExpandableItem(item: DxItemData) {
 
 @Preview(showBackground = true)
 @Composable
-fun DxListScreenPreview() {
-    // Note: MainViewModel is complex to mock in a simple preview, usually better to use a Stateless version or local state for UI-only previews.
+fun AdviceTemplateListScreenPreview() {
     // FriendshipTheme {
-    //     DxListScreen(onBack = {})
+    //    AdviceTemplateListScreen(onBack = {})
     // }
 }

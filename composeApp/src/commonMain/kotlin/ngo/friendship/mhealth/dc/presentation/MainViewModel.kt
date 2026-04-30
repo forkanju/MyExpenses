@@ -13,11 +13,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
 import ngo.friendship.mhealth.dc.domain.model.Interview
+import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
@@ -40,7 +42,7 @@ class MainViewModel(
     val settings: LocalSettings,
     private val caseRepository: CaseRepository,
     private val notifierManager: AppNotifierManager,
-    repository: MainRepository,
+    private val mainRepository: MainRepository,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel() {
 
@@ -59,13 +61,13 @@ class MainViewModel(
     var selectedBottomTab by mutableStateOf(BottomNavItems.Cases)
         private set
 
-    val setupDataState = repository.getSetupData().stateIn(
+    val setupDataState = mainRepository.getSetupData().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = SetupData()
     )
 
-    val userProfileState = repository.getUserProfile().stateIn(
+    val userProfileState = mainRepository.getUserProfile().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = null
@@ -241,6 +243,19 @@ class MainViewModel(
             }
             settings.clear()
             backStack.replaceWith(Screens.Auth)
+        }
+    }
+
+    fun saveInvestigation(title: String) {
+        viewModelScope.launch {
+            loadingFlow.value = true
+            val isSuccess = mainRepository.saveInvestigation(title)
+            loadingFlow.value = false
+            if (isSuccess) {
+                showSuccess("Investigation saved successfully")
+            } else {
+                showError("Failed to save investigation")
+            }
         }
     }
 }

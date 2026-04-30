@@ -1,7 +1,19 @@
 package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,116 +23,59 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
-import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import kotlinx.coroutines.flow.collectLatest
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
+import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.DashboardCard
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.DashboardCardData
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.SectionData
 import ngo.friendship.mhealth.dc.theme.FontSize
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Hand
-import ngo.friendship.mhealth.dc.theme.Resources.Icon.Report
 import ngo.friendship.mhealth.dc.theme.TextSecondary
-import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun HealthDashboardScreen(
+fun DashboardScreen(
     onNavigate: (NavKey) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: DashboardViewModel = koinViewModel()
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collectLatest { effect ->
+            when (effect) {
+                is DashboardEffect.NavigateTo -> onNavigate(effect.route)
+            }
+        }
+    }
+
+    DashboardContent(
+        modifier = modifier,
+        state = state,
+        onIntent = viewModel::onIntent
+    )
+}
+
+@Composable
+fun DashboardContent(
+    state: DashboardState,
+    onIntent: (DashboardIntent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-// This is the "Single Source of Truth" data list
-    val sections = listOf(
-        SectionData(
-            title = "Urgent reports",
-            cards = listOf(
-                DashboardCardData(
-                    "Doctor service engagement...",
-                    null,
-                    Report,
-                    Color(0xFFF1F5FD),
-                    "Download",
-                    isCentered = true,
-                    iconTint = Color.Unspecified
-                ),
-                DashboardCardData(
-                    "Doctor center summary",
-                    null,
-                    Report,
-                    Color(0xFFF1F5FD),
-                    "Download",
-                    isCentered = true,
-                    iconTint = Color.Unspecified
-                ),
-                DashboardCardData(
-                    "Disease wise service",
-                    null,
-                    Report,
-                    Color(0xFFF1F5FD),
-                    "Download",
-                    isCentered = true,
-                    iconTint = Color.Unspecified
-                )
-            )
-        ),
-        SectionData(
-
-            title = "Resource lab",
-            cards = listOf(
-                DashboardCardData(
-                    "Prescription templates",
-                    "Templates 32+",
-                    Report,
-                    PrimaryColor,
-                    "Create new",
-                    "Import from global",
-                    onClick = { onNavigate(Screens.PrescriptionTemplateList) }
-                ),
-                DashboardCardData(
-                    "Add DX",
-                    "List 800+",
-                    Report,
-                    Color(0xFFF0914E),
-                    "Create new",
-                    onClick = { onNavigate(Screens.DxList) }
-                ),
-                DashboardCardData(
-                    "Medicine List",
-                    "Medicine 800+",
-                    Report,
-                    Color(0xFF4BB652),
-                    "Create new",
-                    onClick = { onNavigate(Screens.MedicineList) }
-                ),
-                DashboardCardData(
-                    "Advice templates",
-                    "Advice 32+",
-                    Report,
-                    Color(0xFF707070),
-                    "Create new",
-                    onClick = { onNavigate(Screens.AdviceTemplateList) }
-                ),
-                DashboardCardData(
-                    "Investigations templates",
-                    "Templates 32+",
-                    Report,
-                    Color(0xFF707070),
-                    "Create new",
-                    onClick = { onNavigate(Screens.InvestigationsList) }
-                )
-            )
-        )
-    )
-
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
@@ -147,7 +102,7 @@ fun HealthDashboardScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            sections.forEach { section ->
+            state.sections.forEach { section ->
                 item {
                     Text(
                         text = section.title,
@@ -196,7 +151,7 @@ fun HealthDashboardScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LocalTreatmentCard(
-                    onClick = { onNavigate(Screens.LocalTreatment) }
+                    onClick = { onIntent(DashboardIntent.Navigate(Screens.LocalTreatment)) }
                 )
             }
         }
@@ -221,7 +176,7 @@ fun LocalTreatmentCard(onClick: () -> Unit) {
                 Text(
                     text = "Friendship employee 33",
                     style = TextStyle(
-                        
+
                         fontSize = FontSize.EXTRA_REGULAR,
                         color = TextSecondary,
                         fontWeight = FontWeight.Normal
@@ -230,7 +185,7 @@ fun LocalTreatmentCard(onClick: () -> Unit) {
                 Text(
                     text = "Others 16",
                     style = TextStyle(
-                        
+
                         fontSize = FontSize.EXTRA_REGULAR,
                         color = TextSecondary,
                         fontWeight = FontWeight.Normal
@@ -242,7 +197,7 @@ fun LocalTreatmentCard(onClick: () -> Unit) {
                     color = PrimaryColor,
                     style = TextStyle(
                         fontSize = FontSize.SMALL,
-                        
+
                         fontWeight = FontWeight.Normal
                     ),
                     textDecoration = TextDecoration.Underline
@@ -271,6 +226,9 @@ fun LocalTreatmentCard(onClick: () -> Unit) {
 @Composable
 fun HealthDashboardScreenPreview() {
     FriendshipTheme {
-        HealthDashboardScreen(onNavigate = {})
+        DashboardContent(
+            state = DashboardState(),
+            onIntent = {}
+        )
     }
 }

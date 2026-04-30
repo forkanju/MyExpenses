@@ -150,7 +150,9 @@ data class PrescriptionItem(
     @SerialName("dose")
     val dose: String,
     @SerialName("duration")
-    val duration: String
+    val duration: String,
+    @SerialName("meal_time")
+    val mealTime: String? = null
 )
 
 fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {

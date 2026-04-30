@@ -27,6 +27,7 @@ class CaseRepositoryImpl(
 ) : CaseRepository {
 
     override suspend fun getInterviewList(appVersion: Int, type: String): List<Interview> {
+        println("DEBUG: Repository getInterviewList started for type=$type")
         val response = api.getInterviewList(
             request = InterviewListReqDto.build(
                 userName = localSettings.user.userName,
@@ -37,14 +38,17 @@ class CaseRepositoryImpl(
             appVersion = appVersion
         )
 
+        println("DEBUG: Repository getInterviewList API call finished")
         println("DEBUG: API Response Code = ${response.responseCode}")
-        println("DEBUG: Interview List from API = ${response.data?.interviewList?.size}")
+        println("DEBUG: Interview List count from API = ${response.data?.interviewList?.size ?: 0}")
 
-
-        return response.data
+        val result = response.data
             ?.interviewList
             ?.map { it.toDomain() }
             ?: emptyList()
+        
+        println("DEBUG: Repository returning ${result.size} domain interviews")
+        return result
     }
 
     override suspend fun getInterviewDetails(interviewId: Long): InterviewDetails {

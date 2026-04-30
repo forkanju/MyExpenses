@@ -183,6 +183,7 @@ fun CaseDetailScreen(
                 } else {
                     MedicineSection(
                         medicines = state.medicineList,
+                        medicineBrandTypeList = state.medicineBrandTypeList,
                         prescriptionItems = state.formState.prescriptions,
                         onAddMedicine = { item ->
                             onIntent(CaseIntent.AddPrescription(item))
@@ -190,9 +191,16 @@ fun CaseDetailScreen(
                         onRemoveMedicine = { index ->
                             onIntent(CaseIntent.RemovePrescription(index))
                         },
-                        isAnsweredMode = isAnsweredMode
+                        isAnsweredMode = isAnsweredMode,
+                        composerState = state.medicineComposerState,
+                        onComposerStateChange = { composerState ->
+                            onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
+                        }
                     )
                 }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
 
                 LabeledFormTextField(
                     label = "Doctor Advice",

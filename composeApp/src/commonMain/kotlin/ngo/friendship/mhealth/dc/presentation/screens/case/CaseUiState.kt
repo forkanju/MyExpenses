@@ -5,11 +5,14 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.MedicineComposerState
 
 data class CaseUiState(
     val interviewDetails: InterviewDetails = InterviewDetails(),
     val formState: DoctorFeedbackFormState = DoctorFeedbackFormState(),
     val medicineList: List<Medicine> = emptyList(),
+    val medicineBrandTypeList: List<String> = emptyList(),
+    val medicineComposerState: MedicineComposerState = MedicineComposerState(),
     val questionAnswerData: QuestionAnswerJson = QuestionAnswerJson(),
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,

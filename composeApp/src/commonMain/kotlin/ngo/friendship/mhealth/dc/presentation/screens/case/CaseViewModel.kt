@@ -5,8 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.collectLatest
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
+import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addInvestigation
@@ -17,7 +19,8 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.
 import ngo.friendship.mhealth.dc.utils.minusAt
 
 class CaseViewModel(
-    private val repository: CaseRepository
+    private val repository: CaseRepository,
+    private val mainRepository: MainRepository
 ) : BaseViewModel() {
     private val _uiEvent = Channel<CaseUiEvent>(Channel.BUFFERED)
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -27,6 +30,19 @@ class CaseViewModel(
 
     init {
         onIntent(CaseIntent.LoadMedicineList())
+        loadSetupData()
+    }
+
+    private fun loadSetupData() {
+        launch {
+            mainRepository.getSetupData().collectLatest { setupData ->
+                _state.update {
+                    it.copy(
+                        medicineBrandTypeList = setupData.medicineBrandTypes.map { it.type }.distinct()
+                    )
+                }
+            }
+        }
     }
 
     fun onIntent(intent: CaseIntent) {
@@ -36,6 +52,9 @@ class CaseViewModel(
             is CaseIntent.LoadMedicineList -> loadMedicineList(intent.type)
             CaseIntent.SaveDoctorFeedback -> saveDoctorFeedback()
             is CaseIntent.UpdateFormState -> updateFormState(intent.state)
+            is CaseIntent.UpdateMedicineComposerState -> {
+                _state.update { it.copy(medicineComposerState = intent.state) }
+            }
             is CaseIntent.AddDiagnosis -> {
                 updateFormState(addDiagnosis(_state.value.formState, intent.diagnosis))
             }

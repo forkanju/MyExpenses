@@ -144,10 +144,13 @@ suspend inline fun <reified T, reified R> HttpClient.processFormDataRequest(
     body: T? = null,
     crossinline request: HttpRequestBuilder.() -> Unit = {}
 ): R {
+    val requestBodyJson = body.toJson()
+    println("DEBUG: Sending FormData Request to $url")
+    println("DEBUG: Request Body JSON: $requestBodyJson")
     return tryHttpCall {
         if (!ConnectionListener.isConnected) error("No internet connection")
         val response = submitForm(url, parameters {
-            append("data", body.toJson())
+            append("data", requestBodyJson)
         }) {
             request()
         }
@@ -227,6 +230,8 @@ suspend fun <R> tryHttpCall(
     } catch (_: IOException) {
         error("Network I/O error")
     } catch (e: Exception) {
+        println("DEBUG: HTTP Exception caught: ${e.message}")
+        e.printStackTrace()
         if (!e.message.isNullOrBlank())
             throw e
         else
@@ -236,8 +241,11 @@ suspend fun <R> tryHttpCall(
 
 suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
     val body = tryGet { body<R>() }
+    println("DEBUG: API Response Status: ${status.value}")
+    println("DEBUG: API Raw Response Body: ${body.toJson()}")
     body.log("getSuccessBody")
     val baseResponse = body.toJson().fromJson<BaseResponse>()
+    println("DEBUG: Parsed BaseResponse: code=${baseResponse.responseCode}, desc=${baseResponse.errorDesc}")
     val massage = (baseResponse.errorDesc?.ifBlank { null }
         ?: baseResponse.message?.ifBlank { null })?.normalize()
         ?: status.value.description

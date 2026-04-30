@@ -9,12 +9,17 @@ import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import kotlinx.coroutines.flow.emitAll
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
+import ngo.friendship.mhealth.dc.utils.currentTimestamp
+import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
 class MainRepositoryImpl(
     private val api: ApiService,
@@ -23,6 +28,62 @@ class MainRepositoryImpl(
 ) : MainRepository {
     private val setupDataDao = appDatabase.setupDataDao()
     private val userProfileDao = appDatabase.userProfileDao()
+
+    override suspend fun saveDiagnosis(title: String): Boolean {
+        return try {
+            val response = api.saveDiagnosis(
+                request = SaveDiagnosisReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash(),
+                    diagName = title
+                )
+            )
+            response.responseCode == "01"
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun saveInvestigation(title: String): Boolean {
+        return try {
+            val response = api.saveInvestigation(
+                request = SaveInvestigationReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash(),
+                    investigationName = title
+                )
+            )
+            response.responseCode == "01"
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override suspend fun saveMedicine(
+        genericName: String,
+        brandName: String,
+        type: String,
+        strength: String
+    ): Boolean {
+        return try {
+            val response = api.saveMedicine(
+                request = SaveMedicineReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash(),
+                    genericName = genericName,
+                    brandName = brandName,
+                    type = type,
+                    strength = strength
+                )
+            )
+            response.responseCode == "01"
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     override fun getSetupData(): Flow<SetupData> = flow {
         emit(getCachedSetupData())

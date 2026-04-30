@@ -217,6 +217,7 @@ fun LocalCaseDetailScreen(
 
                     MedicineSection(
                         medicines = state.medicineList,
+                        medicineBrandTypeList = state.medicineBrandTypeList,
                         prescriptionItems = state.formState.prescriptions,
                         onAddMedicine = { item ->
                             onIntent(CaseIntent.AddPrescription(item))
@@ -224,7 +225,11 @@ fun LocalCaseDetailScreen(
                         onRemoveMedicine = { index ->
                             onIntent(CaseIntent.RemovePrescription(index))
                         },
-                        isAnsweredMode = false
+                        isAnsweredMode = false,
+                        composerState = state.medicineComposerState,
+                        onComposerStateChange = { composerState ->
+                            onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
+                        }
                     )
 
                     LabeledFormTextField(

@@ -19,6 +19,12 @@ import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
@@ -30,7 +36,6 @@ import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileResDto
 import ngo.friendship.mhealth.dc.domain.network.processFormDataRequest
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.utils.Constants
-import kotlin.time.Clock
 
 class ApiService(
     private val client: HttpClient
@@ -76,6 +81,33 @@ class ApiService(
         request: SaveDoctorFeedbackReqDto
     ): SaveDoctorFeedbackResDto {
         return client.processFormDataRequest<SaveDoctorFeedbackReqDto, SaveDoctorFeedbackResDto>(
+            url = "mHealthEnt_gateway/api/usergate",
+            body = request
+        )
+    }
+
+    suspend fun saveDiagnosis(
+        request: SaveDiagnosisReqDto
+    ): SaveDiagnosisResDto {
+        return client.processFormDataRequest<SaveDiagnosisReqDto, SaveDiagnosisResDto>(
+            url = "mHealthEnt_gateway/api/usergate",
+            body = request
+        )
+    }
+
+    suspend fun saveInvestigation(
+        request: SaveInvestigationReqDto
+    ): SaveInvestigationResDto {
+        return client.processFormDataRequest<SaveInvestigationReqDto, SaveInvestigationResDto>(
+            url = "mHealthEnt_gateway/api/usergate",
+            body = request
+        )
+    }
+
+    suspend fun saveMedicine(
+        request: SaveMedicineReqDto
+    ): SaveMedicineResDto {
+        return client.processFormDataRequest<SaveMedicineReqDto, SaveMedicineResDto>(
             url = "mHealthEnt_gateway/api/usergate",
             body = request
         )

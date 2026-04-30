@@ -160,6 +160,7 @@ fun AppExposedDropdownField(
 /* 3. GENERIC NAME FIELD */
 /* ------------------------------------------------------ */
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenericNameAutoCompleteTextField(
     value: TextFieldValue,
@@ -183,12 +184,17 @@ fun GenericNameAutoCompleteTextField(
 
     val bgColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
     val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
+    val iconColor = if (isAnsweredMode) Color(0xFF6A6A6A) else BottomBarUnselected
 
     val filtered = suggestions.filter {
         it.contains(value.text, true)
     }.take(5)
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    ExposedDropdownMenuBox(
+        modifier = modifier,
+        expanded = expanded && filtered.isNotEmpty(),
+        onExpandedChange = { expanded = it }
+    ) {
         BasicTextField(
             value = value,
             onValueChange = {
@@ -196,58 +202,56 @@ fun GenericNameAutoCompleteTextField(
                 expanded = true
             },
             modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                 .fillMaxWidth()
                 .height(32.dp),
             textStyle = TextStyle(color = textColor, fontSize = 13.sp),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             interactionSource = interactionSource,
             decorationBox = {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(6.dp))
                         .background(bgColor)
                         .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(6.dp))
                         .padding(horizontal = 12.dp),
-                    contentAlignment = Alignment.CenterStart
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (value.text.isEmpty()) {
-                        Text(placeholder, color = Gray, fontSize = 11.sp)
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (value.text.isEmpty()) {
+                            Text(placeholder, color = Gray, fontSize = 11.sp)
+                        }
+                        it()
                     }
-                    it()
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = iconColor
+                    )
                 }
             }
         )
 
-        AnimatedVisibility(expanded && filtered.isNotEmpty()) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = bgColor)
-            ) {
-                Column {
-                    filtered.forEachIndexed { index, item ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onValueChange(
-                                        TextFieldValue(item, TextRange(item.length))
-                                    )
-                                    expanded = false
-                                    focusManager.clearFocus()
-                                }
-                                .padding(12.dp)
-                        ) {
-                            Text(item, color = textColor)
-                        }
-
-                        if (index != filtered.lastIndex) {
-                            HorizontalDivider(color = Color(0xFFDADADA))
-                        }
+        ExposedDropdownMenu(
+            expanded = expanded && filtered.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(bgColor)
+        ) {
+            filtered.forEach { item ->
+                DropdownMenuItem(
+                    text = { Text(item, color = textColor) },
+                    onClick = {
+                        onValueChange(
+                            TextFieldValue(item, TextRange(item.length))
+                        )
+                        expanded = false
+                        focusManager.clearFocus()
                     }
-                }
+                )
             }
         }
     }

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

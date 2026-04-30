@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more.components
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,13 +36,16 @@ import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 @Composable
 fun CommonNewItemDialog(
     dialogTitle: String,
-    titleLabel: String,
-    contentLabel: String,
+    titleLabel: String = "",
+    contentLabel: String = "",
+    showTitleField: Boolean = true,
+    showContentField: Boolean = true,
     onDismiss: () -> Unit,
     onCreate: (String, String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
+    var titleError by remember { mutableStateOf<String?>(null) }
 
     Box(
         modifier = Modifier
@@ -84,29 +87,44 @@ fun CommonNewItemDialog(
                 HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
 
                 Column(modifier = Modifier.padding(10.dp)) {
-                    LabeledFormTextField(
-                        label = titleLabel,
-                        placeholder = "",
-                        value = title,
-                        onValueChange = { title = it }
-                    )
+                    if (showTitleField) {
+                        LabeledFormTextField(
+                            label = titleLabel,
+                            placeholder = "",
+                            value = title,
+                            onValueChange = {
+                                title = it
+                                if (it.isNotBlank()) titleError = null
+                            },
+                            isError = titleError != null,
+                            supportingText = titleError
+                        )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
 
-                    LabeledFormTextField(
-                        label = contentLabel,
-                        placeholder = "Type",
-                        value = content,
-                        onValueChange = { content = it },
-                        height = 200,
-                        singleLine = false,
-                        maxLines = 15
-                    )
+                    if (showContentField) {
+                        LabeledFormTextField(
+                            label = contentLabel,
+                            placeholder = "Type",
+                            value = content,
+                            onValueChange = { content = it },
+                            height = 200,
+                            singleLine = false,
+                            maxLines = 15
+                        )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
 
                     Button(
-                        onClick = { onCreate(title, content) },
+                        onClick = {
+                            if (showTitleField && title.isBlank()) {
+                                titleError = "This field cannot be empty"
+                            } else {
+                                onCreate(title, content)
+                            }
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp),
@@ -125,12 +143,30 @@ fun CommonNewItemDialog(
 @Composable
 fun CommonNewItemDialogPreview() {
     FriendshipTheme {
-        CommonNewItemDialog(
-            dialogTitle = "New DX",
-            titleLabel = "DX Title",
-            contentLabel = "Advices",
-            onDismiss = {},
-            onCreate = { _, _ -> }
-        )
+        Column {
+            CommonNewItemDialog(
+                dialogTitle = "New DX",
+                titleLabel = "DX Title",
+                contentLabel = "Advices",
+                onDismiss = {},
+                onCreate = { _, _ -> }
+            )
+            
+            CommonNewItemDialog(
+                dialogTitle = "New Advice",
+                contentLabel = "Advice",
+                showTitleField = false,
+                onDismiss = {},
+                onCreate = { _, _ -> }
+            )
+
+            CommonNewItemDialog(
+                dialogTitle = "New Item (Only Title)",
+                titleLabel = "Item Name",
+                showContentField = false,
+                onDismiss = {},
+                onCreate = { _, _ -> }
+            )
+        }
     }
 }

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more.components
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
 import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
@@ -21,15 +22,12 @@ import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
 fun NewMedicineDialog(
+    itemTypes: List<MedicineBrandType> = emptyList(),
     onDismiss: () -> Unit,
     onCreate: (String, String, String, String) -> Unit
 ) {
-    var selectedItemType by remember { mutableStateOf<String?>(null) }
+    var selectedItemType by remember { mutableStateOf<MedicineBrandType?>(null) }
     var genericName by remember { mutableStateOf("") }
-    var medicineStrength by remember { mutableStateOf("") }
-    var selectedBrands by remember { mutableStateOf("") }
-
-    val itemTypes = listOf("Tab", "Capsule", "Syrup", "Injection")
 
     Box(
         modifier = Modifier
@@ -76,7 +74,7 @@ fun NewMedicineDialog(
                         placeholder = "Select",
                         options = itemTypes,
                         selected = selectedItemType,
-                        getLabel = { it },
+                        getLabel = { it.type },
                         onSelectedChange = { selectedItemType = it }
                     )
 
@@ -89,33 +87,18 @@ fun NewMedicineDialog(
                         onValueChange = { genericName = it }
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    LabeledFormTextField(
-                        label = "Medicine Strength (use comma \",\" after type single entry)",
-                        placeholder = "Type (Example: ml/mg/IU or Others)",
-                        value = medicineStrength,
-                        onValueChange = { medicineStrength = it }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    LabeledFormTextField(
-                        label = "Select Brands (use comma \",\" after type single entry)",
-                        placeholder = "Type",
-                        value = selectedBrands,
-                        onValueChange = { selectedBrands = it }
-                    )
-
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
                         onClick = {
+                            if (selectedItemType == null || genericName.isBlank()) {
+                                return@Button
+                            }
                             onCreate(
-                                selectedItemType ?: "",
+                                selectedItemType?.type ?: "",
                                 genericName,
-                                medicineStrength,
-                                selectedBrands
+                                "",
+                                genericName
                             )
                         },
                         modifier = Modifier
@@ -137,6 +120,10 @@ fun NewMedicineDialog(
 fun NewMedicineDialogPreview() {
     FriendshipTheme {
         NewMedicineDialog(
+            itemTypes = listOf(
+                MedicineBrandType(type = "Tab"),
+                MedicineBrandType(type = "Cap")
+            ),
             onDismiss = {},
             onCreate = { _, _, _, _ -> }
         )

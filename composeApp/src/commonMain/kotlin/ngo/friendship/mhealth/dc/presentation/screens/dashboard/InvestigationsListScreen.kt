@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.more.components.CommonNewItemDialog
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
@@ -41,21 +41,15 @@ fun InvestigationsListScreen(
     onBack: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
-    var selectedFilter by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
     var showNewInvestigationDialog by remember { mutableStateOf(false) }
-    val filters = listOf("All", "Recent Used", "Recent Updated")
     
-    val investigationItems = listOf(
-        InvestigationItemData("ANC", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25", listOf(
-            "1. X- Ray",
-            "2. CBC"
-        )),
-        InvestigationItemData("Fever", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        InvestigationItemData("Oral Ulcer RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        InvestigationItemData("UTI", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        InvestigationItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
-    )
+    val setupData by viewModel.setupDataState.collectAsState()
+    val isLoading by viewModel.loadingFlow.collectAsState()
+
+    val investigationItems = setupData.investigations.filter {
+        it.investigationName.contains(searchQuery, ignoreCase = true)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -97,21 +91,9 @@ fun InvestigationsListScreen(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        filters.forEach { filter ->
-                            CommonFilterChip(
-                                text = filter,
-                                isSelected = selectedFilter == filter,
-                                onClick = { selectedFilter = filter }
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(investigationItems) { item ->
-                            InvestigationExpandableItem(item)
+                            InvestigationItem(item.investigationName)
                             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                         }
                     }
@@ -123,74 +105,30 @@ fun InvestigationsListScreen(
             CommonNewItemDialog(
                 dialogTitle = "New Investigation",
                 titleLabel = "Investigation title",
-                contentLabel = "Advices",
+                showContentField = false,
                 onDismiss = { showNewInvestigationDialog = false },
-                onCreate = { title: String, content: String ->
-                    // TODO: Handle creation logic
+                onCreate = { title: String, _: String ->
+                    viewModel.saveInvestigation(title)
                     showNewInvestigationDialog = false
                 }
             )
         }
+
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = PrimaryBlue)
+            }
+        }
     }
 }
 
 @Composable
-fun CommonFilterChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
-    Surface(
-        modifier = Modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(5.dp),
-        color = if (isSelected) PrimaryBlue else Color.White,
-        border = if (isSelected) null else BorderStroke(1.dp, Color.Gray)
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 1.dp),
-            fontSize = 12.sp,
-            color = if (isSelected) Color.White else Color.Gray
-        )
-    }
-}
-
-data class InvestigationItemData(
-    val title: String,
-    val subtitle: String,
-    val details: List<String> = emptyList()
-)
-
-@Composable
-fun InvestigationExpandableItem(item: InvestigationItemData) {
-    var expanded by remember { mutableStateOf(item.title == "ANC") }
-
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
-                Text(text = item.title, fontSize = 16.sp, color = Color.Gray)
-                Text(text = item.subtitle, fontSize = 10.sp, color = Color.LightGray)
-            }
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = "Expand",
-                tint = Color.Gray
-            )
-        }
-        
-        AnimatedVisibility(visible = expanded) {
-            Column(modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
-                item.details.forEach { detail ->
-                    Text(
-                        text = detail,
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    )
-                }
-            }
-        }
+fun InvestigationItem(title: String) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 16.dp)) {
+        Text(text = title, fontSize = 16.sp, color = Color.Gray)
     }
 }
 

@@ -1,13 +1,11 @@
-package ngo.friendship.mhealth.dc.presentation.screens.more
+package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,55 +15,41 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.presentation.MainViewModel
-import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.more.components.NewMedicineDialog
+import ngo.friendship.mhealth.dc.presentation.base.ObserveAsEvents
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.theme.FriendshipTheme
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.NewMedicineDialog
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
 fun MedicineListScreen(
-    viewModel: MainViewModel,
+    viewModel: MedicineListViewModel,
     onBack: () -> Unit
 ) {
-    var selectedFilter by remember { mutableStateOf("All") }
-    val filters = listOf("All", "Recent Used", "Recent Updated")
-    var searchQuery by remember { mutableStateOf("") }
-    var showNewMedicineDialog by remember { mutableStateOf(false) }
+    val state by viewModel.state.collectAsState()
 
-
-    val medicineItems = listOf(
-        MedicineItemData(
-            "Pantoprazole 20 mg",
-            "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"
-        ),
-        MedicineItemData("Fexo 20 mg", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        MedicineItemData(
-            "Esomeprazole 20 mg",
-            "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"
-        ),
-        MedicineItemData(
-            "Becozym 0.5 mg",
-            "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"
-        ),
-        MedicineItemData("Alatrol 10 mg", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
-    )
+    ObserveAsEvents(viewModel.effect) { effect ->
+        when (effect) {
+            is MedicineListEffect.ShowSnackbar -> {
+                SnackbarController.sendEvent(effect.message)
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -74,14 +58,16 @@ fun MedicineListScreen(
                     title = "Medicine List",
                     onBack = onBack,
                     showSearch = true,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { searchQuery = it }
+                    searchQuery = state.searchQuery,
+                    onSearchQueryChange = { 
+                        viewModel.onIntent(MedicineListIntent.SearchQueryChanged(it)) 
+                    }
                 )
             },
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        showNewMedicineDialog = true
+                        viewModel.onIntent(MedicineListIntent.ToggleNewMedicineDialog)
                     },
                     containerColor = PrimaryBlue,
                     contentColor = Color.White,
@@ -102,21 +88,12 @@ fun MedicineListScreen(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        filters.forEach { filter ->
-                            CommonFilterChip(
-                                text = filter,
-                                isSelected = selectedFilter == filter,
-                                onClick = { selectedFilter = filter }
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(medicineItems) { item ->
-                            MedicineListItem(item)
+                        items(state.filteredMedicines) { item ->
+                            MedicineListItem(
+                                title = "${item.type} : ${item.genericName}",
+                                subtitle = item.brandName
+                            )
                             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                         }
                     }
@@ -124,33 +101,36 @@ fun MedicineListScreen(
             }
         }
 
-        if (showNewMedicineDialog) {
+        if (state.showNewMedicineDialog) {
             NewMedicineDialog(
-                onDismiss = { showNewMedicineDialog = false },
-                onCreate = { type: String, generic: String, strength: String, brands: String ->
-                    // TODO: Handle creation logic
-                    showNewMedicineDialog = false
+                itemTypes = state.medicineTypes,
+                onDismiss = { viewModel.onIntent(MedicineListIntent.ToggleNewMedicineDialog) },
+                onCreate = { type, generic, _, _ ->
+                    viewModel.onIntent(MedicineListIntent.SaveMedicine(type, generic))
                 }
             )
+        }
+
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = PrimaryBlue)
+            }
         }
     }
 }
 
-
-data class MedicineItemData(
-    val title: String,
-    val subtitle: String
-)
-
 @Composable
-fun MedicineListItem(item: MedicineItemData) {
+fun MedicineListItem(title: String, subtitle: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp)
     ) {
-        Text(text = item.title, fontSize = 16.sp, color = Color.Gray)
-        Text(text = item.subtitle, fontSize = 10.sp, color = Color.LightGray)
+        Text(text = title, fontSize = 16.sp, color = Color.Gray)
+        Text(text = subtitle, fontSize = 12.sp, color = Color.LightGray)
     }
 }
 
