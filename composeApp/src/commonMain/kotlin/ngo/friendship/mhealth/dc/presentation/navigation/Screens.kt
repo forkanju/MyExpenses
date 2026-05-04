@@ -5,6 +5,7 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
 @Serializable
 object Screens {
@@ -21,7 +22,8 @@ object Screens {
     data class CaseDetail(
         val interviewId: Long,
         val mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
-        val source: String = SOURCE_CASE_LIST
+        val source: String = SOURCE_CASE_LIST,
+        val selectedTab: String = "Pending"
     ) : NavKey {
         companion object {
             const val SOURCE_CASE_LIST = "case_list"
@@ -43,6 +45,18 @@ object Screens {
 
     @Serializable
     data object InvestigationsList : NavKey
+
+    @Serializable
+    data class FcmProfile(val fcmCode: String) : NavKey
+
+    @Serializable
+    data class BeneficiaryProfile(
+        val beneficiaryId: Long,
+        val beneficiaryName: String = "",
+        val beneficiaryAge: String = "",
+        val location: String = "",
+        val questionnaireName: String = ""
+    ) : NavKey
 
     @Serializable
     data object LocalTreatment : NavKey
@@ -99,6 +113,8 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.MedicineList::class, Screens.MedicineList.serializer())
     polymorphic(NavKey::class, Screens.AdviceTemplateList::class, Screens.AdviceTemplateList.serializer())
     polymorphic(NavKey::class, Screens.InvestigationsList::class, Screens.InvestigationsList.serializer())
+    polymorphic(NavKey::class, Screens.FcmProfile::class, Screens.FcmProfile.serializer())
+    polymorphic(NavKey::class, Screens.BeneficiaryProfile::class, Screens.BeneficiaryProfile.serializer())
     polymorphic(NavKey::class, Screens.LocalTreatment::class, Screens.LocalTreatment.serializer())
     polymorphic(NavKey::class, Screens.LocalPrescriptionForm::class, Screens.LocalPrescriptionForm.serializer())
     polymorphic(NavKey::class, Screens.LocalTreatmentDetails::class, Screens.LocalTreatmentDetails.serializer())

@@ -2,11 +2,14 @@ package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -32,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
@@ -49,9 +51,19 @@ import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiState
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.*
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.DiagnosisChipGroup
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.InvestigationChipGroup
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.MedicineSection
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PatientProfileCard
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionActionButtonRow
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionHeader
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionTopBar
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.SendMessageDialog
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.buildDefaultSmsMessage
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.toDateString
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.toEpochMillisOrNull
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
-
+import ngo.friendship.mhealth.dc.utils.log
 
 @Composable
 fun CaseDetailScreen(
@@ -62,12 +74,17 @@ fun CaseDetailScreen(
     source: String = Screens.CaseDetail.SOURCE_CASE_LIST,
     onIntent: (CaseIntent) -> Unit = {},
     onFcmDetailsClick: () -> Unit,
+    onBeneficiaryDetailsClick: () -> Unit = {},
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit
 ) {
-    val isAnsweredMode = mode == CaseDetailsMode.ANSWERED
+    val isAnsweredMode =
+        mode == CaseDetailsMode.ANSWERED || state.interviewDetails.status == "Close"
+
     val isFromTemplate = source == Screens.CaseDetail.SOURCE_TEMPLATE_LIST
+
+    println("isAnsweredMode: $isAnsweredMode")
 
     val interviewQaItems = remember(state.interviewDetails.details) {
         state.interviewDetails.details.map {
@@ -84,35 +101,77 @@ fun CaseDetailScreen(
         }
     }
 
+    val titlePrefix =
+        remember(isFromTemplate, state.fcmProfileState, state.interviewDetails.fcmInfo) {
+            if (isFromTemplate) {
+                "Prescription Template"
+            } else {
+                val fcmName = state.fcmProfileState.fcmProfile?.userName
+                val location = state.fcmProfileState.fcmProfile?.location
+                "DetailScreen Recomposed: fcmName=$fcmName, location=$location, fcmInfo=${state.interviewDetails.fcmInfo}".log(
+                    "CASE_DEBUG"
+                )
+                if (fcmName != null && location != null) {
+                    "Ref by $fcmName - $location"
+                } else {
+                    state.interviewDetails.fcmInfo?.ifBlank { "Prescription" } ?: "Prescription"
+                }
+            }
+        }
+
     Scaffold(
         modifier = modifier,
         containerColor = if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White,
         topBar = {
             PrescriptionTopBar(
-                titlePrefix = if (isFromTemplate) "Prescription Template" else (state.interviewDetails.fcmInfo?.ifBlank { "Prescription" }
-                    ?: ""),
+                titlePrefix = titlePrefix,
                 onFcmDetailsClick = onFcmDetailsClick,
                 onCall = onCall,
                 onWhatsApp = onWhatsApp,
                 onBack = onBack,
-                showActions = !isFromTemplate
+                showActions = !isFromTemplate,
+                detailsButtonText = if (isFromTemplate) "(View)" else "(View)"
             )
+        },
+        bottomBar = {
+            if (isFromTemplate) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .navigationBarsPadding()
+                        .padding(16.dp)
+                ) {
+                    PrescriptionActionButtonRow(
+                        onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
+                        onShareClick = {
+                            println("Share template")
+                        },
+                        sendButtonText = "Save Template",
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
+                    )
+                }
+            }
         }
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .background(if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White)
                 .padding(paddingValues)
-                .padding(12.dp),
+                .then(if (isFromTemplate) Modifier else Modifier.padding(12.dp))
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (!isFromTemplate) {
                 PatientProfileCard(
                     benefName = state.interviewDetails.beneficiaryName,
-                    isAnsweredMode = isAnsweredMode
+                    benefAge = state.interviewDetails.beneficiaryAge,
+                    questionnaireName = state.interviewDetails.questionnaireName,
+                    isAnsweredMode = isAnsweredMode,
+                    onDetailsClick = onBeneficiaryDetailsClick
                 )
 
                 ExpandableInterviewSummary(
@@ -129,7 +188,7 @@ fun CaseDetailScreen(
                 )
             }
 
-            FormContainerCard(containerColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White) {
+            val formContent: @Composable ColumnScope.() -> Unit = {
                 PrescriptionHeader(isAnsweredMode = isAnsweredMode)
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider(modifier = Modifier.height(1.dp))
@@ -153,51 +212,28 @@ fun CaseDetailScreen(
                         items = state.formState.selectedDiagnoses,
                         onRemove = { item ->
                             onIntent(CaseIntent.RemoveDiagnosis(item))
-                        }
+                        },
+                        isAnsweredMode = isAnsweredMode
                     )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                if (isAnsweredMode) {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        // Static items for preview/testing purposes
-                        PrescriptionItemCard(
-                            item = PrescriptionItem(
-                                medicineName = "Napa 500mg",
-                                dose = "1+0+1",
-                                duration = "৫ দিন"
-                            ),
-                            onRemoveClick = {},
-                            isAnsweredMode = true
-                        )
-                        PrescriptionItemCard(
-                            item = PrescriptionItem(
-                                medicineName = "Amoxicillin 500mg",
-                                dose = "1+1+1",
-                                duration = "৭ দিন"
-                            ),
-                            onRemoveClick = {},
-                            isAnsweredMode = true
-                        )
+                MedicineSection(
+                    medicines = state.medicineList,
+                    medicineBrandTypeList = state.medicineBrandTypeList,
+                    prescriptionItems = state.formState.prescriptions,
+                    onAddMedicine = { item ->
+                        onIntent(CaseIntent.AddPrescription(item))
+                    },
+                    onRemoveMedicine = { index ->
+                        onIntent(CaseIntent.RemovePrescription(index))
+                    },
+                    isAnsweredMode = isAnsweredMode,
+                    composerState = state.medicineComposerState,
+                    onComposerStateChange = { composerState ->
+                        onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
                     }
-                } else {
-                    MedicineSection(
-                        medicines = state.medicineList,
-                        medicineBrandTypeList = state.medicineBrandTypeList,
-                        prescriptionItems = state.formState.prescriptions,
-                        onAddMedicine = { item ->
-                            onIntent(CaseIntent.AddPrescription(item))
-                        },
-                        onRemoveMedicine = { index ->
-                            onIntent(CaseIntent.RemovePrescription(index))
-                        },
-                        isAnsweredMode = isAnsweredMode,
-                        composerState = state.medicineComposerState,
-                        onComposerStateChange = { composerState ->
-                            onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
-                        }
-                    )
-                }
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -214,84 +250,87 @@ fun CaseDetailScreen(
                     enabled = !isAnsweredMode
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                if (!isFromTemplate) {
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                FormAutoCompleteDropdownField(
-                    label = "Investigation",
-                    placeholder = "Type",
-                    options = setupData.investigations,
-                    selected = null,
-                    getLabel = { it.investigationName },
-                    onSelectedChange = { selected ->
-                        onIntent(CaseIntent.AddInvestigation(selected))
-                    },
-                    enabled = !isAnsweredMode
-                )
+                    FormAutoCompleteDropdownField(
+                        label = "Investigation",
+                        placeholder = "Type",
+                        options = setupData.investigations,
+                        selected = null,
+                        getLabel = { it.investigationName },
+                        onSelectedChange = { selected ->
+                            onIntent(CaseIntent.AddInvestigation(selected))
+                        },
+                        enabled = !isAnsweredMode
+                    )
 
-                if (state.formState.selectedInvestigations.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    InvestigationChipGroup(
-                        items = state.formState.selectedInvestigations,
-                        onRemove = { item ->
-                            onIntent(CaseIntent.RemoveInvestigation(item))
-                        }
+                    if (state.formState.selectedInvestigations.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        InvestigationChipGroup(
+                            items = state.formState.selectedInvestigations,
+                            onRemove = { item ->
+                                onIntent(CaseIntent.RemoveInvestigation(item))
+                            },
+                            isAnsweredMode = isAnsweredMode
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LabeledFormTextField(
+                        label = "Investigation Result",
+                        placeholder = "Result",
+                        value = state.formState.investigationResult,
+                        onValueChange = {
+                            onIntent(CaseIntent.UpdateInvestigationResult(it))
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        enabled = !isAnsweredMode
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LabeledFormTextField(
+                        label = "Comments for FCM",
+                        placeholder = "Comment",
+                        value = state.formState.commentsForFcm,
+                        onValueChange = {
+                            onIntent(CaseIntent.UpdateCommentsForFcm(it))
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        enabled = !isAnsweredMode
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    FormDropdownField(
+                        label = "Refer to others",
+                        placeholder = "Select",
+                        options = setupData.referralCenters,
+                        selected = state.formState.selectedReferralCenter,
+                        getLabel = { it.refCenterName },
+                        onSelectedChange = { selected ->
+                            onIntent(CaseIntent.UpdateReferralCenter(selected))
+                        },
+                        enabled = !isAnsweredMode
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LabeledFormTextField(
+                        label = "Doctor notes",
+                        placeholder = "Note",
+                        value = state.formState.doctorNotes,
+                        onValueChange = {
+                            onIntent(CaseIntent.UpdateDoctorNotes(it))
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        enabled = !isAnsweredMode
                     )
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LabeledFormTextField(
-                    label = "Investigation Result",
-                    placeholder = "Result",
-                    value = state.formState.investigationResult,
-                    onValueChange = {
-                        onIntent(CaseIntent.UpdateInvestigationResult(it))
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    enabled = !isAnsweredMode
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LabeledFormTextField(
-                    label = "Comments for FCM",
-                    placeholder = "Comment",
-                    value = state.formState.commentsForFcm,
-                    onValueChange = {
-                        onIntent(CaseIntent.UpdateCommentsForFcm(it))
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    enabled = !isAnsweredMode
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                FormDropdownField(
-                    label = "Refer to others",
-                    placeholder = "Select",
-                    options = setupData.referralCenters,
-                    selected = state.formState.selectedReferralCenter,
-                    getLabel = { it.refCenterName },
-                    onSelectedChange = { selected ->
-                        onIntent(CaseIntent.UpdateReferralCenter(selected))
-                    },
-                    enabled = !isAnsweredMode
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LabeledFormTextField(
-                    label = "Doctor notes",
-                    placeholder = "Note",
-                    value = state.formState.doctorNotes,
-                    onValueChange = {
-                        onIntent(CaseIntent.UpdateDoctorNotes(it))
-                    },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    enabled = !isAnsweredMode
-                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -377,17 +416,20 @@ fun CaseDetailScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
-                } else {
-                    Spacer(modifier = Modifier.height(24.dp))
-                    PrescriptionActionButtonRow(
-                        onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
-                        onShareClick = {
-                            println("Share template")
-                        },
-                        sendButtonText = "Save Template",
-                        enabled = !isAnsweredMode,
-                        isAnsweredMode = isAnsweredMode
-                    )
+                }
+            }
+
+            if (isFromTemplate) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(16.dp),
+                    content = formContent
+                )
+            } else {
+                FormContainerCard(containerColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White) {
+                    formContent()
                 }
             }
         }

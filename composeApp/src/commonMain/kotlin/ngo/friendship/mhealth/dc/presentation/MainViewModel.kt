@@ -13,13 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
 import ngo.friendship.mhealth.dc.domain.model.Interview
-import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
@@ -67,7 +65,7 @@ class MainViewModel(
         initialValue = SetupData()
     )
 
-    val userProfileState = mainRepository.getUserProfile().stateIn(
+    val userProfileState = mainRepository.getDoctorProfile().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = null
@@ -187,45 +185,45 @@ class MainViewModel(
 
 
     fun openCase(interview: Interview) {
+        val targetStatus = if (selectedCaseTab == CaseTab.Answered) {
+            CaseTab.Answered.apiParam // "Close"
+        } else {
+            CaseTab.Opened.apiParam // "Open"
+        }
+
         val mode = if (selectedCaseTab == CaseTab.Answered) {
             CaseDetailsMode.ANSWERED
         } else {
             CaseDetailsMode.NORMAL
         }
 
-        if (!shouldUpdateToOpen(selectedCaseTab)) {
-            backStack.add(
-                Screens.CaseDetail(
-                    interviewId = interview.interviewId,
-                    mode = mode
-                )
-            )
-            return
-        }
-
         launch(loading = Loading.Secondary) {
             val isSuccess = caseRepository.updateInterviewStatus(
                 interviewId = interview.interviewId,
-                status = CaseTab.Opened.apiParam
+                status = targetStatus
             )
 
             if (isSuccess) {
-                interviewListState.value = interviewListState.value.filterNot {
-                    it.interviewId == interview.interviewId
-                }
+                // Only update local counts and lists if moving from a non-open state to Open
+                if (targetStatus == CaseTab.Opened.apiParam && (selectedCaseTab == CaseTab.Pending || selectedCaseTab == CaseTab.Older)) {
+                    interviewListState.value = interviewListState.value.filterNot {
+                        it.interviewId == interview.interviewId
+                    }
 
-                caseTabCounts = caseTabCounts.toMutableMap().apply {
-                    val currentCount = this[selectedCaseTab] ?: 0
-                    this[selectedCaseTab] = (currentCount - 1).coerceAtLeast(0)
+                    caseTabCounts = caseTabCounts.toMutableMap().apply {
+                        val currentCount = this[selectedCaseTab] ?: 0
+                        this[selectedCaseTab] = (currentCount - 1).coerceAtLeast(0)
 
-                    val openCount = this[CaseTab.Opened] ?: 0
-                    this[CaseTab.Opened] = openCount + 1
+                        val openCount = this[CaseTab.Opened] ?: 0
+                        this[CaseTab.Opened] = openCount + 1
+                    }
                 }
 
                 backStack.add(
                     Screens.CaseDetail(
                         interviewId = interview.interviewId,
-                        mode = mode
+                        mode = mode,
+                        selectedTab = selectedCaseTab.label
                     )
                 )
             } else {

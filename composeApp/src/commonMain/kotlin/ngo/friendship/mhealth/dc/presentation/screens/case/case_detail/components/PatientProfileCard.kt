@@ -2,6 +2,7 @@ package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.componen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +41,10 @@ import org.jetbrains.compose.resources.painterResource
 fun PatientProfileCard(
     modifier: Modifier = Modifier,
     benefName: String,
-    isAnsweredMode: Boolean = false
+    benefAge: String? = null,
+    questionnaireName: String? = null,
+    isAnsweredMode: Boolean = false,
+    onDetailsClick: () -> Unit = {}
 ) {
 
     val colorScheme = MaterialTheme.colorScheme
@@ -98,7 +102,7 @@ fun PatientProfileCard(
 
                     Row {
                         Text(
-                            text = benefName,
+                            text = if (benefAge.isNullOrBlank()) benefName else "$benefName ($benefAge)",
                             style = TextStyle(
                                 color = titleColor,
                                 fontFamily = RobotoCondensedFont(),
@@ -114,14 +118,15 @@ fun PatientProfileCard(
                                 color = detailsColor,
                                 fontFamily = RobotoCondensedFont()
                             ),
-                            textDecoration = TextDecoration.Underline
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.clickable { onDetailsClick() }
                         )
                     }
 
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        text = "Oral Ulcer",
+                        text = questionnaireName ?: "Oral Ulcer",
                         style = TextStyle(
                             color = diseaseColor,
                             fontFamily = RobotoCondensedFont(),
@@ -129,15 +134,6 @@ fun PatientProfileCard(
                         )
                     )
 
-                    Spacer(Modifier.height(4.dp))
-
-                    Text(
-                        text = "Source Case  <  Case 1  <  Case 2",
-                        style = TextStyle(
-                            color = detailsColor,
-                            fontFamily = RobotoCondensedFont()
-                        )
-                    )
                 }
             }
         }

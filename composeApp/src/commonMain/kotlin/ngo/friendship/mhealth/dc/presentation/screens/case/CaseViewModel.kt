@@ -10,6 +10,7 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addInvestigation
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeDiagnosis
@@ -51,6 +52,12 @@ class CaseViewModel(
             is CaseIntent.LoadQuestionAnswerData -> loadQuestionAnswerData(intent.interviewId)
             is CaseIntent.LoadMedicineList -> loadMedicineList(intent.type)
             CaseIntent.SaveDoctorFeedback -> saveDoctorFeedback()
+            is CaseIntent.SetMode -> {
+                _state.update { it.copy(mode = intent.mode) }
+            }
+            is CaseIntent.SetSelectedTab -> {
+                _state.update { it.copy(selectedTab = intent.tab) }
+            }
             is CaseIntent.UpdateFormState -> updateFormState(intent.state)
             is CaseIntent.UpdateMedicineComposerState -> {
                 _state.update { it.copy(medicineComposerState = intent.state) }
@@ -164,6 +171,28 @@ class CaseViewModel(
             _state.update { it.copy(interviewDetails = InterviewDetails()) }
             val details = repository.getInterviewDetails(interviewId = interviewId)
             _state.update { it.copy(interviewDetails = details) }
+            
+            val fcmInfo = details.fcmInfo
+            "Interview loaded. fcmInfo: $fcmInfo".log("CASE_DEBUG")
+            
+            fcmInfo?.takeIf { it.isNotBlank() }?.let { fcmCode ->
+                launch {
+                    _state.update { it.copy(fcmProfileState = it.fcmProfileState.copy(isLoading = true)) }
+                    "Fetching FCM Profile for code: $fcmCode".log("CASE_DEBUG")
+                    val profile = repository.getFcmProfile(fcmCode)
+                    "Fetched profile: ${profile?.userName}, ${profile?.location}".log("CASE_DEBUG")
+                    _state.update { 
+                        it.copy(
+                            fcmProfileState = it.fcmProfileState.copy(
+                                fcmProfile = profile,
+                                isLoading = false
+                            )
+                        )
+                    }
+                }
+            } ?: run {
+                "fcmInfo is null or blank, skipping FCM fetch".log("CASE_DEBUG")
+            }
         }
     }
 
@@ -196,14 +225,24 @@ class CaseViewModel(
         launch {
             if (_state.value.formState.prescriptions.isNotEmpty()) {
                 _state.update { it.copy(isSaving = true) }
-                repository.saveDoctorFeedback(formState = _state.value.formState)
-                showSuccess("Feedback saved successfully")
-                repository.updateInterviewStatus(
-                    interviewId = _state.value.formState.interviewId ?: 0,
-                    status = CaseTab.Answered.apiParam
-                )
-                _state.update { it.copy(isSaving = false) }
-                _uiEvent.send(CaseUiEvent.NavigateBack)
+                try {
+                    // First, save the doctor feedback
+                    repository.saveDoctorFeedback(formState = _state.value.formState)
+                    showSuccess("Feedback saved successfully")
+
+                    // After successful save, update interview status to "Close"
+                    repository.updateInterviewStatus(
+                        interviewId = _state.value.formState.interviewId ?: 0,
+                        status = CaseTab.Answered.apiParam // "Close"
+                    )
+
+                    _state.update { it.copy(isSaving = false) }
+                    _uiEvent.send(CaseUiEvent.NavigateBack)
+                } catch (e: Exception) {
+                    _state.update { it.copy(isSaving = false) }
+                    "Error saving feedback: ${e.message}".log("CASE_DEBUG")
+                    showError("Failed to save feedback")
+                }
             } else {
                 showSuccess("Please add the prescriptions")
             }

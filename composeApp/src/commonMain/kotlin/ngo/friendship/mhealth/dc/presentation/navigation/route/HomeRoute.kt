@@ -44,6 +44,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
 
         LaunchedEffect(userProfile) {
             println("HomeRoute: userProfile changed: $userProfile")
+            println("HomeRoute: mobileNo: ${userProfile?.mobileNo}")
             println("HomeRoute: userName: ${userProfile?.userName}, location: ${userProfile?.location}")
         }
 

@@ -19,6 +19,8 @@ import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.home.HomeViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MoreViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -37,6 +39,8 @@ val viewModelModule = module {
     viewModelOf(constructor = ::MedicineListViewModel)
     viewModelOf(constructor = ::MoreViewModel)
     viewModelOf(constructor = ::HomeViewModel)
+    viewModelOf(constructor = ::FcmProfileViewModel)
+    viewModelOf(constructor = ::BeneficiaryProfileViewModel)
 }
 
 val dataModule = module {

@@ -2,16 +2,24 @@ package ngo.friendship.mhealth.dc.presentation.navigation.route
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import ngo.friendship.mhealth.dc.domain.model.SetupData
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import org.koin.compose.viewmodel.koinViewModel
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.LocalCaseDetailScreen
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.*
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceTemplateListScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.InvestigationsListScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.LocalTreatmentDetailsScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.LocalTreatmentScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListScreen
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MoreViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.PrescriptionTemplateListScreen
+import org.koin.compose.viewmodel.koinViewModel
 
 fun EntryProviderScope<NavKey>.dashboardRoute(
     mainViewModel: MainViewModel
@@ -66,7 +74,13 @@ fun EntryProviderScope<NavKey>.dashboardRoute(
     entry<Screens.LocalTreatment> {
         LocalTreatmentScreen(
             onBack = { mainViewModel.backStack.removeLastOrNull() },
-            onNavigateToDetails = { mainViewModel.backStack.add(Screens.LocalTreatmentDetails(patientId = "")) },
+            onNavigateToDetails = {
+                mainViewModel.backStack.add(
+                    Screens.LocalTreatmentDetails(
+                        patientId = ""
+                    )
+                )
+            },
             onAddClick = { mainViewModel.backStack.add(Screens.LocalPrescriptionForm) }
         )
     }

@@ -4,6 +4,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
+import ngo.friendship.mhealth.dc.data.remote.dto.FcmCodeParam
+import ngo.friendship.mhealth.dc.data.remote.dto.FcmProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
@@ -11,6 +13,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
+import ngo.friendship.mhealth.dc.domain.mapper.toDomainFcmProfile
+import ngo.friendship.mhealth.dc.domain.model.FcmProfile
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
@@ -19,11 +23,13 @@ import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
+import ngo.friendship.mhealth.dc.utils.log
+import ngo.friendship.mhealth.dc.utils.md5
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
 class CaseRepositoryImpl(
     private val api: ApiService,
-    private val localSettings: LocalSettings
+    private val localSettings: LocalSettings,
 ) : CaseRepository {
 
     override suspend fun getInterviewList(appVersion: Int, type: String): List<Interview> {
@@ -46,7 +52,7 @@ class CaseRepositoryImpl(
             ?.interviewList
             ?.map { it.toDomain() }
             ?: emptyList()
-        
+
         println("DEBUG: Repository returning ${result.size} domain interviews")
         return result
     }
@@ -123,6 +129,36 @@ class CaseRepositoryImpl(
             )
         )
         return response.responseCode == "01"
+    }
+
+    override suspend fun getFcmProfile(fcmCode: String): FcmProfile? {
+        val sanitizedFcmCode = fcmCode.substringBefore("-").substringBefore("[").trim()
+        val userCode = localSettings.user.userName.md5()
+        val password = localSettings.user.password.md5()
+        "Fetching FCM Profile. Code: $fcmCode, Sanitized: $sanitizedFcmCode, User: $userCode".log("FCM_DEBUG")
+        val response = api.getFcmProfile(
+            request = FcmProfileReqDto(
+                orgCode = "FR",
+                userCode = userCode,
+                password = password,
+                orgId = 101,
+                imei = "IMEI_FREE",
+                demo = false,
+                requestType = "DOCTOR_CENTER",
+                requestName = "FCM_PROFILE",
+                moduleName = "mHealth-FCM",
+                requestTime = currentTimestamp.toDateTimeServerSlash(),
+                requestAction = "",
+                dataLength = 2,
+                lang = "bn",
+                param1 = FcmCodeParam(sanitizedFcmCode)
+            )
+        )
+        "FCM Response: code=${response.responseCode}, name=${response.responseName}, error=${response.errorDesc}".log(
+            "FCM_DEBUG"
+        )
+        "FCM Data: ${response.data?.fcmProfile}".log("FCM_DEBUG")
+        return response.data?.fcmProfile?.toDomainFcmProfile()
     }
 
     override suspend fun sendSms(msisdn: String, message: String): JsonObject {

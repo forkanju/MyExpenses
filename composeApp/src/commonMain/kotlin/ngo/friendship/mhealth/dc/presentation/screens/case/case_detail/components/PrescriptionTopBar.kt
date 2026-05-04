@@ -31,8 +31,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
@@ -47,6 +49,7 @@ fun PrescriptionTopBar(
     onWhatsApp: () -> Unit,
     onBack: () -> Unit,
     showActions: Boolean = true,
+    detailsButtonText: String = "(View)"
 ) {
     TopAppBar(
         navigationIcon = {
@@ -81,7 +84,7 @@ fun PrescriptionTopBar(
                     Spacer(Modifier.width(6.dp))
 
                     Text(
-                        text = "(Details)",
+                        text = detailsButtonText,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         fontFamily = RobotoCondensedFont(),
@@ -142,8 +145,38 @@ private fun CircleActionIcon(
                 painter = painter,
                 contentDescription = contentDescription,
                 tint = Color.Unspecified,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PrescriptionTopBarPreview() {
+    FriendshipTheme {
+        PrescriptionTopBar(
+            titlePrefix = "Prescription for John Doe",
+            onFcmDetailsClick = {},
+            onCall = {},
+            onWhatsApp = {},
+            onBack = {},
+            showActions = true
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PrescriptionTopBarNoActionsPreview() {
+    FriendshipTheme {
+        PrescriptionTopBar(
+            titlePrefix = "Prescription for John Doe",
+            onFcmDetailsClick = {},
+            onCall = {},
+            onWhatsApp = {},
+            onBack = {},
+            showActions = false
+        )
     }
 }

@@ -43,37 +43,46 @@ abstract class BaseViewModel: ViewModel() {
     }
 
     init {
-        CoroutineScope(Dispatchers.Main.immediate).launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             errorFlow.collect {
                 if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
-                snackBarState.currentSnackbarData?.dismiss()
-                if (it.message.length > 50)
-                    backStack.add(Screens.Dialog.Error(it.message))
-                else
-                    snackBarState.showSnackbar(it.message)
+                if (it.message.length > 50) {
+                    if (::backStack.isInitialized) {
+                        backStack.add(Screens.Dialog.Error(it.message))
+                    }
+                } else {
+                    if (::snackBarState.isInitialized) {
+                        snackBarState.currentSnackbarData?.dismiss()
+                        snackBarState.showSnackbar(it.message)
+                    }
+                }
             }
         }
-        CoroutineScope(Dispatchers.Main.immediate).launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             successFlow.collect {
                 if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
-                snackBarState.currentSnackbarData?.dismiss()
-                snackBarState.showSnackbar(it.message)
+                if (::snackBarState.isInitialized) {
+                    snackBarState.currentSnackbarData?.dismiss()
+                    snackBarState.showSnackbar(it.message)
+                }
             }
         }
     }
 
     fun listenSnackbarControllerEvents() {
-        CoroutineScope(Dispatchers.Main.immediate).launch {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
             SnackbarController.events.collect {
                 if (it.message.isBlank()) return@collect
-                snackBarState.currentSnackbarData?.dismiss()
-                val result = snackBarState.showSnackbar(
-                    message = it.message,
-                    actionLabel = it.action?.label,
-                    withDismissAction = it.action?.onAction != null,
-                )
-                if (result == SnackbarResult.ActionPerformed)
-                    it.action?.onAction()
+                if (::snackBarState.isInitialized) {
+                    snackBarState.currentSnackbarData?.dismiss()
+                    val result = snackBarState.showSnackbar(
+                        message = it.message,
+                        actionLabel = it.action?.label,
+                        withDismissAction = it.action?.onAction != null,
+                    )
+                    if (result == SnackbarResult.ActionPerformed)
+                        it.action?.onAction()
+                }
             }
         }
     }

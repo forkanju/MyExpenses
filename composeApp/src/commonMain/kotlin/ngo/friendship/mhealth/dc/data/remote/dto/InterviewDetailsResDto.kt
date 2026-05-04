@@ -48,10 +48,11 @@ data class InterviewDetailsResDto(
 
     @Serializable
     data class DetailItem(
-        @SerialName("ANSWER") val answer: String? = null,
-        @SerialName("Q_NAME") val questionName: String? = null,
-        @SerialName("Q_ID") val questionId: Long? = null
+        @SerialName(value = "ANSWER") val answer: String? = null,
+        @SerialName(value = "Q_NAME") val questionName: String? = null,
+        @SerialName(value = "Q_ID") val questionId: Long? = null
     )
+
     @Serializable
     data class SysPrescriptionItem(
         @SerialName("prescription") val prescription: String? = null

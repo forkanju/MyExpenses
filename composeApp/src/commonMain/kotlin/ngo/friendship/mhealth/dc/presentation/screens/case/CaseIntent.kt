@@ -7,12 +7,15 @@ import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.MedicineComposerState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
 sealed interface CaseIntent {
     data class LoadInterviewDetails(val interviewId: Long) : CaseIntent
     data class LoadQuestionAnswerData(val interviewId: Long) : CaseIntent
     data class LoadMedicineList(val type: String = "Tab") : CaseIntent
     data object SaveDoctorFeedback : CaseIntent
+    data class SetMode(val mode: CaseDetailsMode) : CaseIntent
+    data class SetSelectedTab(val tab: CaseTab) : CaseIntent
     data class UpdateFormState(val state: DoctorFeedbackFormState) : CaseIntent
     data class UpdateMedicineComposerState(val state: MedicineComposerState) : CaseIntent
     

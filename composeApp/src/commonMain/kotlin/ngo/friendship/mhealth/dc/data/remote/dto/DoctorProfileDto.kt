@@ -7,15 +7,15 @@ import ngo.friendship.mhealth.dc.utils.md5
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
 @Serializable
-data class UserProfileReqDto(
+data class DoctorProfileReqDto(
     @SerialName("ORG_CODE") val orgCode: String = "FR",
     @SerialName("userCode") val userCode: String,
     @SerialName("pw") val password: String,
     @SerialName("ORG_ID") val orgId: Int = 101,
-    @SerialName("imei") val imei: String? = "null",
+    @SerialName("imei") val imei: String? = "IMEI_FREE",
     @SerialName("DEMO") val demo: Boolean = false,
-    @SerialName("requestType") val requestType: String = "USER_GATE",
-    @SerialName("requestName") val requestName: String = "FCM_PROFILE",
+    @SerialName("requestType") val requestType: String = "DOCTOR_CENTER",
+    @SerialName("requestName") val requestName: String = "DOCTOR_PROFILE",
     @SerialName("module_name") val moduleName: String = "mHealth-FCM",
     @SerialName("requestTime") val requestTime: String,
     @SerialName("requestAction") val requestAction: String = "",
@@ -25,8 +25,8 @@ data class UserProfileReqDto(
     @SerialName("param1") val param1: EmptyParamDto = EmptyParamDto()
 ) {
     companion object {
-        fun build(userName: String, password: String): UserProfileReqDto {
-            return UserProfileReqDto(
+        fun build(userName: String, password: String): DoctorProfileReqDto {
+            return DoctorProfileReqDto(
                 userCode = userName.md5(),
                 password = password.md5(),
                 requestTime = currentTimestamp.toDateTimeServerSlash()
@@ -36,8 +36,8 @@ data class UserProfileReqDto(
 }
 
 @Serializable
-data class UserProfileResDto(
-    @SerialName("data") val data: UserProfileData? = null,
+data class DoctorProfileResDto(
+    @SerialName("data") val data: DoctorProfileData? = null,
     @SerialName("responseCode") val responseCode: String? = null,
     @SerialName("errorDesc") val errorDesc: String? = null,
     @SerialName("errorCode") val errorCode: String? = null,
@@ -47,12 +47,12 @@ data class UserProfileResDto(
 )
 
 @Serializable
-data class UserProfileData(
-    @SerialName("fcmProfile") val fcmProfile: FcmProfile? = null
+data class DoctorProfileData(
+    @SerialName("doctorProfile") val doctorProfile: DoctorProfile? = null
 )
 
 @Serializable
-data class FcmProfile(
+data class DoctorProfile(
     @SerialName("USER_ID") val userId: Int? = null,
     @SerialName("USER_NAME") val userName: String? = null,
     @SerialName("USER_LOGIN_ID") val userLoginId: String? = null,

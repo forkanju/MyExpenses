@@ -67,14 +67,16 @@ fun MedicineSection(
     onComposerStateChange: (MedicineComposerState) -> Unit = {}
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        MedicineComposerCard(
-            medicines = medicines,
-            onAddClick = onAddMedicine,
-            medicineBrandTypeList = medicineBrandTypeList,
-            isAnsweredMode = isAnsweredMode,
-            state = composerState,
-            onStateChange = onComposerStateChange
-        )
+        if (!isAnsweredMode) {
+            MedicineComposerCard(
+                medicines = medicines,
+                onAddClick = onAddMedicine,
+                medicineBrandTypeList = medicineBrandTypeList,
+                isAnsweredMode = isAnsweredMode,
+                state = composerState,
+                onStateChange = onComposerStateChange
+            )
+        }
 
         prescriptionItems.forEachIndexed { index, item ->
             PrescriptionItemCard(

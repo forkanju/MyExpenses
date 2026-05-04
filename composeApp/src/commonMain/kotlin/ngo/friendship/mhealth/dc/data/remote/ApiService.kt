@@ -9,6 +9,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.FcmProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.FcmProfileResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewListReqDto
@@ -31,8 +35,6 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusResDto
-import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileReqDto
-import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileResDto
 import ngo.friendship.mhealth.dc.domain.network.processFormDataRequest
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.utils.Constants
@@ -129,9 +131,16 @@ class ApiService(
         body = request,
     )
 
-    suspend fun getUserProfile(
-        request: UserProfileReqDto
-    ): UserProfileResDto = client.processFormDataRequest(
+    suspend fun getDoctorProfile(
+        request: DoctorProfileReqDto
+    ): DoctorProfileResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun getFcmProfile(
+        request: FcmProfileReqDto
+    ): FcmProfileResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
     )

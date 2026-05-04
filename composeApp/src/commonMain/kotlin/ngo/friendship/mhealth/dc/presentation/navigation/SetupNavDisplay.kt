@@ -22,9 +22,11 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import fcmProfileRoute
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
 import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.beneficiaryProfileRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.caseRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
@@ -131,6 +133,14 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         caseRoute(
                             mainViewModel = viewModel,
                             snackBarState = snackBarState,
+                        )
+
+                        fcmProfileRoute(
+                            mainViewModel = viewModel
+                        )
+
+                        beneficiaryProfileRoute(
+                            mainViewModel = viewModel
                         )
                     }
                 )

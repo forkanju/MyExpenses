@@ -13,7 +13,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
-import ngo.friendship.mhealth.dc.data.remote.dto.UserProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
@@ -100,7 +100,7 @@ class MainRepositoryImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override fun getUserProfile(): Flow<UserProfile?> = flow {
+    override fun getDoctorProfile(): Flow<UserProfile?> = flow<UserProfile?> {
         // 1. Emit current local data if available
         try {
             // We use a separate collect or combine if we want continuous DB updates, 
@@ -114,14 +114,14 @@ class MainRepositoryImpl(
         
         // Trigger API refresh in background or before emitAll
         try {
-             val response = api.getUserProfile(
-                UserProfileReqDto.build(
+             val response = api.getDoctorProfile(
+                DoctorProfileReqDto.build(
                     userName = localSettings.user.userName,
                     password = localSettings.user.password
                 )
             )
             println("MainRepositoryImpl: API UserProfile Response: $response")
-            response.data?.fcmProfile?.toDomain()?.also {
+            response.data?.doctorProfile?.toDomain()?.also {
                 println("MainRepositoryImpl: Saving UserProfile to DB: $it")
                 userProfileDao.deleteProfile()
                 userProfileDao.insertUserProfile(it)

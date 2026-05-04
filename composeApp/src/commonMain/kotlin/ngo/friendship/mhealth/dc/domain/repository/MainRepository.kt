@@ -6,7 +6,7 @@ import ngo.friendship.mhealth.dc.domain.model.UserProfile
 
 interface MainRepository {
     fun getSetupData(): Flow<SetupData>
-    fun getUserProfile(): Flow<UserProfile?>
+    fun getDoctorProfile(): Flow<UserProfile?>
     suspend fun saveDiagnosis(title: String): Boolean
     suspend fun saveInvestigation(title: String): Boolean
     suspend fun saveMedicine(
