@@ -9,7 +9,7 @@ data class Interview(
     val beneficiaryCode: String = "",
     val location: String = "",
     val status: String = "",
-    val startTime: String = "",
+    val startTime: String = "00:00",
     val questionnaireId: Long? = null,
     val questionnaireName: String = "",
     val stCaption: String? = null,

@@ -9,6 +9,8 @@ import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import kotlinx.coroutines.flow.emitAll
+import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
@@ -18,6 +20,7 @@ import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
@@ -28,6 +31,44 @@ class MainRepositoryImpl(
 ) : MainRepository {
     private val setupDataDao = appDatabase.setupDataDao()
     private val userProfileDao = appDatabase.userProfileDao()
+
+    override suspend fun getAdviceList(): List<AdviceItemData> {
+        return try {
+            val response = api.getAdviceList(
+                request = AdviceListReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash()
+                )
+            )
+            response.data?.adviceList?.map {
+                AdviceItemData(
+                    title = it.adviceName ?: "",
+                    subtitle = "Updated: ${currentTimestamp.toDateTimeServerSlash()}", // Subtitle not in API, using current time as placeholder
+                    details = listOf(it.adviceDetails ?: "")
+                )
+            } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    override suspend fun saveAdvice(title: String, content: String): Boolean {
+        return try {
+            val response = api.saveAdvice(
+                request = SaveAdviceReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash(),
+                    adviceName = title,
+                    adviceDetails = content
+                )
+            )
+            response.responseCode == "01"
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     override suspend fun saveDiagnosis(title: String): Boolean {
         return try {

@@ -45,4 +45,9 @@ sealed interface CaseIntent {
     data class UpdateOfficeId(val id: String) : CaseIntent
     data class UpdateSector(val sector: String) : CaseIntent
     data class UpdateInterviewNote(val note: String) : CaseIntent
+
+    data class OpenCaseFromTab(
+        val interviewId: Long,
+        val sourceTab: CaseTab
+    ) : CaseIntent
 }

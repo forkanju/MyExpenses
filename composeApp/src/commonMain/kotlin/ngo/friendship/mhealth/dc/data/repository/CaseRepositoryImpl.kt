@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
+import ngo.friendship.mhealth.dc.data.remote.dto.BeneficiaryProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.FcmCodeParam
 import ngo.friendship.mhealth.dc.data.remote.dto.FcmProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
@@ -14,6 +15,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.UpdateInterviewStatusReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.mapper.toDomainFcmProfile
+import ngo.friendship.mhealth.dc.domain.model.BeneficiaryProfile
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
@@ -159,6 +161,19 @@ class CaseRepositoryImpl(
         )
         "FCM Data: ${response.data?.fcmProfile}".log("FCM_DEBUG")
         return response.data?.fcmProfile?.toDomainFcmProfile()
+    }
+
+    override suspend fun getBeneficiaryProfile(benefCode: String): BeneficiaryProfile? {
+        val sanitizedBenCode = benefCode.substringBefore("[").replace("-", "").trim()
+        val response = api.getBeneficiaryProfile(
+            request = BeneficiaryProfileReqDto.build(
+                userName = localSettings.user.userName,
+                password = localSettings.user.password,
+                requestTime = currentTimestamp.toDateTimeServerSlash(),
+                benefCode = sanitizedBenCode
+            )
+        )
+        return response.toDomain()
     }
 
     override suspend fun sendSms(msisdn: String, message: String): JsonObject {

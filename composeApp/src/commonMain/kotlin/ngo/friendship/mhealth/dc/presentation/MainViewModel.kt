@@ -30,6 +30,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
 import ngo.friendship.mhealth.dc.utils.log
 
 sealed interface MainUiEvent {
@@ -73,6 +74,9 @@ class MainViewModel(
     )
 
     val interviewListState: StateFlow<List<Interview>>
+        field = MutableStateFlow(emptyList())
+
+    val adviceListState: StateFlow<List<AdviceItemData>>
         field = MutableStateFlow(emptyList())
 
     var selectedCaseTab by mutableStateOf(CaseTab.Pending)
@@ -175,57 +179,26 @@ class MainViewModel(
         }
     }
 
-    private fun shouldUpdateToOpen(tab: CaseTab): Boolean {
-        return when (tab) {
-            CaseTab.Pending -> true
-            CaseTab.Older -> true
-            CaseTab.Opened -> false
-            CaseTab.Answered -> false
-        }
-    }
-
-
-    fun openCase(interview: Interview) {
-        val mode = if (selectedCaseTab == CaseTab.Answered) {
+    fun openCase(
+        interview: Interview,
+        sourceTab: CaseTab
+    ) {
+        val mode = if (sourceTab == CaseTab.Answered) {
             CaseDetailsMode.ANSWERED
         } else {
             CaseDetailsMode.NORMAL
         }
 
-        launch(loading = Loading.Secondary) {
-            val isSuccess = caseRepository.updateInterviewStatus(
+        backStack.add(
+            Screens.CaseDetail(
                 interviewId = interview.interviewId,
-                status = interview.status
+                mode = mode,
+                selectedTab = sourceTab.name
             )
-
-            if (isSuccess) {
-                // Only update local counts and lists if moving from a non-open state to Open
-                if (interview.status == CaseTab.Opened.apiParam && (selectedCaseTab == CaseTab.Pending || selectedCaseTab == CaseTab.Older)) {
-                    interviewListState.value = interviewListState.value.filterNot {
-                        it.interviewId == interview.interviewId
-                    }
-
-                    caseTabCounts = caseTabCounts.toMutableMap().apply {
-                        val currentCount = this[selectedCaseTab] ?: 0
-                        this[selectedCaseTab] = (currentCount - 1).coerceAtLeast(0)
-
-                        val openCount = this[CaseTab.Opened] ?: 0
-                        this[CaseTab.Opened] = openCount + 1
-                    }
-                }
-
-                backStack.add(
-                    Screens.CaseDetail(
-                        interviewId = interview.interviewId,
-                        mode = mode,
-                        selectedTab = selectedCaseTab.label
-                    )
-                )
-            } else {
-                showError("Failed to update interview status")
-            }
-        }
+        )
     }
+
+
 
     fun logout() {
         viewModelScope.launch {
@@ -236,6 +209,26 @@ class MainViewModel(
             }
             settings.clear()
             backStack.replaceWith(Screens.Auth)
+        }
+    }
+
+    fun loadAdviceList() {
+        launch(loading = Loading.Secondary) {
+            adviceListState.value = mainRepository.getAdviceList()
+        }
+    }
+
+    fun saveAdvice(title: String, content: String) {
+        viewModelScope.launch {
+            loadingFlow.value = true
+            val isSuccess = mainRepository.saveAdvice(title, content)
+            loadingFlow.value = false
+            if (isSuccess) {
+                showSuccess("Advice saved successfully")
+                loadAdviceList()
+            } else {
+                showError("Failed to save advice")
+            }
         }
     }
 

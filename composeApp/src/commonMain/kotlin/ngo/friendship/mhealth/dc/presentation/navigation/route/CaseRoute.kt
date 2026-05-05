@@ -32,21 +32,30 @@ fun EntryProviderScope<NavKey>.caseRoute(
         val setupData by mainViewModel.setupDataState.collectAsStateWithLifecycle()
         val userProfile by mainViewModel.userProfileState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(screen.interviewId) {
-            viewModel.onIntent(CaseIntent.LoadInterviewDetails(screen.interviewId))
-            viewModel.onIntent(CaseIntent.LoadQuestionAnswerData(screen.interviewId))
-        }
-
-        LaunchedEffect(screen.mode) {
-            viewModel.onIntent(CaseIntent.SetMode(screen.mode))
-        }
-
-        LaunchedEffect(screen.selectedTab) {
-            // Find the CaseTab that matches the selectedTab string
-            val tab = CaseTab.entries
-                .find { it.label == screen.selectedTab }
+        LaunchedEffect(
+            screen.interviewId,
+            screen.mode,
+            screen.selectedTab
+        ) {
+            val selectedTab = CaseTab.entries
+                .find {
+                    it.name == screen.selectedTab ||
+                            it.label == screen.selectedTab ||
+                            it.apiParam == screen.selectedTab
+                }
                 ?: CaseTab.Pending
-            viewModel.onIntent(CaseIntent.SetSelectedTab(tab))
+
+            println("DEBUG_CASE_ROUTE screen.selectedTab=${screen.selectedTab}, resolved=$selectedTab")
+
+            viewModel.onIntent(CaseIntent.SetMode(screen.mode))
+            viewModel.onIntent(CaseIntent.SetSelectedTab(selectedTab))
+
+            viewModel.onIntent(
+                CaseIntent.OpenCaseFromTab(
+                    interviewId = screen.interviewId,
+                    sourceTab = selectedTab
+                )
+            )
         }
 
         LaunchedEffect(Unit) {
@@ -71,19 +80,20 @@ fun EntryProviderScope<NavKey>.caseRoute(
             onIntent = viewModel::onIntent,
             onFcmDetailsClick = {
                 state.interviewDetails.fcmInfo?.takeIf { it.isNotBlank() }?.let { fcmCode ->
-                     backStack.add(Screens.FcmProfile(fcmCode = fcmCode))
+                    backStack.add(Screens.FcmProfile(fcmCode = fcmCode))
                 }
             },
             onBeneficiaryDetailsClick = {
-                 backStack.add(
-                     Screens.BeneficiaryProfile(
+                backStack.add(
+                    Screens.BeneficiaryProfile(
                         beneficiaryId = state.interviewDetails.beneficiaryId,
+                        beneficiaryCode = state.interviewDetails.beneficiaryCode,
                         beneficiaryName = state.interviewDetails.beneficiaryName,
                         beneficiaryAge = state.interviewDetails.beneficiaryAge ?: "",
                         location = state.interviewDetails.location,
                         questionnaireName = state.interviewDetails.questionnaireName
-                     )
-                 )
+                    )
+                )
             },
             onCall = {
                 userProfile?.mobileNo?.takeIf { it.isNotBlank() }?.let { mobile ->

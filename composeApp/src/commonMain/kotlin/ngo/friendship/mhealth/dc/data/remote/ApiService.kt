@@ -7,6 +7,10 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.BeneficiaryProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.BeneficiaryProfileResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
@@ -23,6 +27,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
@@ -148,6 +154,27 @@ class ApiService(
     suspend fun getDashboardData(
         request: DashboardDataReqDto
     ): DashboardDataResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun getBeneficiaryProfile(
+        request: BeneficiaryProfileReqDto
+    ): BeneficiaryProfileResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun getAdviceList(
+        request: AdviceListReqDto
+    ): AdviceListResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun saveAdvice(
+        request: SaveAdviceReqDto
+    ): SaveAdviceResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
     )

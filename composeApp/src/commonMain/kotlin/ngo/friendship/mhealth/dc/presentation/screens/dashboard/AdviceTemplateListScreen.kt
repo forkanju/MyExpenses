@@ -27,6 +27,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,12 +39,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
-import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonFilterChip
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonNewItemDialog
-import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
@@ -55,21 +55,11 @@ fun AdviceTemplateListScreen(
     var searchQuery by remember { mutableStateOf("") }
     var showNewAdviceDialog by remember { mutableStateOf(false) }
 
-    val adviceItems = listOf(
-        AdviceItemData(
-            "ANC", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25", listOf(
-                "১. প্রতিদিন ২-৩ লিটার পানি ......",
-                "২. প্রসাব আটকে রাখবেন না, ......",
-                "৩. সহবাস করার আগে অবশ্যই ......",
-                "৪. পরিষ্কার পরিচ্ছন্নতা বজায় ......",
-                "৫. প্রসাব করার সময় পুরা প্রসাব......"
-            )
-        ),
-        AdviceItemData("Fever", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        AdviceItemData("Oral Ulcer RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        AdviceItemData("UTI", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25"),
-        AdviceItemData("Migraine RX", "Updated: 1:16 PM, 25 Jan 25 Created: 3:35 PM, 12 Nov 25")
-    )
+    val adviceItems by viewModel.adviceListState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadAdviceList()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -135,7 +125,7 @@ fun AdviceTemplateListScreen(
                 contentLabel = "Advices",
                 onDismiss = { showNewAdviceDialog = false },
                 onCreate = { title: String, content: String ->
-                    // TODO: Handle creation logic
+                    viewModel.saveAdvice(title, content)
                     showNewAdviceDialog = false
                 }
             )
@@ -151,7 +141,7 @@ data class AdviceItemData(
 
 @Composable
 fun AdviceExpandableItem(item: AdviceItemData) {
-    var expanded by remember { mutableStateOf(item.title == "ANC") }
+    var expanded by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
         Row(
@@ -162,7 +152,7 @@ fun AdviceExpandableItem(item: AdviceItemData) {
         ) {
             Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
                 Text(text = item.title, fontSize = 16.sp, color = Color.Gray)
-                Text(text = item.subtitle, fontSize = 10.sp, color = Color.LightGray)
+//                Text(text = item.subtitle, fontSize = 10.sp, color = Color.LightGray)
             }
             Icon(
                 imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,

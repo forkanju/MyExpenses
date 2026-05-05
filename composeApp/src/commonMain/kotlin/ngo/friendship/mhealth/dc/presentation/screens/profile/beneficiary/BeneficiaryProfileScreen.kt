@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,11 +36,14 @@ import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
+import ngo.friendship.mhealth.dc.domain.model.BeneficiaryServiceItem
+import ngo.friendship.mhealth.dc.utils.toUiDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BeneficiaryProfileScreen(
     beneficiaryId: Long,
+    beneficiaryCode: String = "",
     beneficiaryName: String = "",
     beneficiaryAge: String = "",
     location: String = "",
@@ -49,11 +53,13 @@ fun BeneficiaryProfileScreen(
     viewModel: BeneficiaryProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(beneficiaryId) {
         viewModel.onIntent(
             BeneficiaryProfileIntent.LoadProfile(
                 beneficiaryId = beneficiaryId,
+                beneficiaryCode = beneficiaryCode,
                 beneficiaryName = beneficiaryName,
                 beneficiaryAge = beneficiaryAge,
                 location = location,
@@ -96,30 +102,45 @@ fun BeneficiaryProfileScreen(
         },
         containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            BeneficiaryHeaderCard(
-                name = state.beneficiaryName,
-                beneficiaryId = state.beneficiaryId.toString(),
-                location = state.location,
-                age = state.beneficiaryAge,
-                lastVisit = interviewDetails?.startTime ?: ""
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TabRowSection(
-                selectedTab = state.selectedTab,
-                onTabSelected = { viewModel.onIntent(BeneficiaryProfileIntent.SelectTab(it)) }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            when (state.selectedTab) {
-                0 -> ServiceListSection()
-                1 -> PersonalInfoSection(state)
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(8.dp))
+                BeneficiaryHeaderCard(
+                    name = state.beneficiaryName,
+                    beneficiaryId = state.beneficiaryId.toString(),
+                    location = state.location,
+                    age = state.beneficiaryAge,
+                    mobileNo = state.beneficiaryProfile?.mobileNumber ?: "N/A",
+                    lastVisit = interviewDetails?.startTime ?: "",
+                    onCallClick = { mobile ->
+                        val clean = mobile.filter { it.isDigit() }
+                        uriHandler.openUri("tel:$clean")
+                    },
+                    onWhatsAppClick = { mobile ->
+                        val clean = mobile.filter { it.isDigit() }
+                        uriHandler.openUri("https://api.whatsapp.com/send?phone=$clean")
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                TabRowSection(
+                    selectedTab = state.selectedTab,
+                    serviceCount = state.beneficiaryProfile?.serviceList?.size ?: 0,
+                    onTabSelected = { viewModel.onIntent(BeneficiaryProfileIntent.SelectTab(it)) }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                when (state.selectedTab) {
+                    0 -> ServiceListSection(state.beneficiaryProfile?.serviceList ?: emptyList())
+                    1 -> PersonalInfoSection(state)
+                }
+            }
+
+            if (state.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
     }
@@ -131,6 +152,9 @@ private fun BeneficiaryHeaderCard(
     beneficiaryId: String,
     location: String,
     age: String,
+    mobileNo: String,
+    onCallClick: (String) -> Unit,
+    onWhatsAppClick: (String) -> Unit,
     lastVisit: String
 ) {
     Card(
@@ -171,12 +195,12 @@ private fun BeneficiaryHeaderCard(
                     fontFamily = RobotoCondensedFont()
                 )
                 Text(
-                    text = "01918967530 (Self)", // Placeholder
+                    text = mobileNo, // Placeholder
                     fontSize = 13.sp,
                     color = PrimaryBlue,
                     textDecoration = TextDecoration.Underline,
                     fontFamily = RobotoCondensedFont(),
-                    modifier = Modifier.clickable { /* Call */ }
+                    modifier = Modifier.clickable {   onCallClick(mobileNo) }
                 )
                 Text(
                     text = "Visited : $lastVisit",
@@ -188,12 +212,12 @@ private fun BeneficiaryHeaderCard(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircleActionIcon(
                     painter = painterResource(Resources.Icon.Call),
-                    onClick = { /* Call */ }
+                    onClick = { onCallClick(mobileNo) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 CircleActionIcon(
                     painter = painterResource(Resources.Icon.Wapp),
-                    onClick = { /* Wapp */ }
+                    onClick = { onWhatsAppClick(mobileNo) }
                 )
             }
         }
@@ -201,12 +225,12 @@ private fun BeneficiaryHeaderCard(
 }
 
 @Composable
-private fun TabRowSection(selectedTab: Int, onTabSelected: (Int) -> Unit) {
+private fun TabRowSection(selectedTab: Int, serviceCount: Int, onTabSelected: (Int) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val tabs = listOf("Service list (07)", "Personal info")
+        val tabs = listOf("Service list (${serviceCount.toString().padStart(2, '0')})", "Personal info")
         tabs.forEachIndexed { index, title ->
             TabItem(
                 title = title,
@@ -243,14 +267,7 @@ private fun TabItem(title: String, isSelected: Boolean, modifier: Modifier = Mod
 }
 
 @Composable
-private fun ServiceListSection() {
-    // Mock list of cases based on image
-    val cases = listOf(
-        CaseItemData("Oral Ulcer", "DX: Oral ulcer (Aphthous ulcer) - localized shallow", "Tab: Ribonson (5mg), Lotion Viola (1%) 5 days...", "15-Dec-22"),
-        CaseItemData("Loose Stool", "DX: Oral ulcer (Aphthous ulcer)", "Orsaline, Tab: Imotil (2mg) (1+1+1) 3 days....", "15-Dec-22"),
-        CaseItemData("Fever", "DX: Oral ulcer (Aphthous ulcer) - localized shallow", "Paracetamol 500mg (1+1+1) 3 days....", "15-Dec-22")
-    )
-
+private fun ServiceListSection(services: List<BeneficiaryServiceItem>) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxSize()
@@ -277,17 +294,15 @@ private fun ServiceListSection() {
                  }
              }
         }
-        items(cases) { case ->
-            CaseItemRow(case)
+        items(services) { service ->
+            CaseItemRow(service)
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
         }
     }
 }
 
-data class CaseItemData(val title: String, val dx: String, val prescription: String, val date: String)
-
 @Composable
-private fun CaseItemRow(case: CaseItemData) {
+private fun CaseItemRow(service: BeneficiaryServiceItem) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.Top) {
             Box(
@@ -305,11 +320,12 @@ private fun CaseItemRow(case: CaseItemData) {
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(text = case.title, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text(text = case.dx, fontSize = 13.sp, color = PrimaryBlue, lineHeight = 16.sp)
-                Text(text = case.prescription, fontSize = 13.sp, color = Color.Gray, lineHeight = 16.sp)
+                Text(text = service.caseName, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text = "Status: ${service.status}", fontSize = 13.sp, color = PrimaryBlue, lineHeight = 16.sp)
+                Text(text = "Referred to: ${service.referredTo}", fontSize = 13.sp, color = Color.Gray, lineHeight = 16.sp)
+                Text(text = "Opened by: ${service.lastOpenedBy}", fontSize = 13.sp, color = Color.Gray, lineHeight = 16.sp)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Date: ${case.date}", fontSize = 11.sp, color = Color.Gray)
+                Text(text = "Date: ${service.interviewTime.toUiDate()}", fontSize = 11.sp, color = Color.Gray)
             }
         }
     }
@@ -334,6 +350,21 @@ private fun PersonalInfoSection(state: BeneficiaryProfileUiState) {
             ProfileInfoRow("Location", state.location)
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
             ProfileInfoRow("Age", state.beneficiaryAge)
+            
+            state.beneficiaryProfile?.let { profile ->
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileInfoRow("Guardian Name", profile.guardianName)
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileInfoRow("Mobile", profile.mobileNumber)
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileInfoRow("Gender", profile.gender)
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileInfoRow("Marital Status", profile.maritalStatus)
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileInfoRow("Occupation", profile.occupation)
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileInfoRow("Religion", profile.religion)
+            }
         }
     }
 }

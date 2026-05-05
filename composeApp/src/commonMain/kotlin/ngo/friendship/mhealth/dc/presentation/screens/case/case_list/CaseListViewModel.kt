@@ -43,8 +43,9 @@ class CaseListViewModel(
             CaseListIntent.ClearError -> _state.value = _state.value.copy(error = null)
             is CaseListIntent.ClickCase -> {
                 viewModelScope.launch {
-                    _effect.send(CaseListEffect.NavigateToDetails(intent.interview))
+                    _effect.send(CaseListEffect.NavigateToDetails(intent.interview, state.value.selectedTab))
                 }
+
             }
             CaseListIntent.ClickFilter -> {
                 viewModelScope.launch {

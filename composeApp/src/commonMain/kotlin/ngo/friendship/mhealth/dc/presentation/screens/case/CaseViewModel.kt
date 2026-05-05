@@ -3,20 +3,20 @@ package ngo.friendship.mhealth.dc.presentation.screens.case
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.collectLatest
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
-import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addInvestigation
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeInvestigation
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.minusAt
 
 class CaseViewModel(
@@ -39,7 +39,8 @@ class CaseViewModel(
             mainRepository.getSetupData().collectLatest { setupData ->
                 _state.update {
                     it.copy(
-                        medicineBrandTypeList = setupData.medicineBrandTypes.map { it.type }.distinct()
+                        medicineBrandTypeList = setupData.medicineBrandTypes.map { it.type }
+                            .distinct()
                     )
                 }
             }
@@ -55,13 +56,16 @@ class CaseViewModel(
             is CaseIntent.SetMode -> {
                 _state.update { it.copy(mode = intent.mode) }
             }
+
             is CaseIntent.SetSelectedTab -> {
                 _state.update { it.copy(selectedTab = intent.tab) }
             }
+
             is CaseIntent.UpdateFormState -> updateFormState(intent.state)
             is CaseIntent.UpdateMedicineComposerState -> {
                 _state.update { it.copy(medicineComposerState = intent.state) }
             }
+
             is CaseIntent.AddDiagnosis -> {
                 updateFormState(addDiagnosis(_state.value.formState, intent.diagnosis))
             }
@@ -159,6 +163,45 @@ class CaseViewModel(
             is CaseIntent.UpdateInterviewNote -> {
                 _state.update { it.copy(interviewNote = intent.note) }
             }
+
+            is CaseIntent.OpenCaseFromTab -> {
+                openCaseFromTab(intent.interviewId, intent.sourceTab)
+            }
+        }
+    }
+
+    private fun openCaseFromTab(
+        interviewId: Long,
+        sourceTab: CaseTab
+    ) {
+        if (interviewId == -1L) return
+
+        launch {
+            _state.update {
+                it.copy(
+                    selectedTab = sourceTab,
+                    interviewDetails = InterviewDetails()
+                )
+            }
+
+            val statusToSend = when (sourceTab) {
+                CaseTab.Pending -> CaseTab.Opened.apiParam
+                CaseTab.Answered -> null
+                CaseTab.Opened -> null
+                CaseTab.Older -> null
+            }
+
+            if (statusToSend != null) {
+                repository.updateInterviewStatus(
+                    interviewId = interviewId,
+                    status = statusToSend
+                )
+            }
+
+            val details = repository.getInterviewDetails(interviewId = interviewId)
+            _state.update { it.copy(interviewDetails = details) }
+
+            loadQuestionAnswerData(interviewId)
         }
     }
 
@@ -171,17 +214,17 @@ class CaseViewModel(
             _state.update { it.copy(interviewDetails = InterviewDetails()) }
             val details = repository.getInterviewDetails(interviewId = interviewId)
             _state.update { it.copy(interviewDetails = details) }
-            
+
             val fcmInfo = details.fcmInfo
             "Interview loaded. fcmInfo: $fcmInfo".log("CASE_DEBUG")
-            
+
             fcmInfo?.takeIf { it.isNotBlank() }?.let { fcmCode ->
                 launch {
                     _state.update { it.copy(fcmProfileState = it.fcmProfileState.copy(isLoading = true)) }
                     "Fetching FCM Profile for code: $fcmCode".log("CASE_DEBUG")
                     val profile = repository.getFcmProfile(fcmCode)
                     "Fetched profile: ${profile?.userName}, ${profile?.location}".log("CASE_DEBUG")
-                    _state.update { 
+                    _state.update {
                         it.copy(
                             fcmProfileState = it.fcmProfileState.copy(
                                 fcmProfile = profile,

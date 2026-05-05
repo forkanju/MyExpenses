@@ -76,7 +76,7 @@ fun CaseItem(
             Row(verticalAlignment = Alignment.Top) {
                 AvatarTileWithBadges(
                     modifier = Modifier.size(width = 56.dp, height = 68.dp),
-                    timeText = "00:25",
+                    timeText = ui.startTime,
                     idText = ui.beneficiaryCode.substringAfter("-"),
                     isAnsweredStyle = isAnsweredStyle,
                     photo = {
@@ -98,7 +98,7 @@ fun CaseItem(
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "${ui.beneficiaryName} (${ui.status} | ${ui.status}y)",
+                        text = "${ui.beneficiaryName} (${ui.status})",
                         style = CompactTextStyle(
                             fontWeight = FontWeight.Bold,
                             color = titleColor

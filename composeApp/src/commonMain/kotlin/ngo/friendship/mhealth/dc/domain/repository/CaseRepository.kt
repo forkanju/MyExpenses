@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.domain.repository
 
 import kotlinx.serialization.json.JsonObject
+import ngo.friendship.mhealth.dc.domain.model.BeneficiaryProfile
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
@@ -25,6 +26,8 @@ interface CaseRepository {
     suspend fun updateInterviewStatus(interviewId: Long, status: String): Boolean
 
     suspend fun getFcmProfile(fcmCode: String): FcmProfile?
+
+    suspend fun getBeneficiaryProfile(benefCode: String): BeneficiaryProfile?
 
     suspend fun sendSms(
         msisdn: String,

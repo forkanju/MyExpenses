@@ -14,6 +14,7 @@ fun EntryProviderScope<NavKey>.beneficiaryProfileRoute(
     entry<Screens.BeneficiaryProfile> { screen ->
         BeneficiaryProfileScreen(
             beneficiaryId = screen.beneficiaryId,
+            beneficiaryCode = screen.beneficiaryCode,
             beneficiaryName = screen.beneficiaryName,
             beneficiaryAge = screen.beneficiaryAge,
             location = screen.location,

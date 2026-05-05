@@ -31,14 +31,18 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CaseListScreen(
     modifier: Modifier = Modifier,
     viewModel: CaseListViewModel = koinViewModel(),
-    onNavigateToDetails: (Interview) -> Unit = {}
+    onNavigateToDetails: (Interview, CaseTab) -> Unit = { _, _ -> }
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->
             when (effect) {
-                is CaseListEffect.NavigateToDetails -> onNavigateToDetails(effect.interview)
+                is CaseListEffect.NavigateToDetails -> onNavigateToDetails(
+                    effect.interview,
+                    effect.sourceTab
+                )
+
                 CaseListEffect.OpenFilterSheet -> {
                     // Handle filter sheet
                 }

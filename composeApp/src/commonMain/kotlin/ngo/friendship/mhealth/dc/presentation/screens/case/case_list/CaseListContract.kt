@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.case_list
 
 import ngo.friendship.mhealth.dc.domain.model.Interview
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
 data class CaseListState(
@@ -23,6 +24,11 @@ sealed interface CaseListIntent {
 }
 
 sealed interface CaseListEffect {
-    data class NavigateToDetails(val interview: Interview) : CaseListEffect
+    data class NavigateToDetails(
+        val interview: Interview,
+        val sourceTab: CaseTab
+    ) : CaseListEffect
+
     data object OpenFilterSheet : CaseListEffect
 }
+

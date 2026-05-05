@@ -52,6 +52,7 @@ object Screens {
     @Serializable
     data class BeneficiaryProfile(
         val beneficiaryId: Long,
+        val beneficiaryCode: String = "",
         val beneficiaryName: String = "",
         val beneficiaryAge: String = "",
         val location: String = "",

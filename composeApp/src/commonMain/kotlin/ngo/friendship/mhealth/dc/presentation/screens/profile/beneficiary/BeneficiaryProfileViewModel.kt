@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ngo.friendship.mhealth.dc.domain.model.BeneficiaryProfile
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
@@ -26,13 +27,14 @@ class BeneficiaryProfileViewModel(
                  _state.update { 
                      it.copy(
                          beneficiaryId = intent.beneficiaryId,
+                         beneficiaryCode = intent.beneficiaryCode,
                          beneficiaryName = intent.beneficiaryName,
                          beneficiaryAge = intent.beneficiaryAge,
                          location = intent.location,
                          questionnaireName = intent.questionnaireName
                      ) 
                  }
-                 loadBeneficiaryCases()
+                 loadBeneficiaryProfile(intent.beneficiaryCode)
             }
             is BeneficiaryProfileIntent.SelectTab -> {
                 _state.update { it.copy(selectedTab = intent.index) }
@@ -43,8 +45,22 @@ class BeneficiaryProfileViewModel(
         }
     }
 
-    private fun loadBeneficiaryCases() {
-        // Placeholder for loading cases for a specific beneficiary
-        // For now, we might load a generic list or just keep it empty
+    private fun loadBeneficiaryProfile(benefCode: String) {
+        launch {
+            _state.update { it.copy(isLoading = true) }
+            try {
+                val profile = repository.getBeneficiaryProfile(benefCode)
+                _state.update {
+                    it.copy(
+                        beneficiaryProfile = profile,
+                        beneficiaryName = profile?.benefName ?: it.beneficiaryName,
+                        location = profile?.locationName ?: it.location,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(isLoading = false) }
+            }
+        }
     }
 }

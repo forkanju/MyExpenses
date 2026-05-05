@@ -845,6 +845,7 @@ fun main() {
 fun String.toUiDateTime(): String {
     return try {
         // Backend: "2026-01-29 16:30:22.0"
+        //Frontend: "16:30, 29 Jan 2026"
         val cleaned = this
             .substringBefore(".")   // remove ".0"
             .replace(" ", "T")      // ISO format
@@ -863,5 +864,26 @@ fun String.toUiDateTime(): String {
         "$hour:$minute, $day $month ${dt.year}"
     } catch (e: Exception) {
         this // fallback
+    }
+}
+
+fun String.toUiDate(): String {
+    return try {
+        val cleaned = this
+            .substringBefore(".")   // remove ".0"
+            .replace(" ", "T")      // ISO format
+
+        val dt = LocalDateTime.parse(cleaned)
+
+        val day = dt.dayOfMonth.toString().padStart(2, '0')
+
+        val month = dt.month.name
+            .lowercase()
+            .replaceFirstChar { it.uppercase() }
+            .take(3)
+
+        "$day $month ${dt.year}"
+    } catch (e: Exception) {
+        this
     }
 }
