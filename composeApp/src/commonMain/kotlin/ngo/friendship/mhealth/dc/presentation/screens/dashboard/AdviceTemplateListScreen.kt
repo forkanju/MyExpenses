@@ -57,6 +57,17 @@ fun AdviceTemplateListScreen(
 
     val adviceItems by viewModel.adviceListState.collectAsState()
 
+    val filteredAdviceItems = remember(searchQuery, adviceItems) {
+        if (searchQuery.isBlank()) {
+            adviceItems
+        } else {
+            adviceItems.filter { item ->
+                item.title.contains(searchQuery, ignoreCase = true) ||
+                        item.details.any { it.contains(searchQuery, ignoreCase = true) }
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.loadAdviceList()
     }
@@ -109,7 +120,7 @@ fun AdviceTemplateListScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(adviceItems) { item ->
+                        items(filteredAdviceItems) { item ->
                             AdviceExpandableItem(item)
                             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                         }
