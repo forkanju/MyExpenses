@@ -51,7 +51,7 @@ fun AdviceTemplateListScreen(
     onBack: () -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf("All") }
-    val filters = listOf("All", "Recent Used", "Recent Updated")
+    val filters = listOf("All")
     var searchQuery by remember { mutableStateOf("") }
     var showNewAdviceDialog by remember { mutableStateOf(false) }
 
