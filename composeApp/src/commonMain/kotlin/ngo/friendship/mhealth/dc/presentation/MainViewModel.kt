@@ -30,6 +30,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.utils.log
 
 sealed interface MainUiEvent {
     data object Idle : MainUiEvent
@@ -185,12 +186,6 @@ class MainViewModel(
 
 
     fun openCase(interview: Interview) {
-        val targetStatus = if (selectedCaseTab == CaseTab.Answered) {
-            CaseTab.Answered.apiParam // "Close"
-        } else {
-            CaseTab.Opened.apiParam // "Open"
-        }
-
         val mode = if (selectedCaseTab == CaseTab.Answered) {
             CaseDetailsMode.ANSWERED
         } else {
@@ -200,12 +195,12 @@ class MainViewModel(
         launch(loading = Loading.Secondary) {
             val isSuccess = caseRepository.updateInterviewStatus(
                 interviewId = interview.interviewId,
-                status = targetStatus
+                status = interview.status
             )
 
             if (isSuccess) {
                 // Only update local counts and lists if moving from a non-open state to Open
-                if (targetStatus == CaseTab.Opened.apiParam && (selectedCaseTab == CaseTab.Pending || selectedCaseTab == CaseTab.Older)) {
+                if (interview.status == CaseTab.Opened.apiParam && (selectedCaseTab == CaseTab.Pending || selectedCaseTab == CaseTab.Older)) {
                     interviewListState.value = interviewListState.value.filterNot {
                         it.interviewId == interview.interviewId
                     }
