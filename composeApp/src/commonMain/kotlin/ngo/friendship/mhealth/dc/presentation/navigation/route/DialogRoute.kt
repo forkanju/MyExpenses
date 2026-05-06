@@ -56,7 +56,10 @@ fun EntryProviderScope<NavKey>.dialogRoute(
             ProfilePopup(
                 uiState = ProfileUiState(
                     name = userProfile?.userName ?: "Doctor Center",
-                    designation = userProfile?.location ?: "Friendship NGO"
+                    designation = userProfile?.location ?: "Friendship NGO",
+                    email = userProfile?.email ?: "",
+                    mobileNo = userProfile?.mobileNo ?: "",
+                    profileImage = userProfile?.getProfileImageSource()
                 ),
                 onDismiss = { viewModel.backStack.removeLastOrNull() },
                 onEvent = { event ->
@@ -64,6 +67,11 @@ fun EntryProviderScope<NavKey>.dialogRoute(
                         ProfileEvent.OnSignOutClick -> {
                             viewModel.backStack.removeLastOrNull()
                             viewModel.logout()
+                        }
+
+                        ProfileEvent.OnChangePasswordClick -> {
+                            viewModel.backStack.removeLastOrNull()
+                            viewModel.backStack.add(Screens.ChangePassword)
                         }
 
                         else -> {

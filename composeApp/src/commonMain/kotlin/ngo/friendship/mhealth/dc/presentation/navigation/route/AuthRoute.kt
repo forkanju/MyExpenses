@@ -33,9 +33,6 @@ fun EntryProviderScope<NavKey>.authRoute(
     }
     entryWithVM<Screens.ForgotPassword, AuthViewModel>(mainViewModel.backStack, snackBarState) {
         ForgotPasswordScreen(
-            onSendResetLinkClick = {
-
-            },
             onBackToLoginClick = backStack::removeLastOrNull
         )
     }

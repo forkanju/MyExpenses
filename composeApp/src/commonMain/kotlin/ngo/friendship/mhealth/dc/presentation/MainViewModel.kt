@@ -36,6 +36,7 @@ import ngo.friendship.mhealth.dc.utils.log
 sealed interface MainUiEvent {
     data object Idle : MainUiEvent
     data object OpenCasesTab : MainUiEvent
+    data object OpenMoreTab : MainUiEvent
 }
 
 class MainViewModel(
@@ -115,9 +116,16 @@ class MainViewModel(
         }
     }
 
-    fun clearOpenCasesEvent() {
+    fun clearEvents() {
         launch {
             uiEvent.emit(MainUiEvent.Idle)
+        }
+    }
+
+    fun openMoreTab() {
+        backStack.replaceWith(Screens.Main)
+        launch {
+            uiEvent.emit(MainUiEvent.OpenMoreTab)
         }
     }
 
@@ -241,6 +249,20 @@ class MainViewModel(
                 showSuccess("Investigation saved successfully")
             } else {
                 showError("Failed to save investigation")
+            }
+        }
+    }
+
+    fun changePassword(old: String, new: String) {
+        viewModelScope.launch {
+            loadingFlow.value = true
+            val (isSuccess, message) = mainRepository.changePassword(old, new)
+            loadingFlow.value = false
+            if (isSuccess) {
+                showSuccess("Password changed successfully. Please login again.")
+                logout()
+            } else {
+                showError(message ?: "Failed to change password")
             }
         }
     }

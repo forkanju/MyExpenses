@@ -1,5 +1,6 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +31,8 @@ fun PrescriptionHeader(
     modifier: Modifier = Modifier,
     title: String = "Prescription",
     rightText: String = "More",
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    onMoreClick: () -> Unit = {}
 ) {
     val titleColor = if (isAnsweredMode) Color(0xFF666666) else PrimaryColor
     val rightTextColor = if (isAnsweredMode) Color(0xFF7A7A7A) else TextSecondary
@@ -65,7 +67,8 @@ fun PrescriptionHeader(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.clickable { onMoreClick() }
         ) {
             Text(
                 text = rightText,
@@ -79,7 +82,7 @@ fun PrescriptionHeader(
 
             Icon(
                 painter = painterResource(resource = Resources.Icon.More),
-                contentDescription = "Action Icon",
+                contentDescription = "More Icon",
                 tint = rightIconColor
             )
         }

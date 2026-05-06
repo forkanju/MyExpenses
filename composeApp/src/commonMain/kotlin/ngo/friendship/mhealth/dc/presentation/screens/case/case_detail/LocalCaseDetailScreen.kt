@@ -37,7 +37,8 @@ fun LocalCaseDetailScreen(
     setupData: SetupData,
     onIntent: (CaseIntent) -> Unit,
     onBack: () -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
+    onMoreClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -192,7 +193,10 @@ fun LocalCaseDetailScreen(
             // Prescription Section
             FormContainerCard {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    PrescriptionHeader(isAnsweredMode = false)
+                    PrescriptionHeader(
+                        isAnsweredMode = false,
+                        onMoreClick = onMoreClick
+                    )
                     HorizontalDivider()
 
                     FormAutoCompleteDropdownField(

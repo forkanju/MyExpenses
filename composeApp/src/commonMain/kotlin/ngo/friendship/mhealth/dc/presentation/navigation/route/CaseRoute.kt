@@ -105,6 +105,9 @@ fun EntryProviderScope<NavKey>.caseRoute(
                     uriHandler.openUri("https://api.whatsapp.com/send?phone=$mobile")
                 }
             },
+            onMoreClick = {
+                mainViewModel.openMoreTab()
+            },
             onBack = backStack::removeLastOrNull
         )
     }

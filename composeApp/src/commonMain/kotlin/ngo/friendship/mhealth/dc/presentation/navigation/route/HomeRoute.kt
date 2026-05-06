@@ -51,7 +51,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
             viewModel.uiEvent.collect { event ->
                 if (event is MainUiEvent.OpenCasesTab) {
                     viewModel.selectBottomTab(BottomNavItems.Cases)
-                    viewModel.clearOpenCasesEvent()
+                    viewModel.clearEvents()
                 }
             }
         }

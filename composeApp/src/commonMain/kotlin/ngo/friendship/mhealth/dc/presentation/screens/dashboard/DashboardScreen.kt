@@ -141,18 +141,18 @@ fun DashboardContent(
                 }
             }
             item {
-                Text(
-                    text = "Local treatment",
-                    style = CompactTextStyle(
-                        fontSize = FontSize.EXTRA_REGULAR,
-                        color = TextSecondary,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                LocalTreatmentCard(
-                    onClick = { onIntent(DashboardIntent.Navigate(Screens.LocalTreatment)) }
-                )
+//                Text(
+//                    text = "Local treatment",
+//                    style = CompactTextStyle(
+//                        fontSize = FontSize.EXTRA_REGULAR,
+//                        color = TextSecondary,
+//                        fontWeight = FontWeight.SemiBold,
+//                    )
+//                )
+//                Spacer(modifier = Modifier.height(8.dp))
+//                LocalTreatmentCard(
+//                    onClick = { onIntent(DashboardIntent.Navigate(Screens.LocalTreatment)) }
+//                )
             }
         }
     }

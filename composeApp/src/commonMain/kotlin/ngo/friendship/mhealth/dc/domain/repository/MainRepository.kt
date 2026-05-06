@@ -18,4 +18,5 @@ interface MainRepository {
         type: String,
         strength: String
     ): Boolean
+    suspend fun changePassword(old: String, new: String): Pair<Boolean, String?>
 }

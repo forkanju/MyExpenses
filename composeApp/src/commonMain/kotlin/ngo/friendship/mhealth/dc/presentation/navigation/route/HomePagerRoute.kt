@@ -38,7 +38,19 @@ fun HomePagerRoute(
                         mainViewModel.selectBottomTab(BottomNavItems.Cases)
                     }
 
-                    mainViewModel.clearOpenCasesEvent()
+                    mainViewModel.clearEvents()
+                }
+
+                MainUiEvent.OpenMoreTab -> {
+                    val moreIndex = BottomNavItems.entries.indexOf(BottomNavItems.More)
+                    println("HomePagerRoute: moving to More page = $moreIndex")
+
+                    if (moreIndex != -1) {
+                        pagerState.scrollToPage(moreIndex)
+                        mainViewModel.selectBottomTab(BottomNavItems.More)
+                    }
+
+                    mainViewModel.clearEvents()
                 }
 
                 MainUiEvent.Idle -> Unit
@@ -61,7 +73,7 @@ fun HomePagerRoute(
                     // or can be triggered via a shared event if needed.
                 }
 
-                BottomNavItems.Dashboard -> Unit
+                BottomNavItems.More -> Unit
             }
         },
         modifier = modifier
@@ -82,7 +94,7 @@ fun HomePagerRoute(
                     }
                 )
 
-                BottomNavItems.Dashboard -> DashboardScreen(
+                BottomNavItems.More -> DashboardScreen(
                     onNavigate = { route ->
                         mainViewModel.backStack.add(route)
                     }

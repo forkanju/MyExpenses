@@ -1,5 +1,6 @@
 package ngo.friendship.mhealth.dc.presentation.screens.auth
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,34 +9,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import ngo.friendship.mhealth.dc.presentation.components.FloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
+import ngo.friendship.mhealth.dc.theme.ButtonPrimary
+import ngo.friendship.mhealth.dc.theme.CanvasBackground
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.TextPrimary
+import ngo.friendship.mhealth.dc.theme.TextWhite
 
 @Composable
 fun ForgotPasswordScreen(
-    onSendResetLinkClick: (emailOrUsername: String) -> Unit = {},
     onBackToLoginClick: () -> Unit = {}
 ) {
-    var emailOrUsername by remember { mutableStateOf("") }
-    var errorText by remember { mutableStateOf<String?>(null) }
+    val uriHandler = LocalUriHandler.current
 
     Column(
         modifier = Modifier
@@ -58,9 +53,9 @@ fun ForgotPasswordScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "Enter your email or username. We’ll send a reset link.",
+            text = "Click below button to reset your password from mHealth web portal.",
             style = MaterialTheme.typography.bodyMedium.copy(
-                
+
                 fontSize = FontSize.REGULAR,
                 fontWeight = FontWeight.Normal,
                 color = TextPrimary
@@ -69,39 +64,22 @@ fun ForgotPasswordScreen(
 
         Spacer(modifier = Modifier.height(28.dp))
 
-        FloatingLabeledTextField(
-            label = "Email / Username",
-            value = emailOrUsername,
-            onValueChange = {
-                emailOrUsername = it
-                errorText = null
-            },
-            placeholder = "Enter email or username",
-            isError = errorText != null,
-            supportingText = errorText,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Done
-            )
-        )
-
         Spacer(modifier = Modifier.height(24.dp))
 
         PrimaryButton(
-            text = "Send reset link",
+            text = "Click here to reset your password",
             onClick = {
-                val trimmed = emailOrUsername.trim()
-                if (trimmed.isEmpty()) {
-                    errorText = "Please enter email or username"
-                } else {
-                    onSendResetLinkClick(trimmed)
-                }
+                uriHandler.openUri("https://mhealth.apps.friendship.ngo/mHealth/")
             },
-            enabled = emailOrUsername.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
+            enabled = true,
+            modifier = Modifier.fillMaxWidth(),
+            isUnderlined = true,
+            buttonBackgroundColor = CanvasBackground,
+            buttonTextColor = ButtonPrimary,
+            border = BorderStroke(1.dp, ButtonPrimary)
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         PrimaryButton(
             text = "Back to login",

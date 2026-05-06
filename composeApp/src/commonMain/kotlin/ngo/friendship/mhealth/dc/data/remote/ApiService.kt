@@ -11,6 +11,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.BeneficiaryProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.BeneficiaryProfileResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
@@ -140,6 +142,13 @@ class ApiService(
     suspend fun getDoctorProfile(
         request: DoctorProfileReqDto
     ): DoctorProfileResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun changePassword(
+        request: ChangePasswordReqDto
+    ): ChangePasswordResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
     )

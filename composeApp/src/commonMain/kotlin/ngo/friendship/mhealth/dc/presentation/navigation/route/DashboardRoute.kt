@@ -97,6 +97,9 @@ fun EntryProviderScope<NavKey>.dashboardRoute(
             onSave = {
                 // Handle save
                 mainViewModel.backStack.removeLastOrNull()
+            },
+            onMoreClick = {
+                mainViewModel.openMoreTab()
             }
         )
     }

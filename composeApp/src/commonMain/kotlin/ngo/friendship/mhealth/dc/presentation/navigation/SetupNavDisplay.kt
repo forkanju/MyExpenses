@@ -25,6 +25,7 @@ import androidx.navigation3.ui.NavDisplay
 import fcmProfileRoute
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
+import ngo.friendship.mhealth.dc.presentation.navigation.route.profileRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.beneficiaryProfileRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.caseRoute
@@ -140,6 +141,10 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                         )
 
                         beneficiaryProfileRoute(
+                            mainViewModel = viewModel
+                        )
+
+                        profileRoute(
                             mainViewModel = viewModel
                         )
                     }

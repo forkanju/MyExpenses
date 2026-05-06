@@ -4,15 +4,36 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,15 +50,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ngo.friendship.mhealth.dc.domain.model.BeneficiaryServiceItem
+import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.utils.toUiDate
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
-import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
-import ngo.friendship.mhealth.dc.domain.model.BeneficiaryServiceItem
-import ngo.friendship.mhealth.dc.utils.toUiDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,7 +102,7 @@ fun BeneficiaryProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "$questionnaireName > $beneficiaryId",
+                        "Beneficiary Profile",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Medium,
                             color = Color(0xFF666666)
@@ -200,7 +221,7 @@ private fun BeneficiaryHeaderCard(
                     color = PrimaryBlue,
                     textDecoration = TextDecoration.Underline,
                     fontFamily = RobotoCondensedFont(),
-                    modifier = Modifier.clickable {   onCallClick(mobileNo) }
+                    modifier = Modifier.clickable { onCallClick(mobileNo) }
                 )
                 Text(
                     text = "Visited : $lastVisit",
@@ -230,7 +251,8 @@ private fun TabRowSection(selectedTab: Int, serviceCount: Int, onTabSelected: (I
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        val tabs = listOf("Service list (${serviceCount.toString().padStart(2, '0')})", "Personal info")
+        val tabs =
+            listOf("Service list (${serviceCount.toString().padStart(2, '0')})", "Personal info")
         tabs.forEachIndexed { index, title ->
             TabItem(
                 title = title,
@@ -243,7 +265,12 @@ private fun TabRowSection(selectedTab: Int, serviceCount: Int, onTabSelected: (I
 }
 
 @Composable
-private fun TabItem(title: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun TabItem(
+    title: String,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = if (isSelected) PrimaryBlue else Color.White,
@@ -272,28 +299,6 @@ private fun ServiceListSection(services: List<BeneficiaryServiceItem>) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxSize()
     ) {
-        item {
-             Row(
-                 modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                 horizontalArrangement = Arrangement.SpaceBetween,
-                 verticalAlignment = Alignment.CenterVertically
-             ) {
-                 Text("Recent Cases", fontSize = 14.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
-                 Row(verticalAlignment = Alignment.CenterVertically) {
-                     Text("Last ", fontSize = 14.sp, color = Color.Gray)
-                     Surface(
-                         shape = RoundedCornerShape(4.dp),
-                         border = BorderStroke(1.dp, Color.Gray),
-                         modifier = Modifier.padding(start = 4.dp)
-                     ) {
-                         Row(modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                             Text("20", fontSize = 13.sp)
-                             Icon(Icons.Default.ArrowDropDown, contentDescription = null, modifier = Modifier.size(16.dp))
-                         }
-                     }
-                 }
-             }
-        }
         items(services) { service ->
             CaseItemRow(service)
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
@@ -311,7 +316,7 @@ private fun CaseItemRow(service: BeneficiaryServiceItem) {
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.LightGray)
             ) {
-                 Image(
+                Image(
                     painter = painterResource(Resources.Icon.FCM), // Placeholder
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
@@ -320,12 +325,36 @@ private fun CaseItemRow(service: BeneficiaryServiceItem) {
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text(text = service.caseName, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text(text = "Status: ${service.status}", fontSize = 13.sp, color = PrimaryBlue, lineHeight = 16.sp)
-                Text(text = "Referred to: ${service.referredTo}", fontSize = 13.sp, color = Color.Gray, lineHeight = 16.sp)
-                Text(text = "Opened by: ${service.lastOpenedBy}", fontSize = 13.sp, color = Color.Gray, lineHeight = 16.sp)
+                Text(
+                    text = service.caseName,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Text(
+                    text = "Status: ${service.status}",
+                    fontSize = 13.sp,
+                    color = PrimaryBlue,
+                    lineHeight = 16.sp
+                )
+                Text(
+                    text = "Referred to: ${service.referredTo}",
+                    fontSize = 13.sp,
+                    color = Color.Gray,
+                    lineHeight = 16.sp
+                )
+                Text(
+                    text = "Opened by: ${service.lastOpenedBy}",
+                    fontSize = 13.sp,
+                    color = Color.Gray,
+                    lineHeight = 16.sp
+                )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Date: ${service.interviewTime.toUiDate()}", fontSize = 11.sp, color = Color.Gray)
+                Text(
+                    text = "Date: ${service.interviewTime.toUiDate()}",
+                    fontSize = 11.sp,
+                    color = Color.Gray
+                )
             }
         }
     }
@@ -350,7 +379,7 @@ private fun PersonalInfoSection(state: BeneficiaryProfileUiState) {
             ProfileInfoRow("Location", state.location)
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
             ProfileInfoRow("Age", state.beneficiaryAge)
-            
+
             state.beneficiaryProfile?.let { profile ->
                 HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                 ProfileInfoRow("Guardian Name", profile.guardianName)

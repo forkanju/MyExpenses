@@ -11,5 +11,5 @@ enum class BottomNavItems(
 ) {
     Home(Res.drawable.home),
     Cases(Res.drawable.case_n),
-    Dashboard(Res.drawable.more)
+    More(Res.drawable.more)
 }

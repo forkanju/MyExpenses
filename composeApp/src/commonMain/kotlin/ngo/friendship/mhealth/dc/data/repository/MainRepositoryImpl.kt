@@ -16,6 +16,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
@@ -142,18 +143,7 @@ class MainRepositoryImpl(
     }.flowOn(Dispatchers.IO)
 
     override fun getDoctorProfile(): Flow<UserProfile?> = flow<UserProfile?> {
-        // 1. Emit current local data if available
-        try {
-            // We use a separate collect or combine if we want continuous DB updates, 
-            // but for a simple refresh we can emitAll or use a more complex pattern.
-            // For debugging, let's just make sure the API call actually runs.
-        } catch (e: Exception) {}
-
-        // Start collecting from DB and emit to the UI
-        // We use emitAll to keep the flow alive with DB changes
-        // But we need to trigger the API call as well.
-        
-        // Trigger API refresh in background or before emitAll
+        // ... (existing logic)
         try {
              val response = api.getDoctorProfile(
                 DoctorProfileReqDto.build(
@@ -173,6 +163,22 @@ class MainRepositoryImpl(
 
         emitAll(userProfileDao.getUserProfile())
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun changePassword(old: String, new: String): Pair<Boolean, String?> {
+        return try {
+            val response = api.changePassword(
+                ChangePasswordReqDto.build(
+                    userName = localSettings.user.userName,
+                    oldPassword = old,
+                    newPassword = new
+                )
+            )
+            val isSuccess = response.responseCode == "01"
+            isSuccess to (if (isSuccess) "Success" else response.errorDesc)
+        } catch (e: Exception) {
+            false to e.message
+        }
+    }
 
     suspend fun getCachedSetupData(): SetupData {
         return SetupData(

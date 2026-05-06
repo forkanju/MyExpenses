@@ -3,12 +3,33 @@ package ngo.friendship.mhealth.dc.presentation.screens.profile.fcm
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -26,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
-import ngo.friendship.mhealth.dc.domain.model.UserProfile
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
@@ -42,6 +63,7 @@ fun FcmProfileScreen(
     viewModel: FcmProfileViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(fcmProfile) {
         if (fcmProfile != null) {
@@ -94,7 +116,21 @@ fun FcmProfileScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            ProfileHeaderCard(state)
+            ProfileHeaderCard(
+                state = state,
+                onCallClick = { mobile ->
+                    val clean = mobile.filter { it.isDigit() }
+                    if (clean.isNotEmpty()) {
+                        uriHandler.openUri("tel:$clean")
+                    }
+                },
+                onWhatsAppClick = { mobile ->
+                    val clean = mobile.filter { it.isDigit() }
+                    if (clean.isNotEmpty()) {
+                        uriHandler.openUri("https://api.whatsapp.com/send?phone=$clean")
+                    }
+                }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             TabRowSection(
                 selectedTab = state.selectedTab,
@@ -110,7 +146,11 @@ fun FcmProfileScreen(
 }
 
 @Composable
-private fun ProfileHeaderCard(state: FcmProfileUiState) {
+private fun ProfileHeaderCard(
+    state: FcmProfileUiState,
+    onCallClick: (String) -> Unit,
+    onWhatsAppClick: (String) -> Unit
+) {
     Card(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -123,7 +163,7 @@ private fun ProfileHeaderCard(state: FcmProfileUiState) {
         ) {
             AvatarBadge(
                 modifier = Modifier.size(80.dp),
-                idText = state.fcmProfile?.userId?.toString() ?: "",
+                idText = state.fcmProfile?.loginId ?: "",
                 photo = {
                     Image(
                         painter = painterResource(Resources.Icon.FCM),
@@ -154,18 +194,24 @@ private fun ProfileHeaderCard(state: FcmProfileUiState) {
                     color = PrimaryBlue,
                     textDecoration = TextDecoration.Underline,
                     fontFamily = RobotoCondensedFont(),
-                    modifier = Modifier.clickable { /* Call */ }
+                    modifier = Modifier.clickable {
+                        state.fcmProfile?.mobileNo?.let { onCallClick(it) }
+                    }
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircleActionIcon(
                     painter = painterResource(Resources.Icon.Call),
-                    onClick = { /* Call */ }
+                    onClick = {
+                        state.fcmProfile?.mobileNo?.let { onCallClick(it) }
+                    }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 CircleActionIcon(
                     painter = painterResource(Resources.Icon.Wapp),
-                    onClick = { /* Wapp */ }
+                    onClick = {
+                        state.fcmProfile?.mobileNo?.let { onWhatsAppClick(it) }
+                    }
                 )
             }
         }
@@ -191,7 +237,12 @@ private fun TabRowSection(selectedTab: Int, onTabSelected: (Int) -> Unit) {
 }
 
 @Composable
-private fun TabItem(title: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun TabItem(
+    title: String,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = if (isSelected) PrimaryBlue else Color.White,
@@ -228,8 +279,7 @@ private fun ProfileInfoSection(fcmProfile: FcmProfile?) {
         ) {
             ProfileInfoRow("Name", fcmProfile?.userName ?: "")
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
-            ProfileInfoRow("User ID", fcmProfile?.userId?.toString() ?: "")
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+
             ProfileInfoRow("Login ID", fcmProfile?.loginId ?: "")
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
             ProfileInfoRow("Location", fcmProfile?.location ?: "")

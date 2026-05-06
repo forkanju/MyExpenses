@@ -75,6 +75,7 @@ fun CaseDetailScreen(
     onIntent: (CaseIntent) -> Unit = {},
     onFcmDetailsClick: () -> Unit,
     onBeneficiaryDetailsClick: () -> Unit = {},
+    onMoreClick: () -> Unit = {},
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit
@@ -189,7 +190,10 @@ fun CaseDetailScreen(
             }
 
             val formContent: @Composable ColumnScope.() -> Unit = {
-                PrescriptionHeader(isAnsweredMode = isAnsweredMode)
+                PrescriptionHeader(
+                    isAnsweredMode = isAnsweredMode,
+                    onMoreClick = onMoreClick
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider(modifier = Modifier.height(1.dp))
                 Spacer(modifier = Modifier.height(12.dp))

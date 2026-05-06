@@ -27,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.SubcomposeAsyncImage
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Profile
@@ -48,9 +50,11 @@ import org.jetbrains.compose.resources.painterResource
 
 
 data class ProfileUiState(
-    val profileImageRes: String? = null,
+    val profileImage: Any? = null,
     val name: String = "",
     val designation: String = "",
+    val email: String = "",
+    val mobileNo: String = "",
     val versionInfo: String = "1.0.0",
     val copyrightText: String = "Copyright ©Friendship.ngo"
 )
@@ -69,6 +73,10 @@ fun ProfilePopup(
     onDismiss: () -> Unit,
     onEvent: (ProfileEvent) -> Unit
 ) {
+    LaunchedEffect(uiState){
+            println("ProfilePopup: uiState changed: ${uiState.name}")
+            println("ProfilePopup: uiState changed: ${uiState.profileImage}")
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -102,12 +110,34 @@ fun ProfilePopup(
                         .clip(CircleShape)
                         .border(1.dp, Color(0xFFE0E0E0), CircleShape)
                 ) {
-                    Image(
-                        painter = painterResource(resource = Profile),
-                        contentDescription = "Profile",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                    if (uiState.profileImage == null || (uiState.profileImage is String && (uiState.profileImage as String).isEmpty())) {
+                        Image(
+                            painter = painterResource(resource = Profile),
+                            contentDescription = "Profile",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        SubcomposeAsyncImage(
+                            model = uiState.profileImage,
+                            contentDescription = "Profile",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                   // Loading placeholder if needed
+                                }
+                            },
+                            error = {
+                                Image(
+                                    painter = painterResource(resource = Profile),
+                                    contentDescription = "Profile",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(12.dp))
@@ -118,17 +148,42 @@ fun ProfilePopup(
                     style = TextStyle(
                         fontFamily = RobotoCondensedFont(),
                         color = PrimaryColor,
-                        fontSize = FontSize.REGULAR
+                        fontSize = FontSize.REGULAR,
+                        fontWeight = FontWeight.Bold
                     )
                 )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = uiState.designation,
-                    style = TextStyle(
-                        color = TextSecondary,
-                        fontSize = FontSize.SMALL
+                if (uiState.designation.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = uiState.designation,
+                        style = TextStyle(
+                            color = TextSecondary,
+                            fontSize = FontSize.SMALL
+                        )
                     )
-                )
+                }
+
+                if (uiState.email.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = uiState.email,
+                        style = TextStyle(
+                            color = TextSecondary,
+                            fontSize = FontSize.SMALL
+                        )
+                    )
+                }
+
+                if (uiState.mobileNo.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = uiState.mobileNo,
+                        style = TextStyle(
+                            color = TextSecondary,
+                            fontSize = FontSize.SMALL
+                        )
+                    )
+                }
 
                 Spacer(Modifier.height(20.dp))
 
@@ -180,27 +235,27 @@ private fun ActionList(onEvent: (ProfileEvent) -> Unit) {
             onClick = { onEvent(ProfileEvent.OnChangePasswordClick) }
         )
 
-        HorizontalDivider(
-            modifier = Modifier.width(dividerWidth),
-            thickness = 1.dp,
-            color = dividerColor
-        )
-
-        ProfileMenuButton(
-            text = "Help",
-            onClick = { onEvent(ProfileEvent.OnHelpClick) }
-        )
-
-        HorizontalDivider(
-            modifier = Modifier.width(dividerWidth),
-            thickness = 1.dp,
-            color = dividerColor
-        )
-
-        ProfileMenuButton(
-            text = "Video Tutorial",
-            onClick = { onEvent(ProfileEvent.OnVideoTutorialClick) }
-        )
+//        HorizontalDivider(
+//            modifier = Modifier.width(dividerWidth),
+//            thickness = 1.dp,
+//            color = dividerColor
+//        )
+//
+//        ProfileMenuButton(
+//            text = "Help",
+//            onClick = { onEvent(ProfileEvent.OnHelpClick) }
+//        )
+//
+//        HorizontalDivider(
+//            modifier = Modifier.width(dividerWidth),
+//            thickness = 1.dp,
+//            color = dividerColor
+//        )
+//
+//        ProfileMenuButton(
+//            text = "Video Tutorial",
+//            onClick = { onEvent(ProfileEvent.OnVideoTutorialClick) }
+//        )
     }
 }
 
