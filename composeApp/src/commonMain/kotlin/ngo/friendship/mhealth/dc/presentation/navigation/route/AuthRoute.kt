@@ -7,23 +7,21 @@ import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
-import ngo.friendship.mhealth.dc.presentation.screens.auth.AuthViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.auth.ForgotPasswordScreen
-import ngo.friendship.mhealth.dc.presentation.screens.auth.LoginScreen
+import ngo.friendship.mhealth.dc.presentation.screen.login.ForgotPasswordScreen
+import ngo.friendship.mhealth.dc.presentation.screen.login.LoginIntent
+import ngo.friendship.mhealth.dc.presentation.screen.login.LoginScreen
+import ngo.friendship.mhealth.dc.presentation.screen.login.LoginViewModel
 
 fun EntryProviderScope<NavKey>.authRoute(
     mainViewModel: MainViewModel,
     snackBarState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
-    entryWithVM<Screens.Auth, AuthViewModel>(mainViewModel.backStack, snackBarState) {
+    entryWithVM<Screens.Auth, LoginViewModel>(mainViewModel.backStack, snackBarState) {
 
         LoginScreen(
             onLoginClick = { userName, password ->
-                viewModel.login(
-                    userName = userName,
-                    password = password
-                )
+                viewModel.onIntent(LoginIntent.Login(userName, password))
             },
             onForgotPasswordClick = {
                 backStack.add(Screens.ForgotPassword)
@@ -31,7 +29,8 @@ fun EntryProviderScope<NavKey>.authRoute(
             modifier = modifier
         )
     }
-    entryWithVM<Screens.ForgotPassword, AuthViewModel>(mainViewModel.backStack, snackBarState) {
+    // Note: ForgotPasswordScreen still uses LoginViewModel (formerly AuthViewModel) for now
+    entryWithVM<Screens.ForgotPassword, LoginViewModel>(mainViewModel.backStack, snackBarState) {
         ForgotPasswordScreen(
             onBackToLoginClick = backStack::removeLastOrNull
         )

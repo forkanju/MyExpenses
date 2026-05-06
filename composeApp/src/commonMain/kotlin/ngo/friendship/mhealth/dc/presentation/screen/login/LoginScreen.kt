@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.auth
+package ngo.friendship.mhealth.dc.presentation.screen.login
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -126,18 +126,9 @@ fun LoginScreen(
         PrimaryButton(
             text = "Sign in",
             onClick = {
-                if (email.isBlank()) {
-                    SnackbarController.sendEvent("Please enter email or username")
-                    return@PrimaryButton
-                }
-                if (password.isBlank()) {
-                    SnackbarController.sendEvent("Please enter password")
-                    return@PrimaryButton
-                }
                 focusManager.clearFocus()
                 onLoginClick(email, password)
             },
-//            enabled = email.isNotBlank() && password.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -153,4 +144,3 @@ private fun LoginPrev() {
         LoginScreen()
     }
 }
-

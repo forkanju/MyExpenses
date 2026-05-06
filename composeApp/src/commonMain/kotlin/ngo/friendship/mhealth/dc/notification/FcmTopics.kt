@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.fcm
+package ngo.friendship.mhealth.dc.notification
 
 object FcmTopics {
     const val TEST = "test"

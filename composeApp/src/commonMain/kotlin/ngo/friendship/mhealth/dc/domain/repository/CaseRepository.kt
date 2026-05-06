@@ -8,8 +8,7 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
-import ngo.friendship.mhealth.dc.domain.model.UserProfile
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 
 interface CaseRepository {
 

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.auth
+package ngo.friendship.mhealth.dc.presentation.screen.login
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +24,6 @@ import ngo.friendship.mhealth.dc.theme.CanvasBackground
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.TextPrimary
-import ngo.friendship.mhealth.dc.theme.TextWhite
 
 @Composable
 fun ForgotPasswordScreen(

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplate
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplateDefault
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.md5
 
 @Serializable

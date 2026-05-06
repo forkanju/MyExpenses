@@ -23,7 +23,7 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.md5

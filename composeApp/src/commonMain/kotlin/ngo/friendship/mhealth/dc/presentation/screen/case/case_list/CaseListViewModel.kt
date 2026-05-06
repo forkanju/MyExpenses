@@ -61,7 +61,7 @@ class CaseListViewModel(
             _state.value = _state.value.copy(isLoading = true)
             try {
                 // Mapping CaseTab to API type string using apiParam
-                val type = _state.value.selectedTab.apiParam 
+                val type = _state.value.selectedTab.apiParam
                 println("DEBUG: CaseListViewModel calling repository for type=$type")
                 val interviews = repository.getInterviewList(appVersion = 3069, type = type)
                 
@@ -101,7 +101,7 @@ class CaseListViewModel(
     }
 
     private fun updateTabCounts() {
-        // Logic to update counts for all tabs if needed, 
+        // Logic to update counts for all tabs if needed,
         // or just update for the current list size
         val currentCounts = _state.value.tabCounts.toMutableMap()
         currentCounts[_state.value.selectedTab] = _state.value.interviews.size

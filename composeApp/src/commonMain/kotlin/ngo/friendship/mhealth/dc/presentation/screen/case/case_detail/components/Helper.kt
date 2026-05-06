@@ -9,7 +9,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 
 fun addDiagnosis(
     state: DoctorFeedbackFormState,
@@ -28,7 +28,7 @@ fun removeDiagnosis(
     )
 }
 
-fun addInvestigation(
+fun addInvestigation2(
     state: DoctorFeedbackFormState,
     item: Investigation
 ): DoctorFeedbackFormState {
@@ -36,6 +36,17 @@ fun addInvestigation(
     return state.copy(
         selectedInvestigations = state.selectedInvestigations + item,
         investigationResult = item.investigationName
+    )
+}
+
+fun addInvestigation(
+    state: DoctorFeedbackFormState,
+    item: Investigation
+): DoctorFeedbackFormState {
+    if (state.selectedInvestigations.any { it.investigationId == item.investigationId }) return state
+
+    return state.copy(
+        selectedInvestigations = state.selectedInvestigations + item
     )
 }
 
@@ -51,21 +62,21 @@ fun removeInvestigation(
 }
 
 
- fun String.toEpochMillisOrNull(): Long? {
+fun String.toEpochMillisOrNull(): Long? {
     return runCatching {
         val localDate = LocalDate.parse(this) // expects yyyy-MM-dd
         localDate.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds()
     }.getOrNull()
 }
 
- fun Long.toDateString(): String {
+fun Long.toDateString(): String {
     return Instant.fromEpochMilliseconds(this)
         .toLocalDateTime(TimeZone.currentSystemDefault())
         .date
         .toString() // yyyy-MM-dd
 }
 
- fun buildDefaultSmsMessage(
+fun buildDefaultSmsMessage(
     interviewDetails: InterviewDetails,
     prescriptions: List<PrescriptionItem>
 ): String {

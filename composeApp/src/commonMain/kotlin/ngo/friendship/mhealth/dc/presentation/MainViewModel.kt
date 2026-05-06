@@ -21,8 +21,8 @@ import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
-import ngo.friendship.mhealth.dc.fcm.AppNotifierManager
-import ngo.friendship.mhealth.dc.fcm.FcmTopics
+import ngo.friendship.mhealth.dc.notification.AppNotifierManager
+import ngo.friendship.mhealth.dc.notification.FcmTopics
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
@@ -31,7 +31,6 @@ import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
-import ngo.friendship.mhealth.dc.utils.log
 
 sealed interface MainUiEvent {
     data object Idle : MainUiEvent

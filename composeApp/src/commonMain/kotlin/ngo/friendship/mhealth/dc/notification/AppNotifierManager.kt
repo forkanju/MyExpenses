@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.fcm
+package ngo.friendship.mhealth.dc.notification
 
 import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.PayloadData

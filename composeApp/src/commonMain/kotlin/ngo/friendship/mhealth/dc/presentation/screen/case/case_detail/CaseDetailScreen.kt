@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +49,7 @@ import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseIntent
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.DiagnosisChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.InvestigationChipGroup
@@ -282,16 +282,29 @@ fun CaseDetailScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+//                    LabeledFormTextField(
+//                        label = "Investigation Result",
+//                        placeholder = "Result",
+//                        value = state.formState.investigationResult,
+//                        onValueChange = {
+//                            onIntent(CaseIntent.UpdateInvestigationResult(it))
+//                        },
+//                        isError = false,
+//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+//                        enabled = !isAnsweredMode
+//                    )
                     LabeledFormTextField(
                         label = "Investigation Result",
-                        placeholder = "Result",
+                        placeholder = "Write investigation result here...",
                         value = state.formState.investigationResult,
                         onValueChange = {
                             onIntent(CaseIntent.UpdateInvestigationResult(it))
                         },
                         isError = false,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        singleLine = false,
+                        maxLines = 2
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 

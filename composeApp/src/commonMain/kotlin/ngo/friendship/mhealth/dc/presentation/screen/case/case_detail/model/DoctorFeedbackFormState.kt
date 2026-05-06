@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model
 
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis

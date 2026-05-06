@@ -10,11 +10,12 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.addInvestigation
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.removeInvestigation
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.DoctorFeedbackFormState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.minusAt

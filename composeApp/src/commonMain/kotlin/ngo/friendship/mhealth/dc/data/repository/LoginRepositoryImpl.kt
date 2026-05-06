@@ -5,13 +5,13 @@ import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.LoginRequestDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.User
-import ngo.friendship.mhealth.dc.domain.repository.AuthRepository
+import ngo.friendship.mhealth.dc.domain.repository.LoginRepository
 
 
-class AuthRepositoryImpl(
+class LoginRepositoryImpl(
     private val api: ApiService,
     private val settings: LocalSettings
-) : AuthRepository {
+) : LoginRepository {
 
     override suspend fun login(userName: String, password: String): User {
         val request = LoginRequestDto(userName = userName, password = password)
