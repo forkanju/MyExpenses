@@ -50,9 +50,6 @@ val networkModule = module {
             install(DefaultRequest) {
                 url(NetworkConfig.getBaseUrl())
                 accept(ContentType.Application.Json)
-                settings.token?.let {
-                    header(HttpHeaders.Authorization, "Bearer $it")
-                }
             }
             install(HttpTimeout) {
                 requestTimeoutMillis = 20_000L
@@ -65,6 +62,9 @@ val networkModule = module {
             }
         }.apply {
             plugin(HttpSend).intercept { request ->
+                settings.token?.let {
+                    request.header(HttpHeaders.Authorization, "Bearer $it")
+                }
                 execute(request).apply {
                     if (response.status == HttpStatusCode.Unauthorized) {
                         settings.token = null

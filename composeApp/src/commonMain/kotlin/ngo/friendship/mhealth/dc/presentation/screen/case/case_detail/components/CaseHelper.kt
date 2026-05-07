@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -25,17 +25,6 @@ fun removeDiagnosis(
 ): DoctorFeedbackFormState {
     return state.copy(
         selectedDiagnoses = state.selectedDiagnoses.filterNot { it.diagId == item.diagId }
-    )
-}
-
-fun addInvestigation2(
-    state: DoctorFeedbackFormState,
-    item: Investigation
-): DoctorFeedbackFormState {
-    if (state.selectedInvestigations.any { it.investigationId == item.investigationId }) return state
-    return state.copy(
-        selectedInvestigations = state.selectedInvestigations + item,
-        investigationResult = item.investigationName
     )
 }
 

@@ -27,7 +27,7 @@ import ngo.friendship.mhealth.dc.presentation.components.FormContainerCard
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.AppDatePickerDialog
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.*
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 

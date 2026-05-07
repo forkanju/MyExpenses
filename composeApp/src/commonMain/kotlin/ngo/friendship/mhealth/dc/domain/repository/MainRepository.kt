@@ -19,4 +19,5 @@ interface MainRepository {
         strength: String
     ): Boolean
     suspend fun changePassword(old: String, new: String): Pair<Boolean, String?>
+    suspend fun clearAllData()
 }

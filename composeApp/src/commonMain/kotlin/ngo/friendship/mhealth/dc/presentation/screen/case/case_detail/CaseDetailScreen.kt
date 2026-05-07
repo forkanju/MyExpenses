@@ -48,9 +48,12 @@ import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.buildDefaultSmsMessage
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toDateString
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toEpochMillisOrNull
+import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.DiagnosisChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.InvestigationChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.MedicineSection
@@ -59,9 +62,6 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.component
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionHeader
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionTopBar
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.SendMessageDialog
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.buildDefaultSmsMessage
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.toDateString
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.toEpochMillisOrNull
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.utils.log
 
@@ -282,17 +282,6 @@ fun CaseDetailScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-//                    LabeledFormTextField(
-//                        label = "Investigation Result",
-//                        placeholder = "Result",
-//                        value = state.formState.investigationResult,
-//                        onValueChange = {
-//                            onIntent(CaseIntent.UpdateInvestigationResult(it))
-//                        },
-//                        isError = false,
-//                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//                        enabled = !isAnsweredMode
-//                    )
                     LabeledFormTextField(
                         label = "Investigation Result",
                         placeholder = "Write investigation result here...",
@@ -366,7 +355,7 @@ fun CaseDetailScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                         },
-                        rightText = "",//Save as a template
+                        rightText = "Save as a template",//Save as a template
                         onLeftClick = {
                             onIntent(CaseIntent.ToggleDatePicker)
                         },

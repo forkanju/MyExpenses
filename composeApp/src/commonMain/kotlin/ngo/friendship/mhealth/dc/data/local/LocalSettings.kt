@@ -25,6 +25,8 @@ class LocalSettings {
 
     fun clear() {
         settings.clear()
+        _token = null
+        _user = null
     }
 
     inline fun <reified T> Settings.putOrRemove(key: String, value: T?) {

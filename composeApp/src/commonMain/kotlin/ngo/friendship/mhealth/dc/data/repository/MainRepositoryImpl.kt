@@ -28,7 +28,7 @@ import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 class MainRepositoryImpl(
     private val api: ApiService,
     private val localSettings: LocalSettings,
-    appDatabase: AppDatabase
+    private val appDatabase: AppDatabase
 ) : MainRepository {
     private val setupDataDao = appDatabase.setupDataDao()
     private val userProfileDao = appDatabase.userProfileDao()
@@ -178,6 +178,10 @@ class MainRepositoryImpl(
         } catch (e: Exception) {
             false to e.message
         }
+    }
+
+    override suspend fun clearAllData() {
+        appDatabase.clearAllTables()
     }
 
     suspend fun getCachedSetupData(): SetupData {

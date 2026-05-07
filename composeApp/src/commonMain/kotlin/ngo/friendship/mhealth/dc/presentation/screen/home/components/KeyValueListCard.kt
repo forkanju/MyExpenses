@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.home.components
+package ngo.friendship.mhealth.dc.presentation.screen.home.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,18 +35,27 @@ fun KeyValueListCard(
             Text(
                 title,
                 fontSize = FontSize.REGULAR,
-                
+
                 fontWeight = FontWeight.SemiBold,
                 color = TextSecondary
             )
             Spacer(Modifier.height(10.dp))
 
-            items.forEachIndexed { idx, kv ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(kv.key, fontSize = FontSize.SMALL,  color = TextSecondary)
-                    Text(kv.value.toString(), fontSize = FontSize.SMALL,  color = TextSecondary)
+            if (items.isEmpty()) {
+                Text(
+                    "No data found",
+                    fontSize = FontSize.SMALL,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            } else {
+                items.forEachIndexed { idx, kv ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(kv.key, fontSize = FontSize.SMALL, color = TextSecondary)
+                        Text(kv.value.toString(), fontSize = FontSize.SMALL, color = TextSecondary)
+                    }
+                    if (idx != items.lastIndex) Spacer(Modifier.height(3.dp))
                 }
-                if (idx != items.lastIndex) Spacer(Modifier.height(3.dp))
             }
         }
     }

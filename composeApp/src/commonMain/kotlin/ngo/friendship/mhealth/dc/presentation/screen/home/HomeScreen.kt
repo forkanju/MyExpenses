@@ -12,12 +12,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.HomeTopRow
-import ngo.friendship.mhealth.dc.presentation.screens.home.components.KeyValueListCard
+import ngo.friendship.mhealth.dc.presentation.screen.home.components.KeyValueListCard
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.SectionTitle
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.SegmentedBarCard
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.StatRingCard
 import ngo.friendship.mhealth.dc.presentation.screens.home.components.TrendTableCard
-import ngo.friendship.mhealth.dc.presentation.screens.home.components.TwoCardsRow
+import ngo.friendship.mhealth.dc.presentation.screen.home.components.TwoCardsRow
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.KeyValueUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.SegmentUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.StatRingUi

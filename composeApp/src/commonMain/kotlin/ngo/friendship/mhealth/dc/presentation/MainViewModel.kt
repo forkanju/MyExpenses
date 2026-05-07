@@ -214,6 +214,7 @@ class MainViewModel(
                 notifierManager.unsubscribeFromTopic(FcmTopics.doctorCaseList(user.userName))
                 notifierManager.unsubscribeFromTopic(FcmTopics.doctorInterviewUpdates(user.userName))
             }
+            mainRepository.clearAllData()
             settings.clear()
             backStack.replaceWith(Screens.Auth)
         }
