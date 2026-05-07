@@ -308,7 +308,7 @@ fun ExpandableInterviewSummary(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "See full Interview",
+                text = "",//See full Interview
                 fontSize = 13.sp,
                 color = Color.White,
                 textDecoration = TextDecoration.Underline,

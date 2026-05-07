@@ -21,5 +21,8 @@ data class DoctorFeedbackFormState(
     val sms: String = "",
     val questionAnswers: List<QuestionAnswerTemplate> = emptyList(),
     val questionAnswers2: List<QuestionAnswerTemplateDefault> = emptyList(),
-    val prescriptions: List<PrescriptionItem> = emptyList()
+    val prescriptions: List<PrescriptionItem> = emptyList(),
+    val isPresTempSave: Int = 0,
+    val prescriptionName: String = "",
+    val isGlobalPrescription: Int = 0
 )

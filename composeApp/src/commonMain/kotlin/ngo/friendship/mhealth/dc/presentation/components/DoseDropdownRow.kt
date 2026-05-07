@@ -62,7 +62,7 @@ fun DoseAndDrugAutoCompleteRow(
             onValueChange = onRightValueChange,
             suggestions = suggestions,
             placeholder = rightPlaceholder,
-//            onSuggestionSelected = onSuggestionSelected,
+            onSuggestionSelected = onSuggestionSelected,
             isAnsweredMode = isAnsweredMode
         )
     }
@@ -167,6 +167,7 @@ fun GenericNameAutoCompleteTextField(
     onValueChange: (TextFieldValue) -> Unit,
     suggestions: List<String>,
     placeholder: String,
+    onSuggestionSelected: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false
 ) {
@@ -245,9 +246,9 @@ fun GenericNameAutoCompleteTextField(
                 DropdownMenuItem(
                     text = { Text(item, color = textColor) },
                     onClick = {
-                        onValueChange(
-                            TextFieldValue(item, TextRange(item.length))
-                        )
+                        val newValue = TextFieldValue(item, TextRange(item.length))
+                        onValueChange(newValue)
+                        onSuggestionSelected(newValue)
                         expanded = false
                         focusManager.clearFocus()
                     }

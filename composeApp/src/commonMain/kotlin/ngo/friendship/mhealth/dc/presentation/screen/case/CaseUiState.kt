@@ -6,7 +6,7 @@ import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.MedicineComposerState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
 import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiState
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
@@ -32,5 +32,8 @@ data class CaseUiState(
     val age: String = "",
     val officeId: String = "",
     val sector: String = "ISM",
-    val interviewNote: String = ""
+    val interviewNote: String = "",
+    val isSaveTemplateDialogVisible: Boolean = false,
+    val templateName: String = "",
+    val isGlobalTemplate: Boolean = false
 )

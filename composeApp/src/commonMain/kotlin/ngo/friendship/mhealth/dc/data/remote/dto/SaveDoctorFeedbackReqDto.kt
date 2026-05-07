@@ -99,8 +99,11 @@ data class DoctorFeedbackObject(
     @SerialName("doctorFindings")
     val doctorFindings: String = "static findings",//static for temporary
 
-    @SerialName("advice_message_for_fcm")
-    val adviceMessageForFcm: String,
+    @SerialName("advice_message_for_fcm") //comments
+    val commentsForFCM: String,
+
+    @SerialName("doctor_advice")
+    val doctorAdvice: String,
 
     @SerialName("REF_CENTER_ID")
     val refCenterId: String?,
@@ -124,7 +127,16 @@ data class DoctorFeedbackObject(
     val questionAnswerJson2: List<QuestionAnswerTemplateDefault>,
 
     @SerialName("prescription")
-    val prescription: List<PrescriptionItem>
+    val prescription: List<PrescriptionItem>,
+
+    @SerialName("is_pres_temp_save")
+    val isPresTempSave: Int,
+
+    @SerialName("prescription_name")
+    val prescriptionName: String,
+
+    @SerialName("is_global_prescription")
+    val isGlobalPrescription: Int
 )
 
 @Serializable
@@ -152,19 +164,22 @@ data class PrescriptionItem(
     @SerialName("duration")
     val duration: String,
     @SerialName("meal_time")
-    val mealTime: String? = null
+    val mealTime: String? = null,
+    @SerialName("medicine_id")
+    val medicineId: Long? = null
 )
 
 fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
     return DoctorFeedbackObject(
         interviewId = interviewId,
         doctorFindings = doctorNotes,
-        adviceMessageForFcm = commentsForFcm,
+        commentsForFCM = commentsForFcm,
         refCenterId = selectedReferralCenter?.refCenterId.toString(),
-        investigationResult = listOfNotNull(
-            investigationResult.takeIf { it.isNotBlank() },
-            doctorAdvice.takeIf { it.isNotBlank() }
-        ).joinToString("\n"),
+//        investigationResult = listOfNotNull(
+//            investigationResult.takeIf { it.isNotBlank() },
+//            doctorAdvice.takeIf { it.isNotBlank() }
+//        ).joinToString("\n"),
+        investigationResult = investigationResult,
         nextFollowUpDate = nextFollowUpDate,
         investigation = selectedInvestigations.map {
             IdNameItem(
@@ -180,6 +195,11 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
         },
         questionAnswerJson = questionAnswers,
         questionAnswerJson2 = questionAnswers2,
-        prescription = prescriptions
+        prescription = prescriptions,
+        isPresTempSave = isPresTempSave,
+        prescriptionName = prescriptionName,
+        isGlobalPrescription = isGlobalPrescription,
+        doctorAdvice = doctorAdvice
+
     )
 }

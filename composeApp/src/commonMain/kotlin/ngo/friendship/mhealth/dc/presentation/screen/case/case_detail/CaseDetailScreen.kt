@@ -50,13 +50,14 @@ import ngo.friendship.mhealth.dc.presentation.components.QAItem
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.SaveTemplateDialog
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.buildDefaultSmsMessage
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toDateString
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toEpochMillisOrNull
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.DiagnosisChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.InvestigationChipGroup
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.MedicineSection
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MedicineSection
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PatientProfileCard
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionActionButtonRow
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionHeader
@@ -360,7 +361,7 @@ fun CaseDetailScreen(
                             onIntent(CaseIntent.ToggleDatePicker)
                         },
                         onRightClick = {
-                            println("Save as template")
+                            onIntent(CaseIntent.ToggleSaveTemplateDialog)
                         },
                         isAnsweredMode = isAnsweredMode
                     )
@@ -448,6 +449,17 @@ fun CaseDetailScreen(
                     onIntent(CaseIntent.UpdateCustomMessage(updatedState))
                     onIntent(CaseIntent.ToggleSendMessageDialog)
                 }
+            )
+        }
+
+        if (state.isSaveTemplateDialogVisible) {
+            SaveTemplateDialog(
+                name = state.templateName,
+                isGlobal = state.isGlobalTemplate,
+                onNameChange = { onIntent(CaseIntent.UpdateTemplateName(it)) },
+                onGlobalToggle = { onIntent(CaseIntent.ToggleGlobalTemplate) },
+                onSave = { onIntent(CaseIntent.SaveAsTemplate) },
+                onDismiss = { onIntent(CaseIntent.ToggleSaveTemplateDialog) }
             )
         }
     }

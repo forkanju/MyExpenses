@@ -65,7 +65,12 @@ class CaseViewModel(
 
             is CaseIntent.UpdateFormState -> updateFormState(intent.state)
             is CaseIntent.UpdateMedicineComposerState -> {
+                val oldType = _state.value.medicineComposerState.doseType
+                val newType = intent.state.doseType
                 _state.update { it.copy(medicineComposerState = intent.state) }
+                if (oldType != newType && newType.isNotEmpty()) {
+                    onIntent(CaseIntent.LoadMedicineList(newType))
+                }
             }
 
             is CaseIntent.AddDiagnosis -> {
@@ -169,6 +174,59 @@ class CaseViewModel(
             is CaseIntent.OpenCaseFromTab -> {
                 openCaseFromTab(intent.interviewId, intent.sourceTab)
             }
+
+            CaseIntent.ToggleSaveTemplateDialog -> {
+                _state.update {
+                    val nextVisible = !it.isSaveTemplateDialogVisible
+                    it.copy(
+                        isSaveTemplateDialogVisible = nextVisible,
+                        formState = it.formState.copy(
+                            isPresTempSave = if (nextVisible) 1 else 0
+                        )
+                    )
+                }
+            }
+
+            is CaseIntent.UpdateTemplateName -> {
+                _state.update {
+                    it.copy(
+                        templateName = intent.name,
+                        formState = it.formState.copy(prescriptionName = intent.name)
+                    )
+                }
+            }
+
+            CaseIntent.ToggleGlobalTemplate -> {
+                _state.update {
+                    val nextGlobal = !it.isGlobalTemplate
+                    it.copy(
+                        isGlobalTemplate = nextGlobal,
+                        formState = it.formState.copy(isGlobalPrescription = if (nextGlobal) 1 else 0)
+                    )
+                }
+            }
+
+            CaseIntent.SaveAsTemplate -> {
+                saveAsTemplate()
+            }
+        }
+    }
+
+    private fun saveAsTemplate() {
+        // Implementation for saving as template
+        // For now, just close the dialog and show a success message
+        launch {
+            _state.update {
+                it.copy(
+                    isSaveTemplateDialogVisible = false,
+                    formState = it.formState.copy(
+                        isPresTempSave = 1,
+                        prescriptionName = it.templateName,
+                        isGlobalPrescription = if (it.isGlobalTemplate) 1 else 0
+                    )
+                )
+            }
+            showSuccess("Template saved successfully")
         }
     }
 
@@ -203,6 +261,7 @@ class CaseViewModel(
             val details = repository.getInterviewDetails(interviewId = interviewId)
             _state.update { it.copy(interviewDetails = details) }
 
+            loadMedicineList(_state.value.medicineComposerState.doseType.ifEmpty { "Tab" })
             loadQuestionAnswerData(interviewId)
         }
     }

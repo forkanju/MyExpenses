@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +44,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.MedicineComposerState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionActionRowAligned
 import ngo.friendship.mhealth.dc.theme.DarkerGray
 import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
@@ -183,7 +185,34 @@ fun MedicineComposerCard(
                 suggestions = genericNames,
                 rightPlaceholder = "Type generic name",
                 onSuggestionSelected = { selected ->
-                    onStateChange(state.copy(genericNameQuery = selected))
+                    // 1. Find the medicine that matches the selected generic name
+                    val genericNameText = selected.text.trim()
+
+                    // Search in the medicines list. Use a find that is more resilient.
+                    val medicine = medicines.find {
+                        it.genericName.trim().equals(genericNameText, ignoreCase = true) &&
+                                it.brandName.isNotBlank()
+
+                    } ?: medicines.find {
+                        it.genericName.trim().equals(genericNameText, ignoreCase = true)
+                    }
+
+                    val brandName = medicine?.brandName ?: ""
+                    val medicineId = medicine?.medicineId ?: -1L
+
+
+                    onStateChange(
+                        state.copy(
+                            // 2. Set the generic name field
+                            genericNameQuery = selected,
+                            // 3. Set the brand name to the "Type medicine name" field
+                            medicineQuery = TextFieldValue(
+                                brandName,
+                                TextRange(brandName.length)
+                            ),
+                            medicineId = medicineId
+                        )
+                    )
                 },
                 isAnsweredMode = isAnsweredMode
             )
@@ -230,7 +259,8 @@ fun MedicineComposerCard(
                             medicineName = finalMedicineName,
                             dose = state.dose,
                             duration = state.days,
-                            mealTime = mealTimeText
+                            mealTime = mealTimeText,
+                            medicineId = state.medicineId.takeIf { it != -1L }
                         )
 
                         onAddClick(item)
@@ -241,7 +271,8 @@ fun MedicineComposerCard(
                                 genericNameQuery = TextFieldValue(""),
                                 dose = "0+0+1",
                                 days = "৭ দিন",
-                                mealTime = MealTime.PORE
+                                mealTime = MealTime.PORE,
+                                medicineId = -1L
                             )
                         )
                     }
