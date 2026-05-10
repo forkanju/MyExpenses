@@ -26,7 +26,7 @@ import ngo.friendship.mhealth.dc.presentation.components.CustomTopBar
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.BottomBar
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.theme.Resources
 
 fun EntryProviderScope<NavKey>.homeRoute(

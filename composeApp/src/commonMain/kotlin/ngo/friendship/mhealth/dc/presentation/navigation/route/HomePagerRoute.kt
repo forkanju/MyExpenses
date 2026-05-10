@@ -9,12 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.collectLatest
-import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.presentation.MainUiEvent
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListScreen
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.CaseListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardScreen
 import ngo.friendship.mhealth.dc.presentation.screens.home.HomeScreen
 

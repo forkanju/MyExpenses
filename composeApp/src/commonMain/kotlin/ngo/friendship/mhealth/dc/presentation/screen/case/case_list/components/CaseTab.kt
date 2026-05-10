@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components
 
 import androidx.compose.ui.graphics.Color
 

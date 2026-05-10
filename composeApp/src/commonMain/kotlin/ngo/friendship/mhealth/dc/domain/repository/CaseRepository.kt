@@ -1,5 +1,6 @@
 package ngo.friendship.mhealth.dc.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.domain.model.BeneficiaryProfile
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
@@ -32,5 +33,8 @@ interface CaseRepository {
         msisdn: String,
         message: String
     ): JsonObject
+
+    fun observeCases(): Flow<List<Interview>>
+    suspend fun markAsOpened(interviewId: String)
 
 }

@@ -1,7 +1,7 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_list
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_list
 
 import ngo.friendship.mhealth.dc.domain.model.Interview
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 
 data class CaseListState(
     val isLoading: Boolean = false,
@@ -12,6 +12,7 @@ data class CaseListState(
     val searchQuery: String = "",
     val error: String? = null
 )
+
 
 sealed interface CaseListIntent {
     data class SelectTab(val tab: CaseTab) : CaseListIntent

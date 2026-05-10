@@ -3,7 +3,7 @@ package ngo.friendship.mhealth.dc.di
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.screen.login.LoginViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.CaseListViewModel
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.CaseListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListViewModel

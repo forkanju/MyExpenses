@@ -17,7 +17,7 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.removeDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.removeInvestigation
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.minusAt
 

@@ -5,7 +5,6 @@ import androidx.savedstate.serialization.SavedStateConfiguration
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
 
 @Serializable
 object Screens {

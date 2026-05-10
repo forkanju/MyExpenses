@@ -1,5 +1,9 @@
 package ngo.friendship.mhealth.dc.data.repository
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
@@ -34,6 +38,10 @@ class CaseRepositoryImpl(
     private val localSettings: LocalSettings,
 ) : CaseRepository {
 
+    private val _interviews = MutableStateFlow<List<Interview>>(emptyList())
+
+    override fun observeCases(): Flow<List<Interview>> = _interviews.asStateFlow()
+
     override suspend fun getInterviewList(appVersion: Int, type: String): List<Interview> {
         println("DEBUG: Repository getInterviewList started for type=$type")
         val response = api.getInterviewList(
@@ -46,14 +54,23 @@ class CaseRepositoryImpl(
             appVersion = appVersion
         )
 
-        println("DEBUG: Repository getInterviewList API call finished")
-        println("DEBUG: API Response Code = ${response.responseCode}")
-        println("DEBUG: Interview List count from API = ${response.data?.interviewList?.size ?: 0}")
-
         val result = response.data
             ?.interviewList
             ?.map { it.toDomain() }
             ?: emptyList()
+
+        _interviews.update { current ->
+            val updated = current.toMutableList()
+            result.forEach { newItem ->
+                val index = updated.indexOfFirst { it.interviewId == newItem.interviewId }
+                if (index != -1) {
+                    updated[index] = newItem
+                } else {
+                    updated.add(newItem)
+                }
+            }
+            updated
+        }
 
         println("DEBUG: Repository returning ${result.size} domain interviews")
         return result
@@ -130,7 +147,15 @@ class CaseRepositoryImpl(
                 status = status
             )
         )
-        return response.responseCode == "01"
+        val success = response.responseCode == "01"
+        if (success) {
+            _interviews.update { current ->
+                current.map {
+                    if (it.interviewId == interviewId) it.copy(status = status) else it
+                }
+            }
+        }
+        return success
     }
 
     override suspend fun getFcmProfile(fcmCode: String): FcmProfile? {
@@ -182,4 +207,11 @@ class CaseRepositoryImpl(
             message
         )
     }
+
+    override suspend fun markAsOpened(interviewId: String) {
+        val idLong = interviewId.toLongOrNull() ?: return
+        updateInterviewStatus(interviewId = idLong, status = "Open")
+    }
+
+
 }

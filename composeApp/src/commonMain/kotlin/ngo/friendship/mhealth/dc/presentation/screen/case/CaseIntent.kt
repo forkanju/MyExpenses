@@ -8,7 +8,7 @@ import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 
 sealed interface CaseIntent {
     data class LoadInterviewDetails(val interviewId: Long) : CaseIntent

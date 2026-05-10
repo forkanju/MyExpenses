@@ -84,7 +84,7 @@ fun SaveTemplateDialog(
                     OutlinedTextField(
                         value = name,
                         onValueChange = onNameChange,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedBorderColor = Color.LightGray,

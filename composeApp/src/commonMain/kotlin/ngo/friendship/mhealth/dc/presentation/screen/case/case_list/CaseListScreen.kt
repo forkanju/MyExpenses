@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_list
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +23,7 @@ import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.presentation.components.SearchRow
 import ngo.friendship.mhealth.dc.presentation.components.TopTabsRow
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseItem
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import org.koin.compose.viewmodel.koinViewModel
 

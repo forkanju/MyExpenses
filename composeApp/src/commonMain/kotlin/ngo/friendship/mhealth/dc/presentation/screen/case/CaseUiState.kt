@@ -8,7 +8,7 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.Doct
 import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
 import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiState
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 
 data class CaseUiState(
     val interviewDetails: InterviewDetails = InterviewDetails(),
