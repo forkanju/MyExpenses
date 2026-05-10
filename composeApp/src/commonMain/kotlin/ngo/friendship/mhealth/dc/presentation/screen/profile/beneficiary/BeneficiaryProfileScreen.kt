@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary
+package ngo.friendship.mhealth.dc.presentation.screen.profile.beneficiary
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -53,6 +53,10 @@ import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.BeneficiaryServiceItem
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
+import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileIntent
+import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileUiEffect
+import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileUiState
+import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileViewModel
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
@@ -132,7 +136,7 @@ fun BeneficiaryProfileScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 BeneficiaryHeaderCard(
                     name = state.beneficiaryName,
-                    beneficiaryId = state.beneficiaryId.toString(),
+                    beneficiaryId = state.beneficiaryCode.takeLast(5),
                     location = state.location,
                     age = state.beneficiaryAge,
                     mobileNo = state.beneficiaryProfile?.mobileNumber ?: "N/A",
@@ -155,8 +159,8 @@ fun BeneficiaryProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 when (state.selectedTab) {
-                    0 -> ServiceListSection(state.beneficiaryProfile?.serviceList ?: emptyList())
-                    1 -> PersonalInfoSection(state)
+                    0 -> PersonalInfoSection(state)
+                    1 -> ServiceListSection(state.beneficiaryProfile?.serviceList ?: emptyList())
                 }
             }
 
@@ -252,7 +256,7 @@ private fun TabRowSection(selectedTab: Int, serviceCount: Int, onTabSelected: (I
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val tabs =
-            listOf("Service list (${serviceCount.toString().padStart(2, '0')})", "Personal info")
+            listOf("Personal info", "Service list (${serviceCount.toString().padStart(2, '0')})")
         tabs.forEachIndexed { index, title ->
             TabItem(
                 title = title,
@@ -374,7 +378,7 @@ private fun PersonalInfoSection(state: BeneficiaryProfileUiState) {
         ) {
             ProfileInfoRow("Name", state.beneficiaryName)
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
-            ProfileInfoRow("Beneficiary ID", state.beneficiaryId.toString())
+            ProfileInfoRow("Beneficiary Code", state.beneficiaryCode.takeLast(5))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
             ProfileInfoRow("Location", state.location)
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))

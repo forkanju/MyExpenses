@@ -17,18 +17,14 @@ import ngo.friendship.mhealth.dc.presentation.screens.dashboard.LocalTreatmentDe
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.LocalTreatmentScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MoreViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.PrescriptionTemplateListScreen
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.PrescriptionTemplateListScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 fun EntryProviderScope<NavKey>.dashboardRoute(
     mainViewModel: MainViewModel
 ) {
     entry<Screens.PrescriptionTemplateList> {
-        val viewModel = koinViewModel<MoreViewModel>()
-        val templates by viewModel.templates.collectAsStateWithLifecycle()
         PrescriptionTemplateListScreen(
-            templates = templates,
             onBack = { mainViewModel.backStack.removeLastOrNull() },
             onAddTemplate = {
                 mainViewModel.backStack.add(

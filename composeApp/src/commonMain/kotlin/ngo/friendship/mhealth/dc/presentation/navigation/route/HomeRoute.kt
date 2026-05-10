@@ -80,8 +80,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
                     notificationIcon = Resources.Icon.Notification,
                     notificationCount = notificationCount,
                     onNotificationClick = {
-                        viewModel.selectBottomTab(BottomNavItems.Cases)
-                        viewModel.selectCaseTab(CaseTab.Pending)
+                        viewModel.openCasesTab(CaseTab.Pending)
                     },
                     userName = userProfile?.userName ?: "Doctor Center",
                     userSubtitle = userProfile?.location ?: "Friendship NGO",

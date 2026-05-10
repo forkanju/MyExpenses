@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.DashboardCardData
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.model.DashboardCardData
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.TextSecondary

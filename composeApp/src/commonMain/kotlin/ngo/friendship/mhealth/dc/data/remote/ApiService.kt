@@ -27,6 +27,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.LoginRequestDto
 import ngo.friendship.mhealth.dc.data.remote.dto.LoginResponseDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
@@ -170,6 +172,13 @@ class ApiService(
     suspend fun getBeneficiaryProfile(
         request: BeneficiaryProfileReqDto
     ): BeneficiaryProfileResDto = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+    )
+
+    suspend fun getPrescriptionTemplates(
+        request: PrescriptionTemplateReqDto
+    ): PrescriptionTemplateResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
     )

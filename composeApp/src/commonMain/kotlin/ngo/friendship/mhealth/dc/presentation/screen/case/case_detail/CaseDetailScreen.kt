@@ -58,7 +58,7 @@ import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.DiagnosisChipGroup
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.InvestigationChipGroup
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MedicineSection
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PatientProfileCard
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PatientProfileCard
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionActionButtonRow
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionHeader
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionTopBar
@@ -170,6 +170,7 @@ fun CaseDetailScreen(
             if (!isFromTemplate) {
                 PatientProfileCard(
                     benefName = state.interviewDetails.beneficiaryName,
+                    benefCode = state.interviewDetails.beneficiaryCode.takeLast(5),
                     benefAge = state.interviewDetails.beneficiaryAge,
                     questionnaireName = state.interviewDetails.questionnaireName,
                     isAnsweredMode = isAnsweredMode,

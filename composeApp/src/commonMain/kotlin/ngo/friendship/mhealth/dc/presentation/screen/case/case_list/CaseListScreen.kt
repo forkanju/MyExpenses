@@ -22,8 +22,8 @@ import kotlinx.coroutines.flow.collectLatest
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.presentation.components.SearchRow
 import ngo.friendship.mhealth.dc.presentation.components.TopTabsRow
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseItem
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseItem
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -31,9 +31,18 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CaseListScreen(
     modifier: Modifier = Modifier,
     viewModel: CaseListViewModel = koinViewModel(),
+    initialTab: CaseTab? = null,
+    onTabConsumed: () -> Unit = {},
     onNavigateToDetails: (Interview, CaseTab) -> Unit = { _, _ -> }
 ) {
     val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(initialTab) {
+        if (initialTab != null) {
+            viewModel.onIntent(CaseListIntent.SelectTab(initialTab))
+            onTabConsumed()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collectLatest { effect ->

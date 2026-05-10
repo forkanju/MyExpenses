@@ -1,11 +1,9 @@
 package ngo.friendship.mhealth.dc.presentation.navigation.route
 
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileScreen
+import ngo.friendship.mhealth.dc.presentation.screen.profile.beneficiary.BeneficiaryProfileScreen
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 
 fun EntryProviderScope<NavKey>.beneficiaryProfileRoute(

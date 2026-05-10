@@ -210,7 +210,10 @@ class CaseRepositoryImpl(
 
     override suspend fun markAsOpened(interviewId: String) {
         val idLong = interviewId.toLongOrNull() ?: return
-        updateInterviewStatus(interviewId = idLong, status = "Open")
+        val currentCase = _interviews.value.find { it.interviewId == idLong }
+        if (currentCase?.status == "New" || currentCase?.status == "Older") {
+            updateInterviewStatus(interviewId = idLong, status = "Open")
+        }
     }
 
 

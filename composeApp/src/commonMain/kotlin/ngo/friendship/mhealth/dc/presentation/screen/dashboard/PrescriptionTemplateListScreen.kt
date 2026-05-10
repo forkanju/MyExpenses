@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -24,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,13 +42,15 @@ import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun PrescriptionTemplateListScreen(
-    templates: List<PrescriptionTemplate>,
     onBack: () -> Unit,
-    onAddTemplate: () -> Unit
+    onAddTemplate: () -> Unit,
+    viewModel: PrescriptionTemplateListViewModel = koinViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
@@ -71,21 +75,29 @@ fun PrescriptionTemplateListScreen(
             }
         }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(templates) { template ->
-                    TemplateItem(template)
-                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+            if (state.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (state.templates.isEmpty()) {
+                Text(
+                    text = "No templates found",
+                    modifier = Modifier.align(Alignment.Center),
+                    color = Color.Gray
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(state.templates) { template ->
+                        TemplateItem(template)
+                        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                    }
                 }
             }
         }
@@ -125,8 +137,14 @@ fun TemplateItem(template: PrescriptionTemplate) {
                 fontWeight = FontWeight.Normal,
                 color = Color.Black
             )
+            val subtitle = buildString {
+                if (template.updatedDate.isNotBlank()) {
+                    append("Updated: ${template.updatedDate} ")
+                }
+                append("Created: ${template.createdDate}")
+            }
             Text(
-                text = "Updated: ${template.updatedDate} Created: ${template.createdDate}",
+                text = subtitle,
                 fontSize = 11.sp,
                 color = Color.Gray
             )
@@ -139,39 +157,5 @@ fun TemplateItem(template: PrescriptionTemplate) {
                 tint = Color.Gray
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrescriptionTemplateListScreenPreview() {
-    FriendshipTheme {
-        PrescriptionTemplateListScreen(
-            templates = listOf(
-                PrescriptionTemplate(
-                    "1",
-                    "Oral ulcer prescription by Abir",
-                    "1:16 PM, 25 Jan 25",
-                    "3:35 PM, 12 Nov 25",
-                    0xFF60BF77
-                ),
-                PrescriptionTemplate(
-                    "2",
-                    "Oral ulcer prescription by Abir",
-                    "1:16 PM, 25 Jan 25",
-                    "3:35 PM, 12 Nov 25",
-                    0xFF214695
-                ),
-                PrescriptionTemplate(
-                    "3",
-                    "Oral ulcer prescription by Abir",
-                    "1:16 PM, 25 Jan 25",
-                    "3:35 PM, 12 Nov 25",
-                    0xFFF78A6C
-                )
-            ),
-            onBack = {},
-            onAddTemplate = {}
-        )
     }
 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
@@ -34,7 +35,7 @@ import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
 
 sealed interface MainUiEvent {
     data object Idle : MainUiEvent
-    data object OpenCasesTab : MainUiEvent
+    data class OpenCasesTab(val tab: CaseTab = CaseTab.Pending) : MainUiEvent
     data object OpenMoreTab : MainUiEvent
 }
 
@@ -83,12 +84,7 @@ class MainViewModel(
         private set
 
     var caseTabCounts by mutableStateOf(
-        mapOf(
-            CaseTab.Pending to 0,
-            CaseTab.Opened to 0,
-            CaseTab.Older to 0,
-            CaseTab.Answered to 0
-        )
+        CaseTab.entries.associateWith { 0 }
     )
         private set
 
@@ -96,12 +92,22 @@ class MainViewModel(
         private set
 
     init {
+        loadInterviewList(tab = CaseTab.Pending)
+
+        viewModelScope.launch {
+            caseRepository.observeCases().collectLatest { interviews ->
+                caseTabCounts = CaseTab.entries.associateWith { tab ->
+                    interviews.count { it.status == tab.apiParam }
+                }
+            }
+        }
+
         viewModelScope.launch {
             notifierManager.notificationClickFlow.collect { data ->
                 println("MainViewModel: Notification click received = $data")
 
                 backStack.replaceWith(Screens.Main)
-                uiEvent.emit(MainUiEvent.OpenCasesTab)
+                uiEvent.emit(MainUiEvent.OpenCasesTab(CaseTab.Pending))
             }
         }
 
@@ -125,6 +131,13 @@ class MainViewModel(
         backStack.replaceWith(Screens.Main)
         launch {
             uiEvent.emit(MainUiEvent.OpenMoreTab)
+        }
+    }
+
+    fun openCasesTab(tab: CaseTab = CaseTab.Pending) {
+        backStack.replaceWith(Screens.Main)
+        launch {
+            uiEvent.emit(MainUiEvent.OpenCasesTab(tab))
         }
     }
 

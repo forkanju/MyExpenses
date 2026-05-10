@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,16 +31,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
-import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
-import ngo.friendship.mhealth.dc.theme.Surface
-import ngo.friendship.mhealth.dc.theme.TextDarkerGray
 import org.jetbrains.compose.resources.painterResource
+
 @Composable
 fun PatientProfileCard(
     modifier: Modifier = Modifier,
     benefName: String,
+    benefCode: String,
     benefAge: String? = null,
     questionnaireName: String? = null,
     isAnsweredMode: Boolean = false,
@@ -51,7 +50,8 @@ fun PatientProfileCard(
     val containerColor = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.surface
     val titleColor = if (isAnsweredMode) colorScheme.onSurfaceVariant else colorScheme.onSurface
     val detailsColor = if (isAnsweredMode) colorScheme.inverseOnSurface else colorScheme.primary
-    val diseaseColor = if (isAnsweredMode) colorScheme.onSurfaceVariant.copy(alpha = 0.8f) else colorScheme.primary
+    val diseaseColor =
+        if (isAnsweredMode) colorScheme.onSurfaceVariant.copy(alpha = 0.8f) else colorScheme.primary
 
     val imageFilter = if (isAnsweredMode) {
         ColorFilter.colorMatrix(
@@ -81,7 +81,7 @@ fun PatientProfileCard(
 
                 AvatarBadge(
                     modifier = Modifier.size(width = 50.dp, height = 62.dp),
-                    idText = "30230",
+                    idText = benefCode,
                     isAnsweredStyle = isAnsweredMode,
                     photo = {
                         Image(
@@ -133,7 +133,6 @@ fun PatientProfileCard(
                             fontWeight = FontWeight.SemiBold
                         )
                     )
-
                 }
             }
         }
@@ -168,6 +167,6 @@ fun PatientProfileCard(
 @Composable
 fun SimpleCardPreview() {
     MaterialTheme {
-        PatientProfileCard(benefName = "Benf Name")
+        PatientProfileCard(benefName = "Benf Name", benefCode = "3657575")
     }
 }

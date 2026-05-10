@@ -1,7 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.screens.dashboard
 
 import androidx.navigation3.runtime.NavKey
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.model.SectionData
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.model.SectionData
 
 data class DashboardState(
     val sections: List<SectionData> = emptyList(),

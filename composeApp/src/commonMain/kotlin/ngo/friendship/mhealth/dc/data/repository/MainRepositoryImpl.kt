@@ -14,10 +14,12 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
+import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
@@ -49,6 +51,21 @@ class MainRepositoryImpl(
                     details = listOf(it.adviceDetails ?: "")
                 )
             } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    override suspend fun getPrescriptionTemplates(): List<PrescriptionTemplate> {
+        return try {
+            val response = api.getPrescriptionTemplates(
+                request = PrescriptionTemplateReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash()
+                )
+            )
+            response.data?.prescriptionTemplates?.map { it.toDomain() } ?: emptyList()
         } catch (e: Exception) {
             emptyList()
         }
