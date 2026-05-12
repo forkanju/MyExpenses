@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case
+package ngo.friendship.mhealth.dc.presentation.screen.case
 
 enum class CaseDetailsMode {
     NORMAL,

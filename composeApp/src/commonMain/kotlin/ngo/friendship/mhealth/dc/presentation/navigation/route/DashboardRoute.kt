@@ -7,16 +7,16 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.LocalCaseDetailScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceTemplateListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListScreen
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListViewModel
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.DxListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.InvestigationsListScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.LocalTreatmentDetailsScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.LocalTreatmentScreen
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListScreen
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListViewModel
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.MedicineListViewModel
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.PrescriptionTemplateListScreen
 import org.koin.compose.viewmodel.koinViewModel
 

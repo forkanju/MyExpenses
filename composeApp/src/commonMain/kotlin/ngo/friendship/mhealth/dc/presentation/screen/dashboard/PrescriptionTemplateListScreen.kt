@@ -35,13 +35,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
+import ngo.friendship.mhealth.dc.utils.toUiDate
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -131,17 +130,18 @@ fun TemplateItem(template: PrescriptionTemplate) {
         Spacer(modifier = Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
+            val displayTitle = template.title.substringBefore(" Prescription").trim()
             Text(
-                text = template.title,
+                text = displayTitle,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color.Black
             )
             val subtitle = buildString {
                 if (template.updatedDate.isNotBlank()) {
-                    append("Updated: ${template.updatedDate} ")
+                    append("Updated: at ${template.updatedDate.toUiDate()} ")
                 }
-                append("Created: ${template.createdDate}")
+                append("Created: at ${template.createdDate.toUiDate()}")
             }
             Text(
                 text = subtitle,

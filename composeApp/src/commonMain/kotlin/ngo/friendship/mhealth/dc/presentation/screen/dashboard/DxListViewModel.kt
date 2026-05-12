@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxItemData
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListEffect
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListIntent
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListState
 
 class DxListViewModel(
     private val mainRepository: MainRepository
@@ -60,7 +64,7 @@ class DxListViewModel(
                     )
                 }
                 _state.value = _state.value.copy(
-                    dxItems = if (items.isNotEmpty()) items else _state.value.dxItems,
+                    dxItems = items.ifEmpty { _state.value.dxItems },
                     isLoading = false
                 )
                 filterDxItems()

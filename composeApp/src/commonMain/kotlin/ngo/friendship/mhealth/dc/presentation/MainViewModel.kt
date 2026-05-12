@@ -29,7 +29,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
 

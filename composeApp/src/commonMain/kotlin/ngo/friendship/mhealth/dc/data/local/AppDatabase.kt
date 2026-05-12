@@ -10,7 +10,8 @@ import ngo.friendship.mhealth.dc.domain.model.*
         Investigation::class,
         Diagnosis::class,
         ReferralCenter::class,
-        UserProfile::class
+        UserProfile::class,
+        Medicine::class
     ],
     version = 1
 )
@@ -18,6 +19,7 @@ import ngo.friendship.mhealth.dc.domain.model.*
 abstract class AppDatabase : RoomDatabase() {
     abstract fun setupDataDao(): SetupDataDao
     abstract fun userProfileDao(): UserProfileDao
+    abstract fun medicineDao(): MedicineDao
 }
 
 // The Room compiler generates the `actual` implementations.

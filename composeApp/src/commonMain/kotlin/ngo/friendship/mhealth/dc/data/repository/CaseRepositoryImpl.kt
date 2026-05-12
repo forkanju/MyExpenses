@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.BeneficiaryProfileReqDto
@@ -36,9 +37,11 @@ import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 class CaseRepositoryImpl(
     private val api: ApiService,
     private val localSettings: LocalSettings,
+    private val appDatabase: AppDatabase
 ) : CaseRepository {
 
     private val _interviews = MutableStateFlow<List<Interview>>(emptyList())
+    private val medicineDao = appDatabase.medicineDao()
 
     override fun observeCases(): Flow<List<Interview>> = _interviews.asStateFlow()
 
@@ -112,15 +115,25 @@ class CaseRepositoryImpl(
     override suspend fun getMedicineList(
         type: String
     ): List<Medicine> {
+        val allCached = medicineDao.getAllMedicines()
+        if (allCached.isNotEmpty()) {
+            return allCached.filter { it.type == type }
+        }
+
         val response = api.getMedicineList(
             request = MedicineListReqDto.build(
                 userName = localSettings.user.userName,
                 password = localSettings.user.password,
                 requestTime = currentTimestamp.toDateTimeServerSlash(),
-                type = type
+                type = "" // Fetching all medicines
             )
         )
-        return response.data?.medicineList?.map { it.toDomain() }.orEmpty()
+        val medicines = response.data?.medicineList?.map { it.toDomain() }.orEmpty()
+        if (medicines.isNotEmpty()) {
+            medicineDao.deleteAllMedicines()
+            medicineDao.insertMedicines(medicines)
+        }
+        return medicines.filter { it.type == type }
     }
 
     override suspend fun getQuestionAnswerData(): QuestionAnswerJson {

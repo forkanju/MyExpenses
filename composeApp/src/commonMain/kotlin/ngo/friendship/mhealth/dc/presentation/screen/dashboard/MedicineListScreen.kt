@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.base.ObserveAsEvents
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.MedicineListViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.NewMedicineDialog
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 

@@ -1,12 +1,14 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +34,9 @@ fun PrescriptionHeader(
     title: String = "Prescription",
     rightText: String = "More",
     isAnsweredMode: Boolean = false,
+    showMore: Boolean = true,
+    isGlobal: Boolean = false,
+    onGlobalToggle: (Boolean) -> Unit = {},
     onMoreClick: () -> Unit = {}
 ) {
     val titleColor = if (isAnsweredMode) Color(0xFF666666) else PrimaryColor
@@ -65,26 +70,49 @@ fun PrescriptionHeader(
 
         Spacer(Modifier.weight(1f))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.clickable { onMoreClick() }
-        ) {
-            Text(
-                text = rightText,
-                fontSize = FontSize.REGULAR,
-                fontWeight = FontWeight.Normal,
-                fontFamily = RobotoCondensedFont(),
-                color = rightTextColor
-            )
+        if (showMore) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.clickable { onMoreClick() }
+            ) {
+                Text(
+                    text = rightText,
+                    fontSize = FontSize.REGULAR,
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = RobotoCondensedFont(),
+                    color = rightTextColor
+                )
 
-            Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(4.dp))
 
-            Icon(
-                painter = painterResource(resource = Resources.Icon.More),
-                contentDescription = "More Icon",
-                tint = rightIconColor
-            )
+                Icon(
+                    painter = painterResource(resource = Resources.Icon.More),
+                    contentDescription = "More Icon",
+                    tint = rightIconColor
+                )
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Checkbox(
+                    checked = isGlobal,
+                    onCheckedChange = onGlobalToggle,
+                    enabled = !isAnsweredMode
+                )
+                Text(
+                    text = "is Global?",
+                    style = TextStyle(
+                        fontSize = FontSize.REGULAR,
+                        fontFamily = RobotoCondensedFont(),
+                        fontWeight = FontWeight.Normal,
+                        color = rightTextColor
+                    ),
+                    modifier = Modifier.padding(start = 2.dp)
+                )
+            }
         }
     }
 }

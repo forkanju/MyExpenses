@@ -48,21 +48,22 @@ import ngo.friendship.mhealth.dc.presentation.components.FormDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
 import ngo.friendship.mhealth.dc.presentation.components.QAItem
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.DiagnosisChipGroup
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.InvestigationChipGroup
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MedicineSection
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PatientProfileCard
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PrescriptionActionButtonRow
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PrescriptionHeader
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PrescriptionTemplateChipGroup
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PrescriptionTopBar
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.SaveTemplateDialog
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.SendMessageDialog
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.buildDefaultSmsMessage
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toDateString
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toEpochMillisOrNull
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.DiagnosisChipGroup
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.InvestigationChipGroup
-import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MedicineSection
-import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PatientProfileCard
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionActionButtonRow
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionHeader
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionTopBar
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.SendMessageDialog
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.utils.log
 
@@ -192,38 +193,63 @@ fun CaseDetailScreen(
             }
 
             val formContent: @Composable ColumnScope.() -> Unit = {
+                if (state.prescriptionTemplates.isNotEmpty() && !isFromTemplate) {
+                    PrescriptionTemplateChipGroup(
+                        items = state.prescriptionTemplates,
+                        onSelect = { onIntent(CaseIntent.SelectPrescriptionTemplate(it)) },
+                        isAnsweredMode = isAnsweredMode
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
                 PrescriptionHeader(
                     isAnsweredMode = isAnsweredMode,
+                    showMore = !isFromTemplate,
+                    isGlobal = state.isGlobalTemplate,
+                    onGlobalToggle = { onIntent(CaseIntent.ToggleGlobalTemplate) },
                     onMoreClick = onMoreClick
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 HorizontalDivider(modifier = Modifier.height(1.dp))
                 Spacer(modifier = Modifier.height(12.dp))
 
-                FormAutoCompleteDropdownField(
-                    label = "DX",
-                    placeholder = "Type",
-                    options = setupData.diagnoses,
-                    selected = null,//selectedDiagnosis
-                    getLabel = { it.diagName },
-                    onSelectedChange = { selected ->
-                        onIntent(CaseIntent.AddDiagnosis(selected))
-                    },
-                    enabled = !isAnsweredMode
-                )
-
-                if (state.formState.selectedDiagnoses.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    DiagnosisChipGroup(
-                        items = state.formState.selectedDiagnoses,
-                        onRemove = { item ->
-                            onIntent(CaseIntent.RemoveDiagnosis(item))
-                        },
-                        isAnsweredMode = isAnsweredMode
+                if (isFromTemplate) {
+                    LabeledFormTextField(
+                        label = "Prescription Name",
+                        placeholder = "Enter template name",
+                        value = state.templateName,
+                        onValueChange = { onIntent(CaseIntent.UpdateTemplateName(it)) },
+                        enabled = !isAnsweredMode
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                if (!isFromTemplate) {
+                    FormAutoCompleteDropdownField(
+                        label = "DX",
+                        placeholder = "Type",
+                        options = setupData.diagnoses,
+                        selected = null,//selectedDiagnosis
+                        getLabel = { it.diagName },
+                        onSelectedChange = { selected ->
+                            onIntent(CaseIntent.AddDiagnosis(selected))
+                        },
+                        enabled = !isAnsweredMode
+                    )
+
+                    if (state.formState.selectedDiagnoses.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DiagnosisChipGroup(
+                            items = state.formState.selectedDiagnoses,
+                            onRemove = { item ->
+                                onIntent(CaseIntent.RemoveDiagnosis(item))
+                            },
+                            isAnsweredMode = isAnsweredMode
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
                 MedicineSection(
                     medicines = state.medicineList,
                     medicineBrandTypeList = state.medicineBrandTypeList,
@@ -243,7 +269,6 @@ fun CaseDetailScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-
                 LabeledFormTextField(
                     label = "Doctor Advice",
                     placeholder = "Advice",
@@ -255,6 +280,38 @@ fun CaseDetailScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     enabled = !isAnsweredMode
                 )
+
+                if (isFromTemplate) {
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LabeledFormTextField(
+                        label = "Comments for FCM",
+                        placeholder = "Comment",
+                        value = state.formState.commentsForFcm,
+                        onValueChange = {
+                            onIntent(CaseIntent.UpdateCommentsForFcm(it))
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        enabled = !isAnsweredMode
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LabeledFormTextField(
+                        label = "Doctor notes",
+                        placeholder = "Note",
+                        value = state.formState.doctorNotes,
+                        onValueChange = {
+                            onIntent(CaseIntent.UpdateDoctorNotes(it))
+                        },
+                        isError = false,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        enabled = !isAnsweredMode
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
 
                 if (!isFromTemplate) {
                     Spacer(modifier = Modifier.height(12.dp))
@@ -411,7 +468,7 @@ fun CaseDetailScreen(
                                 isAnsweredMode = isAnsweredMode
                             )
 
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(18.dp))
 
                             PrescriptionActionButtonRow(
                                 onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },

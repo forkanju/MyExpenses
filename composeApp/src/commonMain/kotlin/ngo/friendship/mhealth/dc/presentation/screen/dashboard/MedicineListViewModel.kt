@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +11,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListEffect
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListIntent
+import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListState
 
 class MedicineListViewModel(
     private val mainRepository: MainRepository,

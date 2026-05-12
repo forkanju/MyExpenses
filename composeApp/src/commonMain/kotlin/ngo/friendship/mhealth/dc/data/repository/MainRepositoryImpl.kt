@@ -3,21 +3,22 @@ package ngo.friendship.mhealth.dc.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
-import kotlinx.coroutines.flow.emitAll
 import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
-import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
-import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.domain.model.SetupData
@@ -57,6 +58,10 @@ class MainRepositoryImpl(
     }
 
     override suspend fun getPrescriptionTemplates(): List<PrescriptionTemplate> {
+        return getPrescriptionTemplateDtos().map { it.toDomain() }
+    }
+
+    override suspend fun getPrescriptionTemplateDtos(): List<PrescriptionTemplateDto> {
         return try {
             val response = api.getPrescriptionTemplates(
                 request = PrescriptionTemplateReqDto.build(
@@ -65,7 +70,7 @@ class MainRepositoryImpl(
                     requestTime = currentTimestamp.toDateTimeServerSlash()
                 )
             )
-            response.data?.prescriptionTemplates?.map { it.toDomain() } ?: emptyList()
+            response.data?.prescriptionTemplates ?: emptyList()
         } catch (e: Exception) {
             emptyList()
         }
@@ -145,7 +150,18 @@ class MainRepositoryImpl(
     }
 
     override fun getSetupData(): Flow<SetupData> = flow {
-        emit(getCachedSetupData())
+        val cached = getCachedSetupData()
+
+        // Check if cached data is not empty (checking investigations as a proxy for all setup data)
+        if (cached.investigations.isNotEmpty() ||
+            cached.diagnoses.isNotEmpty() ||
+            cached.medicineBrandTypes.isNotEmpty() ||
+            cached.referralCenters.isNotEmpty()) {
+            emit(cached)
+            return@flow
+        }
+
+        // If cache is empty, fetch from API
         val response = api.getSetupData(
             request = SetupDataReqDto.build(
                 userName = localSettings.user.userName,
@@ -162,7 +178,7 @@ class MainRepositoryImpl(
     override fun getDoctorProfile(): Flow<UserProfile?> = flow<UserProfile?> {
         // ... (existing logic)
         try {
-             val response = api.getDoctorProfile(
+            val response = api.getDoctorProfile(
                 DoctorProfileReqDto.build(
                     userName = localSettings.user.userName,
                     password = localSettings.user.password

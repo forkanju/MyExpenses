@@ -1,13 +1,15 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,8 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
+import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 
 @Composable
 fun SelectedItemChip(
@@ -75,6 +80,40 @@ fun DiagnosisChipGroup(
 }
 
 @Composable
+fun PrescriptionTemplateChipGroup(
+    items: List<PrescriptionTemplateDto>,
+    onSelect: (PrescriptionTemplateDto) -> Unit,
+    modifier: Modifier = Modifier,
+    isAnsweredMode: Boolean = false
+) {
+    Row(
+        modifier = modifier.horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        items.forEach { item ->
+            val colorScheme = MaterialTheme.colorScheme
+            val chipBg = if (isAnsweredMode) colorScheme.surfaceVariant else colorScheme.background
+            val chipBorder = if (isAnsweredMode) colorScheme.outlineVariant else colorScheme.outline
+            val chipText = if (isAnsweredMode) colorScheme.onSurfaceVariant else colorScheme.onSurface
+
+            Surface(
+                modifier = Modifier.clickable(enabled = !isAnsweredMode) { onSelect(item) },
+                shape = RoundedCornerShape(16.dp),
+                color = chipBg,
+                border = BorderStroke(1.dp, chipBorder)
+            ) {
+                Text(
+                    text = item.prescLabel.orEmpty().substringBefore(" Prescription").trim(),
+                    color = chipText,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun InvestigationChipGroup(
     items: List<Investigation>,
     onRemove: (Investigation) -> Unit,
@@ -91,5 +130,38 @@ fun InvestigationChipGroup(
                 isAnsweredMode = isAnsweredMode
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DiagnosisChipGroupPreview() {
+    val sampleDiagnoses = listOf(
+        Diagnosis(diagId = 1, diagName = "Fever"),
+        Diagnosis(diagId = 2, diagName = "Cough"),
+        Diagnosis(diagId = 3, diagName = "Headache")
+    )
+    FriendshipTheme {
+        DiagnosisChipGroup(
+            items = sampleDiagnoses,
+            onRemove = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DiagnosisChipGroupAnsweredPreview() {
+    val sampleDiagnoses = listOf(
+        Diagnosis(diagId = 1, diagName = "Fever"),
+        Diagnosis(diagId = 2, diagName = "Cough"),
+        Diagnosis(diagId = 3, diagName = "Headache")
+    )
+    FriendshipTheme {
+        DiagnosisChipGroup(
+            items = sampleDiagnoses,
+            onRemove = {},
+            isAnsweredMode = true
+        )
     }
 }

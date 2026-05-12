@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case
+package ngo.friendship.mhealth.dc.presentation.screen.case
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,8 +10,7 @@ import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
-import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
-import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiState
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.addInvestigation
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.removeDiagnosis
@@ -32,8 +31,16 @@ class CaseViewModel(
     val state = _state.asStateFlow()
 
     init {
-        onIntent(CaseIntent.LoadMedicineList())
+        onIntent(CaseIntent.LoadMedicineList(""))
         loadSetupData()
+        loadPrescriptionTemplates()
+    }
+
+    private fun loadPrescriptionTemplates() {
+        launch {
+            val templates = mainRepository.getPrescriptionTemplateDtos()
+            _state.update { it.copy(prescriptionTemplates = templates) }
+        }
     }
 
     private fun loadSetupData() {
@@ -68,7 +75,7 @@ class CaseViewModel(
                 val oldType = _state.value.medicineComposerState.doseType
                 val newType = intent.state.doseType
                 _state.update { it.copy(medicineComposerState = intent.state) }
-                if (oldType != newType && newType.isNotEmpty()) {
+                if (oldType != newType) {
                     onIntent(CaseIntent.LoadMedicineList(newType))
                 }
             }
@@ -144,7 +151,12 @@ class CaseViewModel(
             }
 
             is CaseIntent.TogglePrescriptionSms -> {
-                _state.update { it.copy(isPrescriptionWithSmsChecked = intent.checked) }
+                _state.update {
+                    it.copy(
+                        isPrescriptionWithSmsChecked = intent.checked,
+                        customMessageState = it.customMessageState.copy(isFcmChecked = intent.checked)
+                    )
+                }
             }
 
             is CaseIntent.UpdatePatientName -> {
@@ -208,6 +220,31 @@ class CaseViewModel(
 
             CaseIntent.SaveAsTemplate -> {
                 saveAsTemplate()
+            }
+
+            is CaseIntent.SelectPrescriptionTemplate -> {
+                val template = intent.template
+                val newPrescriptions = template.medicineList?.map { medDto ->
+                    val medicine =
+                        _state.value.medicineList.find { it.medicineId == medDto.medicineId }
+                    PrescriptionItem(
+                        medicineName = medicine?.brandName ?: "Unknown",
+                        dose = medDto.dailyDose.orEmpty(),
+                        duration = medDto.durationDay.orEmpty(),
+                        medicineId = medDto.medicineId
+                    )
+                } ?: emptyList()
+
+                _state.update {
+                    it.copy(
+                        formState = it.formState.copy(
+                            doctorAdvice = template.doctorAdvice.orEmpty(),
+                            commentsForFcm = template.messageToFcm.orEmpty(),
+                            doctorNotes = template.doctorFindings.orEmpty(),
+                            prescriptions = it.formState.prescriptions + newPrescriptions
+                        )
+                    )
+                }
             }
         }
     }
@@ -317,7 +354,7 @@ class CaseViewModel(
     }
 
     private fun loadMedicineList(
-        type: String = "Tab"
+        type: String
     ) {
         launch(loading = Loading.Gone) {
             val list = repository.getMedicineList(type = type)
@@ -330,15 +367,49 @@ class CaseViewModel(
             if (_state.value.formState.prescriptions.isNotEmpty()) {
                 _state.update { it.copy(isSaving = true) }
                 try {
-                    // First, save the doctor feedback
-                    repository.saveDoctorFeedback(formState = _state.value.formState)
-                    showSuccess("Feedback saved successfully")
-
-                    // After successful save, update interview status to "Close"
-                    repository.updateInterviewStatus(
-                        interviewId = _state.value.formState.interviewId ?: 0,
-                        status = CaseTab.Answered.apiParam // "Close"
+                    val currentState = _state.value
+                    val isFromTemplate = currentState.interviewDetails.interviewId == -1L
+                    
+                    // Update formState with correct template save status and comments for FCM if needed
+                    val finalFormState = currentState.formState.copy(
+                        isPresTempSave = if (isFromTemplate) 1 else currentState.formState.isPresTempSave,
+                        commentsForFcm = if (!isFromTemplate && currentState.isPrescriptionWithSmsChecked && currentState.customMessageState.isFcmChecked) {
+                            currentState.customMessageState.messageText
+                        } else {
+                            currentState.formState.commentsForFcm
+                        }
                     )
+
+                    // First, save the doctor feedback
+                    repository.saveDoctorFeedback(formState = finalFormState)
+                    
+                    // Only send SMS and update status if it's a real case (not a template creation)
+                    if (!isFromTemplate) {
+                        // If SMS is checked, send the SMS
+                        if (currentState.isPrescriptionWithSmsChecked) {
+                            val smsText = currentState.customMessageState.messageText
+                            val phoneNumber = currentState.customMessageState.phoneNumber.ifBlank {
+                                currentState.fcmProfileState.fcmProfile?.mobileNo ?: currentState.formState.mobile
+                            }
+                            
+                            if (phoneNumber.isNotBlank() && smsText.isNotBlank()) {
+                                try {
+                                    repository.sendSms(msisdn = phoneNumber, message = smsText)
+                                    "SMS sent successfully to $phoneNumber".log("CASE_DEBUG")
+                                } catch (e: Exception) {
+                                    "Failed to send SMS: ${e.message}".log("CASE_DEBUG")
+                                }
+                            }
+                        }
+                        
+                        // After successful save, update interview status to "Close"
+                        repository.updateInterviewStatus(
+                            interviewId = currentState.formState.interviewId ?: 0,
+                            status = CaseTab.Answered.apiParam // "Close"
+                        )
+                    }
+
+                    showSuccess(if (isFromTemplate) "Template saved successfully" else "Feedback saved successfully")
 
                     _state.update { it.copy(isSaving = false) }
                     _uiEvent.send(CaseUiEvent.NavigateBack)

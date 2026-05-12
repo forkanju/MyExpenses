@@ -5,10 +5,11 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
-import ngo.friendship.mhealth.dc.presentation.screens.case.CaseDetailsMode
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
 import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
 
 data class CaseUiState(
     val interviewDetails: InterviewDetails = InterviewDetails(),
@@ -25,8 +26,8 @@ data class CaseUiState(
     val isDatePickerVisible: Boolean = false,
     val selectedSummaryTab: Int = 0,
     val isSendMessageDialogVisible: Boolean = false,
-    val customMessageState: CustomMessageState = CustomMessageState(),
-    val isPrescriptionWithSmsChecked: Boolean = false,
+    val customMessageState: CustomMessageState = CustomMessageState(isFcmChecked = true),
+    val isPrescriptionWithSmsChecked: Boolean = true,
     val patientName: String = "",
     val selectedGender: String = "Male",
     val age: String = "",
@@ -35,5 +36,6 @@ data class CaseUiState(
     val interviewNote: String = "",
     val isSaveTemplateDialogVisible: Boolean = false,
     val templateName: String = "",
-    val isGlobalTemplate: Boolean = false
+    val isGlobalTemplate: Boolean = false,
+    val prescriptionTemplates: List<PrescriptionTemplateDto> = emptyList()
 )

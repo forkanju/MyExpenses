@@ -1,18 +1,36 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Male
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,11 +43,14 @@ import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.components.FormAutoCompleteDropdownField
 import ngo.friendship.mhealth.dc.presentation.components.FormContainerCard
 import ngo.friendship.mhealth.dc.presentation.components.LabeledFormTextField
-import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.AppDatePickerDialog
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.AppDatePickerDialog
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.DiagnosisChipGroup
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.InvestigationChipGroup
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MedicineSection
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.*
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PrescriptionActionButtonRow
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.PrescriptionHeader
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
@@ -75,7 +96,12 @@ fun LocalCaseDetailScreen(
                     ) {
                         // Gender Toggle Selection
                         Column(modifier = Modifier.weight(0.35f)) {
-                            Text("Gender", fontSize = 13.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+                            Text(
+                                "Gender",
+                                fontSize = 13.sp,
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Medium
+                            )
                             Spacer(Modifier.height(4.dp))
                             Surface(
                                 shape = RoundedCornerShape(20.dp),
@@ -146,7 +172,12 @@ fun LocalCaseDetailScreen(
                     ) {
                         // Sector Dropdown (Placeholder)
                         Column(modifier = Modifier.weight(0.5f)) {
-                            Text("Sector", fontSize = 13.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+                            Text(
+                                "Sector",
+                                fontSize = 13.sp,
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Medium
+                            )
                             Spacer(Modifier.height(4.dp))
                             Box(
                                 modifier = Modifier
@@ -165,7 +196,15 @@ fun LocalCaseDetailScreen(
                             label = "Mobile",
                             placeholder = "01xxxxxxxxx",
                             value = state.formState.mobile,
-                            onValueChange = { onIntent(CaseIntent.UpdateFormState(state.formState.copy(mobile = it))) },
+                            onValueChange = {
+                                onIntent(
+                                    CaseIntent.UpdateFormState(
+                                        state.formState.copy(
+                                            mobile = it
+                                        )
+                                    )
+                                )
+                            },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                         )
                     }
@@ -175,7 +214,12 @@ fun LocalCaseDetailScreen(
             // Interview Section
             FormContainerCard {
                 Column {
-                    Text("Interview", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = PrimaryBlue)
+                    Text(
+                        "Interview",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryBlue
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = state.interviewNote,
@@ -287,7 +331,12 @@ fun LocalCaseDetailScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             IconButton(onClick = { onIntent(CaseIntent.ToggleDatePicker) }) {
-                                Icon(Icons.Default.DateRange, contentDescription = null, tint = PrimaryBlue, modifier = Modifier.size(20.dp))
+                                Icon(
+                                    Icons.Default.DateRange,
+                                    contentDescription = null,
+                                    tint = PrimaryBlue,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         }
                     }

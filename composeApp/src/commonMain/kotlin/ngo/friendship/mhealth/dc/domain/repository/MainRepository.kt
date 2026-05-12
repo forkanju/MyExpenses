@@ -11,6 +11,7 @@ interface MainRepository {
     fun getDoctorProfile(): Flow<UserProfile?>
     suspend fun getAdviceList(): List<AdviceItemData>
     suspend fun getPrescriptionTemplates(): List<PrescriptionTemplate>
+    suspend fun getPrescriptionTemplateDtos(): List<ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto>
     suspend fun saveAdvice(title: String, content: String): Boolean
     suspend fun saveDiagnosis(title: String): Boolean
     suspend fun saveInvestigation(title: String): Boolean
