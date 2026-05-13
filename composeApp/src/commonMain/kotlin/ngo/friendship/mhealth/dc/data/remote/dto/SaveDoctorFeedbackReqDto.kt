@@ -69,7 +69,12 @@ data class SaveDoctorFeedbackReqDto(
                 imei = "IMEI_FREE",
                 demo = false,
                 requestType = "DOCTOR_CENTER",
-                requestName = "SAVE_DOCTOR_FEEDBACK",
+                requestName = when {
+                    formState.requestName == "DELETE_PRESCRIPTION_TEMPLATE" -> "DELETE_PRESCRIPTION_TEMPLATE"
+                    formState.prescriptionId != null -> "UPDATE_PRESCRIPTION_TEMPLATE"
+                    formState.isPresTempSave == 1 -> "SAVE_PRESCRIPTION_TEMPLATE"
+                    else -> "SAVE_DOCTOR_FEEDBACK"
+                },
                 moduleName = "mHealth-FCM",
                 requestTime = requestTime,
                 requestAction = "",
@@ -136,7 +141,10 @@ data class DoctorFeedbackObject(
     val prescriptionName: String,
 
     @SerialName("is_global_prescription")
-    val isGlobalPrescription: Int
+    val isGlobalPrescription: Int,
+
+    @SerialName("prescription_id")
+    val prescriptionId: Long? = null
 )
 
 @Serializable
@@ -199,7 +207,7 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
         isPresTempSave = isPresTempSave,
         prescriptionName = prescriptionName,
         isGlobalPrescription = isGlobalPrescription,
-        doctorAdvice = doctorAdvice
-
+        doctorAdvice = doctorAdvice,
+        prescriptionId = prescriptionId
     )
 }

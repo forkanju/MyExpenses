@@ -11,9 +11,15 @@ interface MedicineDao {
     @Query("SELECT * FROM Medicine")
     suspend fun getAllMedicines(): List<Medicine>
 
+    @Query("SELECT * FROM Medicine WHERE type = :type")
+    suspend fun getMedicinesByType(type: String): List<Medicine>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMedicines(medicines: List<Medicine>)
 
     @Query("DELETE FROM Medicine")
     suspend fun deleteAllMedicines()
+
+    @Query("DELETE FROM Medicine WHERE type = :type")
+    suspend fun deleteMedicinesByType(type: String)
 }

@@ -18,6 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,7 +40,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.LaunchedEffect
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.PrescriptionTemplateListIntent
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.utils.toUiDate
 import org.koin.compose.viewmodel.koinViewModel
@@ -47,10 +52,16 @@ import org.koin.compose.viewmodel.koinViewModel
 fun PrescriptionTemplateListScreen(
     onBack: () -> Unit,
     onAddTemplate: () -> Unit,
+    onTemplateClick: (PrescriptionTemplate) -> Unit,
     viewModel: PrescriptionTemplateListViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    
+    // Trigger load templates if not loaded
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(PrescriptionTemplateListIntent.LoadTemplates)
+    }
 
     Scaffold(
         topBar = {
@@ -94,7 +105,12 @@ fun PrescriptionTemplateListScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(state.templates) { template ->
-                        TemplateItem(template)
+                        TemplateItem(
+                            template = template,
+                            onClick = { onTemplateClick(template) },
+                            onEdit = { onTemplateClick(template) },
+                            onDelete = { viewModel.onIntent(PrescriptionTemplateListIntent.DeleteTemplate(template)) }
+                        )
                         HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                     }
                 }
@@ -104,10 +120,18 @@ fun PrescriptionTemplateListScreen(
 }
 
 @Composable
-fun TemplateItem(template: PrescriptionTemplate) {
+fun TemplateItem(
+    template: PrescriptionTemplate,
+    onClick: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -150,12 +174,33 @@ fun TemplateItem(template: PrescriptionTemplate) {
             )
         }
 
-        IconButton(onClick = { /* More actions */ }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "More",
-                tint = Color.Gray
-            )
+        Box {
+            IconButton(onClick = { showMenu = true }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More",
+                    tint = Color.Gray
+                )
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Edit") },
+                    onClick = {
+                        showMenu = false
+                        onEdit()
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Delete") },
+                    onClick = {
+                        showMenu = false
+                        onDelete()
+                    }
+                )
+            }
         }
     }
 }

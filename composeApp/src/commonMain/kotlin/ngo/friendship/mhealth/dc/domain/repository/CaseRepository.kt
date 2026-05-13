@@ -19,6 +19,8 @@ interface CaseRepository {
 
     suspend fun getMedicineList(type: String): List<Medicine>
 
+    suspend fun getAllMedicines(): List<Medicine>
+
     suspend fun saveDoctorFeedback(formState: DoctorFeedbackFormState): SaveDoctorFeedbackResult
 
     suspend fun getQuestionAnswerData(): QuestionAnswerJson

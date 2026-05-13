@@ -265,7 +265,7 @@ fun LocalTreatmentDetailsScreen(
                                 fontSize = 14.sp,
                                 color = Color.Gray
                             )
-                            Text("1+0+1 (৭ দিন) -খাবারের পরে", fontSize = 12.sp, color = Color.Gray)
+                            Text("1+0+1 (7 days) - After meal", fontSize = 12.sp, color = Color.Gray)
                         }
                     }
                 }

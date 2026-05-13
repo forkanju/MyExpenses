@@ -24,5 +24,7 @@ data class DoctorFeedbackFormState(
     val prescriptions: List<PrescriptionItem> = emptyList(),
     val isPresTempSave: Int = 0,
     val prescriptionName: String = "",
-    val isGlobalPrescription: Int = 0
+    val isGlobalPrescription: Int = 0,
+    val prescriptionId: Long? = null,
+    val requestName: String? = null
 )

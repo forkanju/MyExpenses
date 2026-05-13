@@ -11,7 +11,10 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.Medi
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
 
+import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
+
 sealed interface CaseIntent {
+    data class LoadFromTemplate(val template: PrescriptionTemplate) : CaseIntent
     data class LoadInterviewDetails(val interviewId: Long) : CaseIntent
     data class LoadQuestionAnswerData(val interviewId: Long) : CaseIntent
     data class LoadMedicineList(val type: String = "Tab") : CaseIntent

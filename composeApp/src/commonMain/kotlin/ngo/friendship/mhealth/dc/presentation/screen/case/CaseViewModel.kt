@@ -31,7 +31,7 @@ class CaseViewModel(
     val state = _state.asStateFlow()
 
     init {
-        onIntent(CaseIntent.LoadMedicineList(""))
+        onIntent(CaseIntent.LoadMedicineList("Tab"))
         loadSetupData()
         loadPrescriptionTemplates()
     }
@@ -58,6 +58,54 @@ class CaseViewModel(
 
     fun onIntent(intent: CaseIntent) {
         when (intent) {
+            is CaseIntent.LoadFromTemplate -> {
+                launch {
+                    val template = intent.template
+                    val allMedicines = repository.getAllMedicines()
+                    
+                    val newPrescriptions = template.medicineList?.map { medDto ->
+                        val medicine = allMedicines.find { it.medicineId == medDto.medicineId?.toLongOrNull() }
+                        
+                        val mealTimeText = when (medDto.takingRule) {
+                            "1" -> "Before"
+                            "2" -> "After"
+                            else -> null
+                        }
+                        
+                        val medicineName = if (medicine != null) {
+                            "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
+                        } else {
+                            "Unknown"
+                        }
+                        
+                        PrescriptionItem(
+                            medicineName = medicineName,
+                            dose = medDto.dailyDose.orEmpty(),
+                            duration = medDto.durationDay.orEmpty(),
+                            medicineId = medDto.medicineId?.toLongOrNull(),
+                            mealTime = mealTimeText
+                        )
+                    } ?: emptyList()
+
+                    _state.update {
+                        it.copy(
+                            templateName = template.title,
+                            isGlobalTemplate = template.isGlobal,
+                            prescriptionId = template.prescriptionId,
+                            formState = it.formState.copy(
+                                prescriptionName = template.title,
+                                isGlobalPrescription = if (template.isGlobal) 1 else 0,
+                                prescriptionId = template.prescriptionId,
+                                doctorAdvice = template.doctorAdvice.orEmpty(),
+                                commentsForFcm = template.commentsForFcm.orEmpty(),
+                                doctorNotes = template.doctorNotes.orEmpty(),
+                                prescriptions = newPrescriptions,
+                                isPresTempSave = 1
+                            )
+                        )
+                    }
+                }
+            }
             is CaseIntent.LoadInterviewDetails -> loadInterviewDetails(intent.interviewId)
             is CaseIntent.LoadQuestionAnswerData -> loadQuestionAnswerData(intent.interviewId)
             is CaseIntent.LoadMedicineList -> loadMedicineList(intent.type)
@@ -226,22 +274,38 @@ class CaseViewModel(
                 val template = intent.template
                 val newPrescriptions = template.medicineList?.map { medDto ->
                     val medicine =
-                        _state.value.medicineList.find { it.medicineId == medDto.medicineId }
+                        _state.value.medicineList.find { it.medicineId == medDto.medicineId?.toLongOrNull() }
+
+                    val mealTimeText = when (medDto.takingRule) {
+                        "1" -> "Before"
+                        "2" -> "After"
+                        else -> null
+                    }
+
+                    val medicineName = if (medicine != null) {
+                        "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
+                    } else {
+                        "Unknown"
+                    }
+
                     PrescriptionItem(
-                        medicineName = medicine?.brandName ?: "Unknown",
+                        medicineName = medicineName,
                         dose = medDto.dailyDose.orEmpty(),
                         duration = medDto.durationDay.orEmpty(),
-                        medicineId = medDto.medicineId
+                        medicineId = medDto.medicineId?.toLongOrNull(),
+                        mealTime = mealTimeText
                     )
                 } ?: emptyList()
 
                 _state.update {
                     it.copy(
+                        templateName = template.prescLabel.orEmpty().substringBefore(" Prescription").trim(),
+                        isGlobalTemplate = template.isGlobalPress == "1",
                         formState = it.formState.copy(
                             doctorAdvice = template.doctorAdvice.orEmpty(),
                             commentsForFcm = template.messageToFcm.orEmpty(),
                             doctorNotes = template.doctorFindings.orEmpty(),
-                            prescriptions = it.formState.prescriptions + newPrescriptions
+                            prescriptions = newPrescriptions
                         )
                     )
                 }
@@ -354,7 +418,7 @@ class CaseViewModel(
     }
 
     private fun loadMedicineList(
-        type: String
+        type: String = "Tab"
     ) {
         launch(loading = Loading.Gone) {
             val list = repository.getMedicineList(type = type)
@@ -369,10 +433,12 @@ class CaseViewModel(
                 try {
                     val currentState = _state.value
                     val isFromTemplate = currentState.interviewDetails.interviewId == -1L
+                    val isUpdate = isFromTemplate && currentState.prescriptionId != null
                     
                     // Update formState with correct template save status and comments for FCM if needed
                     val finalFormState = currentState.formState.copy(
                         isPresTempSave = if (isFromTemplate) 1 else currentState.formState.isPresTempSave,
+                        prescriptionId = currentState.prescriptionId,
                         commentsForFcm = if (!isFromTemplate && currentState.isPrescriptionWithSmsChecked && currentState.customMessageState.isFcmChecked) {
                             currentState.customMessageState.messageText
                         } else {
@@ -409,7 +475,12 @@ class CaseViewModel(
                         )
                     }
 
-                    showSuccess(if (isFromTemplate) "Template saved successfully" else "Feedback saved successfully")
+                    val successMessage = when {
+                        isUpdate -> "Template updated successfully"
+                        isFromTemplate -> "Template saved successfully"
+                        else -> "Feedback saved successfully"
+                    }
+                    showSuccess(successMessage)
 
                     _state.update { it.copy(isSaving = false) }
                     _uiEvent.send(CaseUiEvent.NavigateBack)

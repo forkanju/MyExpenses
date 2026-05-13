@@ -33,6 +33,15 @@ fun EntryProviderScope<NavKey>.dashboardRoute(
                         source = Screens.CaseDetail.SOURCE_TEMPLATE_LIST
                     )
                 )
+            },
+            onTemplateClick = { template ->
+                mainViewModel.backStack.add(
+                    Screens.CaseDetail(
+                        interviewId = -1L,
+                        source = Screens.CaseDetail.SOURCE_TEMPLATE_LIST,
+                        template = template
+                    )
+                )
             }
         )
     }

@@ -35,7 +35,8 @@ fun EntryProviderScope<NavKey>.caseRoute(
         LaunchedEffect(
             screen.interviewId,
             screen.mode,
-            screen.selectedTab
+            screen.selectedTab,
+            screen.template
         ) {
             val selectedTab = CaseTab.entries
                 .find {
@@ -50,12 +51,16 @@ fun EntryProviderScope<NavKey>.caseRoute(
             viewModel.onIntent(CaseIntent.SetMode(screen.mode))
             viewModel.onIntent(CaseIntent.SetSelectedTab(selectedTab))
 
-            viewModel.onIntent(
-                CaseIntent.OpenCaseFromTab(
-                    interviewId = screen.interviewId,
-                    sourceTab = selectedTab
+            if (screen.template != null) {
+                viewModel.onIntent(CaseIntent.LoadFromTemplate(screen.template))
+            } else {
+                viewModel.onIntent(
+                    CaseIntent.OpenCaseFromTab(
+                        interviewId = screen.interviewId,
+                        sourceTab = selectedTab
+                    )
                 )
-            )
+            }
         }
 
         LaunchedEffect(Unit) {

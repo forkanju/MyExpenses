@@ -11,4 +11,5 @@ data class PrescriptionTemplateListState(
 sealed interface PrescriptionTemplateListIntent {
     data object LoadTemplates : PrescriptionTemplateListIntent
     data class Search(val query: String) : PrescriptionTemplateListIntent
+    data class DeleteTemplate(val template: PrescriptionTemplate) : PrescriptionTemplateListIntent
 }

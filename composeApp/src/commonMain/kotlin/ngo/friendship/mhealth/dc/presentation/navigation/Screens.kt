@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
 
+import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
+
 @Serializable
 object Screens {
     @Serializable
@@ -22,7 +24,8 @@ object Screens {
         val interviewId: Long,
         val mode: CaseDetailsMode = CaseDetailsMode.NORMAL,
         val source: String = SOURCE_CASE_LIST,
-        val selectedTab: String = "Pending"
+        val selectedTab: String = "Pending",
+        val template: PrescriptionTemplate? = null
     ) : NavKey {
         companion object {
             const val SOURCE_CASE_LIST = "case_list"

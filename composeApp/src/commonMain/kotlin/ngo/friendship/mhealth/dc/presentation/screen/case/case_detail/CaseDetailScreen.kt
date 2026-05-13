@@ -150,7 +150,7 @@ fun CaseDetailScreen(
                         onShareClick = {
                             println("Share template")
                         },
-                        sendButtonText = "Save Template",
+                        sendButtonText = if (state.prescriptionId != null) "Update Template" else "Save Template",
                         enabled = !isAnsweredMode,
                         isAnsweredMode = isAnsweredMode
                     )

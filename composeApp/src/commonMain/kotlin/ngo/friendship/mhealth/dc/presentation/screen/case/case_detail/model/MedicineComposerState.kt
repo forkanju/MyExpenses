@@ -8,7 +8,7 @@ data class MedicineComposerState(
     val doseType: String = "",
     val medicineQuery: TextFieldValue = TextFieldValue(""),
     val dose: String = "0+0+1",
-    val days: String = "৭ দিন",
-    val mealTime: MealTime = MealTime.PORE,
+    val days: String = "7 days",
+    val mealTime: MealTime = MealTime.AFTER,
     val genericNameQuery: TextFieldValue = TextFieldValue("")
 )

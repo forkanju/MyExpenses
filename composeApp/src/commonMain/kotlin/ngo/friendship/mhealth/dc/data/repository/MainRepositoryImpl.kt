@@ -70,8 +70,11 @@ class MainRepositoryImpl(
                     requestTime = currentTimestamp.toDateTimeServerSlash()
                 )
             )
+            println("PRESCRIPTION_TEMPLATES RESPONSE: $response")
             response.data?.prescriptionTemplates ?: emptyList()
         } catch (e: Exception) {
+            println("ERROR fetching templates: ${e.message}")
+            e.printStackTrace()
             emptyList()
         }
     }

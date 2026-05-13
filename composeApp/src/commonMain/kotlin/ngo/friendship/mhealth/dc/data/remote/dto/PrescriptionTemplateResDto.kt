@@ -29,16 +29,20 @@ data class PrescriptionTemplateDto(
     @SerialName("medicine_list") val medicineList: List<PrescriptionMedicineDto>? = null,
     @SerialName("LAST_UPDATED_ON") val lastUpdatedOn: String? = null,
     @SerialName("DOCTOR_FINDINGS") val doctorFindings: String? = null,
-    @SerialName("PRESC_ID") val prescId: Long? = null,
-    @SerialName("DOCTOR_ADVICE") val doctorAdvice: String? = null
+    @SerialName("PRESC_ID") val prescId: String? = null,
+    @SerialName("DOCTOR_ADVICE") val doctorAdvice: String? = null,
+    @SerialName("IS_GLOBAL_PRESCRIPTION") val isGlobalPress: String? = null
 )
 
 @Serializable
 data class PrescriptionMedicineDto(
-    @SerialName("ORG_ID") val orgId: Int? = null,
+    @SerialName("ORG_ID") val orgId: String? = null,
     @SerialName("DURATION_DAY") val durationDay: String? = null,
-    @SerialName("MEDICINE_ID") val medicineId: Long? = null,
+    @SerialName("MEDICINE_ID") val medicineId: String? = null,
     @SerialName("QTY") val qty: String? = null,
     @SerialName("DAILY_DOSE") val dailyDose: String? = null,
-    @SerialName("PRESC_ID") val prescId: Long? = null
+    @SerialName("PRESC_ID") val prescId: String? = null,
+    @SerialName("TAKING_RULE") val takingRule: String? = null,
+    @SerialName("GENERIC_NAME") val genericName: String? = null,
+    @SerialName("BRAND_NAME") val brandName: String? = null,
 )

@@ -115,9 +115,9 @@ class CaseRepositoryImpl(
     override suspend fun getMedicineList(
         type: String
     ): List<Medicine> {
-        val allCached = medicineDao.getAllMedicines()
-        if (allCached.isNotEmpty()) {
-            return allCached.filter { it.type == type }
+        val cached = medicineDao.getMedicinesByType(type)
+        if (cached.isNotEmpty()) {
+            return cached
         }
 
         val response = api.getMedicineList(
@@ -125,15 +125,19 @@ class CaseRepositoryImpl(
                 userName = localSettings.user.userName,
                 password = localSettings.user.password,
                 requestTime = currentTimestamp.toDateTimeServerSlash(),
-                type = "" // Fetching all medicines
+                type = type
             )
         )
         val medicines = response.data?.medicineList?.map { it.toDomain() }.orEmpty()
         if (medicines.isNotEmpty()) {
-            medicineDao.deleteAllMedicines()
+            medicineDao.deleteMedicinesByType(type)
             medicineDao.insertMedicines(medicines)
         }
-        return medicines.filter { it.type == type }
+        return medicines
+    }
+
+    override suspend fun getAllMedicines(): List<Medicine> {
+        return medicineDao.getAllMedicines()
     }
 
     override suspend fun getQuestionAnswerData(): QuestionAnswerJson {

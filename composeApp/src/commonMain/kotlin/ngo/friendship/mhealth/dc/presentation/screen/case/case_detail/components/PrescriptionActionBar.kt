@@ -73,7 +73,7 @@ fun PrescriptionActionRowAligned(
 
             Spacer(Modifier.width(9.dp))
 
-            AgePoreToggle(
+            MealTimeToggle(
                 value = toggleValue,
                 onChange = onToggleChange,
                 isAnsweredMode = isAnsweredMode
@@ -95,7 +95,7 @@ fun PrescriptionActionRowAligned(
 }
 
 @Composable
-fun AgePoreToggle(
+fun MealTimeToggle(
     value: ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime,
     onChange: (ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime) -> Unit,
     modifier: Modifier = Modifier,
@@ -115,7 +115,7 @@ fun AgePoreToggle(
                 indication = ripple()
             ) {
                 onChange(
-                    if (value == _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.AGE) _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.PORE else _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.AGE
+                    if (value == ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.BEFORE) ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.AFTER else ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.BEFORE
                 )
             },
         shape = RoundedCornerShape(14.dp),
@@ -136,7 +136,7 @@ fun AgePoreToggle(
             Spacer(Modifier.width(6.dp))
 
             Text(
-                text = if (value == _root_ide_package_.ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.AGE) "আগে" else "পরে",
+                text = if (value == ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.BEFORE) "Before" else "After",
                 fontSize = 12.sp,
                 color = textColor,
                 maxLines = 1

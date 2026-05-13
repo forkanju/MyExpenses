@@ -37,5 +37,6 @@ data class CaseUiState(
     val isSaveTemplateDialogVisible: Boolean = false,
     val templateName: String = "",
     val isGlobalTemplate: Boolean = false,
+    val prescriptionId: Long? = null,
     val prescriptionTemplates: List<PrescriptionTemplateDto> = emptyList()
 )

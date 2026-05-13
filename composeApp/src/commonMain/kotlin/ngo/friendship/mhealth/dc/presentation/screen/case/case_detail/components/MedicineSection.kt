@@ -53,8 +53,8 @@ import ngo.friendship.mhealth.dc.theme.Gray
 import ngo.friendship.mhealth.dc.theme.UnfocusedBorderColor
 
 enum class MealTime {
-    AGE,   // আগে
-    PORE   // পরে
+    BEFORE,   // Before
+    AFTER   // After
 }
 
 @Composable
@@ -233,7 +233,7 @@ fun MedicineComposerCard(
                 doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
                 onDoseSelect = { onStateChange(state.copy(dose = it)) },
                 daysValue = state.days,
-                daysItems = listOf("৩ দিন", "৫ দিন", "৭ দিন", "১০ দিন"),
+                daysItems = listOf("3 days", "5 days", "7 days", "10 days"),
                 onDaysSelect = { onStateChange(state.copy(days = it)) },
                 toggleValue = state.mealTime,
                 onToggleChange = { onStateChange(state.copy(mealTime = it)) },
@@ -252,8 +252,8 @@ fun MedicineComposerCard(
                     } else {
                         val finalMedicineName = "$type: $genericName ($brandName)"
                         val mealTimeText = when (state.mealTime) {
-                            MealTime.AGE -> "আগে"
-                            MealTime.PORE -> "পরে"
+                            MealTime.BEFORE -> "Before"
+                            MealTime.AFTER -> "After"
                         }
                         val item = PrescriptionItem(
                             medicineName = finalMedicineName,
@@ -270,8 +270,8 @@ fun MedicineComposerCard(
                                 medicineQuery = TextFieldValue(""),
                                 genericNameQuery = TextFieldValue(""),
                                 dose = "0+0+1",
-                                days = "৭ দিন",
-                                mealTime = MealTime.PORE,
+                                days = "7 days",
+                                mealTime = MealTime.AFTER,
                                 medicineId = -1L
                             )
                         )
@@ -355,7 +355,7 @@ fun MedicineComposerCardPreview() {
                 item = PrescriptionItem(
                     medicineName = "Napa 500mg",
                     dose = "1+0+1",
-                    duration = "৫ দিন"
+                    duration = "5 days"
                 ),
                 onRemoveClick = {}
             )
