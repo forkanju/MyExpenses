@@ -27,7 +27,7 @@ fun CheckboxWithEditableText(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    onEditClick: () -> Unit,
+    onEditClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isAnsweredMode: Boolean = false
@@ -62,18 +62,25 @@ fun CheckboxWithEditableText(
             text = text,
             fontSize = 14.sp,
             color = textColor,
-            textDecoration = TextDecoration.Underline
+            textDecoration = if (onEditClick != null) TextDecoration.Underline else TextDecoration.None,
+            modifier = if (onEditClick != null) {
+                Modifier.clickable(enabled = enabled && !isAnsweredMode, onClick = onEditClick)
+            } else {
+                Modifier
+            }
         )
 
-        Spacer(Modifier.width(6.dp))
+        if (onEditClick != null) {
+            Spacer(Modifier.width(6.dp))
 
-        Icon(
-            painter = painterResource(Resources.Icon.Edit),
-            contentDescription = "Edit",
-            tint = iconColor,
-            modifier = Modifier
-                .size(22.dp)
-                .clickable(enabled = !isAnsweredMode, onClick = onEditClick)
-        )
+            Icon(
+                painter = painterResource(Resources.Icon.Edit),
+                contentDescription = "Edit",
+                tint = iconColor,
+                modifier = Modifier
+                    .size(22.dp)
+                    .clickable(enabled = !isAnsweredMode, onClick = onEditClick)
+            )
+        }
     }
 }

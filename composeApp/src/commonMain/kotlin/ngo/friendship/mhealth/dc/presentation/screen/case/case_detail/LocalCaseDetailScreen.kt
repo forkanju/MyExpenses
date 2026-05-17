@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,6 +65,7 @@ fun LocalCaseDetailScreen(
     onMoreClick: () -> Unit = {}
 ) {
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             CommonTopBar(
                 title = "New",
@@ -153,7 +156,7 @@ fun LocalCaseDetailScreen(
                             placeholder = "00",
                             value = state.age,
                             onValueChange = { onIntent(CaseIntent.UpdateAge(it)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
                         )
 
                         LabeledFormTextField(
@@ -162,7 +165,7 @@ fun LocalCaseDetailScreen(
                             placeholder = "0000",
                             value = state.officeId,
                             onValueChange = { onIntent(CaseIntent.UpdateOfficeId(it)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next)
                         )
                     }
 
@@ -205,7 +208,7 @@ fun LocalCaseDetailScreen(
                                     )
                                 )
                             },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Next)
                         )
                     }
                 }

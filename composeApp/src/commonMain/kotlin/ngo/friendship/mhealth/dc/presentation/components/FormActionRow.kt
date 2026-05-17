@@ -3,7 +3,6 @@ package ngo.friendship.mhealth.dc.presentation.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +49,10 @@ fun FormActionRow(
             }
         }
 
-        TextButton(enabled = !isAnsweredMode, onClick = onRightClick) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable(enabled = !isAnsweredMode, onClick = onRightClick)
+        ) {
             Text(
                 text = rightText,
                 fontSize = 14.sp,

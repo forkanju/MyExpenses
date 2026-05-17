@@ -111,7 +111,7 @@ fun EntryProviderScope<NavKey>.caseRoute(
                 }
             },
             onMoreClick = {
-                mainViewModel.openMoreTab()
+                backStack.add(Screens.Dashboard)
             },
             onBack = backStack::removeLastOrNull
         )

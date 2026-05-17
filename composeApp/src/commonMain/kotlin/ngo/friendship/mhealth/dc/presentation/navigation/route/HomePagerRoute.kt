@@ -17,7 +17,7 @@ import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.BottomNavItems
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.CaseListScreen
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardScreen
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.DashboardScreen
 import ngo.friendship.mhealth.dc.presentation.screens.home.HomeScreen
 
 @Composable

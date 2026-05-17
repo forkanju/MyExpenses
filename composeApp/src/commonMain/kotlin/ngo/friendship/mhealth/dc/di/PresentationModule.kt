@@ -8,7 +8,7 @@ import ngo.friendship.mhealth.dc.presentation.screen.dashboard.DashboardViewMode
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.PrescriptionTemplateListViewModel
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.DxListViewModel
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.MedicineListViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.home.HomeViewModel
+import ngo.friendship.mhealth.dc.presentation.screen.home.HomeViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.profile.beneficiary.BeneficiaryProfileViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileViewModel
 import org.koin.core.module.dsl.viewModelOf

@@ -44,10 +44,11 @@ class CaseListViewModel(
                         item.location.contains(query, ignoreCase = true) ||
                         item.questionnaireName.contains(query, ignoreCase = true)
             }
+            .sortedByDescending { it.startTime }
 
         CaseListState(
             isLoading = loading,
-            interviews = allInterviews.filter { it.status == tab.apiParam },
+            interviews = allInterviews.filter { it.status == tab.apiParam }.sortedByDescending { it.startTime },
             filteredInterviews = filtered,
             selectedTab = tab,
             tabCounts = counts,

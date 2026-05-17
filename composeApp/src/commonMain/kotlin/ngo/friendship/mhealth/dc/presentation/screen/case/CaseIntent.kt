@@ -17,6 +17,7 @@ sealed interface CaseIntent {
     data class LoadFromTemplate(val template: PrescriptionTemplate) : CaseIntent
     data class LoadInterviewDetails(val interviewId: Long) : CaseIntent
     data class LoadQuestionAnswerData(val interviewId: Long) : CaseIntent
+    data class LoadDoctorFeedback(val interviewId: Long) : CaseIntent
     data class LoadMedicineList(val type: String = "Tab") : CaseIntent
     data object SaveDoctorFeedback : CaseIntent
     data class SetMode(val mode: CaseDetailsMode) : CaseIntent
@@ -42,6 +43,7 @@ sealed interface CaseIntent {
     data object ToggleSendMessageDialog : CaseIntent
     data class UpdateCustomMessage(val messageState: CustomMessageState) : CaseIntent
     data class TogglePrescriptionSms(val checked: Boolean) : CaseIntent
+    data class ToggleCalledBack(val checked: Boolean) : CaseIntent
     
     // Intents for Local Case
     data class UpdatePatientName(val name: String) : CaseIntent

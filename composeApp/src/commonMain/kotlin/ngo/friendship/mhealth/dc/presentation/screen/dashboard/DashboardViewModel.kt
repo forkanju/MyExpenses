@@ -44,6 +44,11 @@ class DashboardViewModel(
             }
 
             DashboardIntent.LoadDashboard -> loadDashboardData()
+            is DashboardIntent.ShowSnackbar -> {
+                viewModelScope.launch {
+                    _effect.send(DashboardEffect.ShowSnackbar(intent.message))
+                }
+            }
         }
     }
 
@@ -70,13 +75,23 @@ class DashboardViewModel(
             }
 
             mainRepository.getSetupData().collect { setupData ->
-                updateSections(setupData, adviceList.size, medicineList.size, prescriptionTemplates.size)
+                updateSections(
+                    setupData,
+                    adviceList.size,
+                    medicineList.size,
+                    prescriptionTemplates.size
+                )
             }
             _state.value = _state.value.copy(isLoading = false)
         }
     }
 
-    private fun updateSections(setupData: SetupData, adviceCount: Int, medicineCount: Int, prescriptionCount: Int) {
+    private fun updateSections(
+        setupData: SetupData,
+        adviceCount: Int,
+        medicineCount: Int,
+        prescriptionCount: Int
+    ) {
         val sections = listOf(
             SectionData(
                 title = "Urgent reports",
@@ -88,7 +103,8 @@ class DashboardViewModel(
                         Color(0xFFF1F5FD),
                         "Download",
                         isCentered = true,
-                        iconTint = Color.Unspecified
+                        iconTint = Color.Unspecified,
+                        onClick = { onIntent(DashboardIntent.ShowSnackbar("No service available")) }
                     ),
                     DashboardCardData(
                         "Doctor center summary",
@@ -97,7 +113,8 @@ class DashboardViewModel(
                         Color(0xFFF1F5FD),
                         "Download",
                         isCentered = true,
-                        iconTint = Color.Unspecified
+                        iconTint = Color.Unspecified,
+                        onClick = { onIntent(DashboardIntent.ShowSnackbar("No service available")) }
                     ),
                     DashboardCardData(
                         "Disease wise service",
@@ -106,7 +123,8 @@ class DashboardViewModel(
                         Color(0xFFF1F5FD),
                         "Download",
                         isCentered = true,
-                        iconTint = Color.Unspecified
+                        iconTint = Color.Unspecified,
+                        onClick = { onIntent(DashboardIntent.ShowSnackbar("No service available")) }
                     )
                 )
             ),

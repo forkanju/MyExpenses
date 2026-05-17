@@ -13,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.theme.DarkerGray
@@ -36,12 +38,18 @@ fun LabeledFormTextField(
     supportingText: String? = null,
     singleLine: Boolean = true,
     maxLines: Int = 1,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     isAnsweredMode: Boolean = false
 ) {
+    val focusManager = LocalFocusManager.current
+    val effectiveKeyboardActions = keyboardActions ?: KeyboardActions(
+        onNext = {
+            focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
+        }
+    )
     val labelColor = if (isAnsweredMode) Color(0xFF666666) else TextPrimary
     val fieldTextColor = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
     val borderColor = when {
@@ -78,7 +86,7 @@ fun LabeledFormTextField(
             singleLine = singleLine,
             maxLines = maxLines,
             keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
+            keyboardActions = effectiveKeyboardActions,
             decorationBox = { innerTextField ->
                 Surface(
                     modifier = Modifier.fillMaxSize(),

@@ -26,5 +26,6 @@ data class DoctorFeedbackFormState(
     val prescriptionName: String = "",
     val isGlobalPrescription: Int = 0,
     val prescriptionId: Long? = null,
-    val requestName: String? = null
+    val requestName: String? = null,
+    val isCalledBack: Boolean = false
 )

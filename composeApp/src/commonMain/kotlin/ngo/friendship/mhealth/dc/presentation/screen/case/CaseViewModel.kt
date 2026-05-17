@@ -4,19 +4,23 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
+import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
+import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.addDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.addInvestigation
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.removeDiagnosis
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.removeInvestigation
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.utils.defJson
 import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.minusAt
 
@@ -46,7 +50,7 @@ class CaseViewModel(
     private fun loadSetupData() {
         launch {
             mainRepository.getSetupData().collectLatest { setupData ->
-                _state.update {
+                _state.update { it ->
                     it.copy(
                         medicineBrandTypeList = setupData.medicineBrandTypes.map { it.type }
                             .distinct()
@@ -62,22 +66,23 @@ class CaseViewModel(
                 launch {
                     val template = intent.template
                     val allMedicines = repository.getAllMedicines()
-                    
+
                     val newPrescriptions = template.medicineList?.map { medDto ->
-                        val medicine = allMedicines.find { it.medicineId == medDto.medicineId?.toLongOrNull() }
-                        
+                        val medicine =
+                            allMedicines.find { it.medicineId == medDto.medicineId?.toLongOrNull() }
+
                         val mealTimeText = when (medDto.takingRule) {
                             "1" -> "Before"
                             "2" -> "After"
                             else -> null
                         }
-                        
+
                         val medicineName = if (medicine != null) {
                             "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
                         } else {
                             "Unknown"
                         }
-                        
+
                         PrescriptionItem(
                             medicineName = medicineName,
                             dose = medDto.dailyDose.orEmpty(),
@@ -106,8 +111,10 @@ class CaseViewModel(
                     }
                 }
             }
+
             is CaseIntent.LoadInterviewDetails -> loadInterviewDetails(intent.interviewId)
             is CaseIntent.LoadQuestionAnswerData -> loadQuestionAnswerData(intent.interviewId)
+            is CaseIntent.LoadDoctorFeedback -> loadDoctorFeedback(intent.interviewId)
             is CaseIntent.LoadMedicineList -> loadMedicineList(intent.type)
             CaseIntent.SaveDoctorFeedback -> saveDoctorFeedback()
             is CaseIntent.SetMode -> {
@@ -207,6 +214,15 @@ class CaseViewModel(
                 }
             }
 
+            is CaseIntent.ToggleCalledBack -> {
+                _state.update {
+                    it.copy(
+                        isCalledBackChecked = intent.checked,
+                        formState = it.formState.copy(isCalledBack = intent.checked)
+                    )
+                }
+            }
+
             is CaseIntent.UpdatePatientName -> {
                 _state.update { it.copy(patientName = intent.name) }
             }
@@ -297,11 +313,15 @@ class CaseViewModel(
                     )
                 } ?: emptyList()
 
+                val templateName = template.prescLabel.orEmpty()
+                    .substringBefore(" Prescription").trim()
+
                 _state.update {
                     it.copy(
-                        templateName = template.prescLabel.orEmpty().substringBefore(" Prescription").trim(),
+                        templateName = templateName,
                         isGlobalTemplate = template.isGlobalPress == "1",
                         formState = it.formState.copy(
+                            prescriptionName = templateName,
                             doctorAdvice = template.doctorAdvice.orEmpty(),
                             commentsForFcm = template.messageToFcm.orEmpty(),
                             doctorNotes = template.doctorFindings.orEmpty(),
@@ -364,6 +384,10 @@ class CaseViewModel(
 
             loadMedicineList(_state.value.medicineComposerState.doseType.ifEmpty { "Tab" })
             loadQuestionAnswerData(interviewId)
+
+            if (sourceTab == CaseTab.Answered) {
+                loadDoctorFeedback(interviewId)
+            }
         }
     }
 
@@ -434,11 +458,13 @@ class CaseViewModel(
                     val currentState = _state.value
                     val isFromTemplate = currentState.interviewDetails.interviewId == -1L
                     val isUpdate = isFromTemplate && currentState.prescriptionId != null
-                    
+
                     // Update formState with correct template save status and comments for FCM if needed
                     val finalFormState = currentState.formState.copy(
                         isPresTempSave = if (isFromTemplate) 1 else currentState.formState.isPresTempSave,
                         prescriptionId = currentState.prescriptionId,
+                        prescriptionName = if (isFromTemplate) currentState.templateName else currentState.formState.prescriptionName,
+                        isGlobalPrescription = if (isFromTemplate) (if (currentState.isGlobalTemplate) 1 else 0) else currentState.formState.isGlobalPrescription,
                         commentsForFcm = if (!isFromTemplate && currentState.isPrescriptionWithSmsChecked && currentState.customMessageState.isFcmChecked) {
                             currentState.customMessageState.messageText
                         } else {
@@ -448,16 +474,17 @@ class CaseViewModel(
 
                     // First, save the doctor feedback
                     repository.saveDoctorFeedback(formState = finalFormState)
-                    
+
                     // Only send SMS and update status if it's a real case (not a template creation)
                     if (!isFromTemplate) {
                         // If SMS is checked, send the SMS
                         if (currentState.isPrescriptionWithSmsChecked) {
                             val smsText = currentState.customMessageState.messageText
                             val phoneNumber = currentState.customMessageState.phoneNumber.ifBlank {
-                                currentState.fcmProfileState.fcmProfile?.mobileNo ?: currentState.formState.mobile
+                                currentState.fcmProfileState.fcmProfile?.mobileNo
+                                    ?: currentState.formState.mobile
                             }
-                            
+
                             if (phoneNumber.isNotBlank() && smsText.isNotBlank()) {
                                 try {
                                     repository.sendSms(msisdn = phoneNumber, message = smsText)
@@ -467,7 +494,7 @@ class CaseViewModel(
                                 }
                             }
                         }
-                        
+
                         // After successful save, update interview status to "Close"
                         repository.updateInterviewStatus(
                             interviewId = currentState.formState.interviewId ?: 0,
@@ -491,6 +518,99 @@ class CaseViewModel(
                 }
             } else {
                 showSuccess("Please add the prescriptions")
+            }
+        }
+    }
+
+    private fun loadDoctorFeedback(interviewId: Long) {
+        launch {
+            try {
+                val response = mainRepository.getDoctorFeedback(interviewId)
+                println("response69: ${response.data}")
+                if (response.responseCode == "01") {
+                    val feedbackList = response.data?.patientInterviewFeedback
+                    if (!feedbackList.isNullOrEmpty()) {
+                        val feedback = feedbackList[0]
+
+                        // Parse prescriptions
+                        val prescriptions = mutableListOf<PrescriptionItem>()
+                        feedback.prescribedMedicine?.let { jsonStr ->
+                            try {
+                                if (jsonStr.startsWith("[")) {
+                                    val list =
+                                        defJson.decodeFromString<List<PrescriptionItem>>(jsonStr)
+                                    prescriptions.addAll(list)
+                                } else if (jsonStr.startsWith("{")) {
+                                    val item = defJson.decodeFromString<PrescriptionItem>(jsonStr)
+                                    prescriptions.add(item)
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
+                        val setupData = mainRepository.getSetupData().firstOrNull()
+
+                        val selectedReferralCenter = setupData?.referralCenters?.find {
+                            it.refCenterId == feedback.refCenterId
+                        }
+
+                        val selectedDiagnoses = mutableListOf<Diagnosis>()
+                        if (feedback.diagId != null && feedback.diagId != 0L) {
+                            setupData?.diagnoses?.find { it.diagId == feedback.diagId }?.let {
+                                selectedDiagnoses.add(it)
+                            }
+                        } else if (!feedback.diagDesc.isNullOrBlank()) {
+                            // If ID is 0 but description exists, maybe it's a custom diagnosis or we try to match by name
+                            setupData?.diagnoses?.find {
+                                it.diagName.equals(
+                                    feedback.diagDesc,
+                                    ignoreCase = true
+                                )
+                            }?.let {
+                                selectedDiagnoses.add(it)
+                            } ?: run {
+                                selectedDiagnoses.add(Diagnosis(diagName = feedback.diagDesc))
+                            }
+                        }
+
+                        val selectedInvestigations = mutableListOf<Investigation>()
+                        if (!feedback.investigationAdvice.isNullOrBlank()) {
+                            setupData?.investigations?.find {
+                                it.investigationName.equals(
+                                    feedback.investigationAdvice,
+                                    ignoreCase = true
+                                ) ||
+                                        it.investigationCode.equals(
+                                            feedback.investigationAdvice,
+                                            ignoreCase = true
+                                        )
+                            }?.let {
+                                selectedInvestigations.add(it)
+                            } ?: run {
+                                selectedInvestigations.add(Investigation(investigationName = feedback.investigationAdvice))
+                            }
+                        }
+
+                        _state.update {
+                            it.copy(
+                                formState = it.formState.copy(
+                                    doctorNotes = feedback.doctorFindings ?: "",
+                                    commentsForFcm = feedback.messageToFcm ?: "",
+                                    investigationResult = feedback.investigationResult ?: "",
+                                    nextFollowUpDate = feedback.nextFollowupDate?.split(" ")
+                                        ?.firstOrNull() ?: "",
+                                    prescriptions = prescriptions,
+                                    selectedReferralCenter = selectedReferralCenter,
+                                    selectedDiagnoses = selectedDiagnoses,
+                                    selectedInvestigations = selectedInvestigations
+                                )
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                "Error loading doctor feedback: ${e.message}".log("CASE_DEBUG")
             }
         }
     }

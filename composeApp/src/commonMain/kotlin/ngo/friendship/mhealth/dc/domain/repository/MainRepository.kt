@@ -22,5 +22,6 @@ interface MainRepository {
         strength: String
     ): Boolean
     suspend fun changePassword(old: String, new: String): Pair<Boolean, String?>
+    suspend fun getDoctorFeedback(interviewId: Long): ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackResDto
     suspend fun clearAllData()
 }

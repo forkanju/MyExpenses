@@ -31,6 +31,8 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerDataResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.QuestionAnswerJsonReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveDiagnosisReqDto
@@ -120,6 +122,15 @@ class ApiService(
         request: SaveMedicineReqDto
     ): SaveMedicineResDto {
         return client.processFormDataRequest<SaveMedicineReqDto, SaveMedicineResDto>(
+            url = "mHealthEnt_gateway/api/usergate",
+            body = request
+        )
+    }
+
+    suspend fun getDoctorFeedback(
+        request: DoctorFeedbackReqDto
+    ): DoctorFeedbackResDto {
+        return client.processFormDataRequest<DoctorFeedbackReqDto, DoctorFeedbackResDto>(
             url = "mHealthEnt_gateway/api/usergate",
             body = request
         )

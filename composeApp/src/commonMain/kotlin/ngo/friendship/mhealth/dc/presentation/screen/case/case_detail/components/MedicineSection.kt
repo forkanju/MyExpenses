@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -34,8 +36,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -185,10 +189,9 @@ fun MedicineComposerCard(
                 suggestions = genericNames,
                 rightPlaceholder = "Type generic name",
                 onSuggestionSelected = { selected ->
-                    // 1. Find the medicine that matches the selected generic name
+                    // ... (same as before)
                     val genericNameText = selected.text.trim()
 
-                    // Search in the medicines list. Use a find that is more resilient.
                     val medicine = medicines.find {
                         it.genericName.trim().equals(genericNameText, ignoreCase = true) &&
                                 it.brandName.isNotBlank()
@@ -203,9 +206,7 @@ fun MedicineComposerCard(
 
                     onStateChange(
                         state.copy(
-                            // 2. Set the generic name field
                             genericNameQuery = selected,
-                            // 3. Set the brand name to the "Type medicine name" field
                             medicineQuery = TextFieldValue(
                                 brandName,
                                 TextRange(brandName.length)
@@ -214,7 +215,8 @@ fun MedicineComposerCard(
                         )
                     )
                 },
-                isAnsweredMode = isAnsweredMode
+                isAnsweredMode = isAnsweredMode,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             Spacer(Modifier.height(10.dp))
@@ -223,7 +225,8 @@ fun MedicineComposerCard(
                 value = state.medicineQuery,
                 onValueChange = { onStateChange(state.copy(medicineQuery = it)) },
                 placeholder = "Type medicine name",
-                isAnsweredMode = isAnsweredMode
+                isAnsweredMode = isAnsweredMode,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             Spacer(Modifier.height(10.dp))
@@ -289,10 +292,19 @@ fun MedTextField(
     onValueChange: (TextFieldValue) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier,
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val focusManager = LocalFocusManager.current
+
+    val effectiveKeyboardActions = keyboardActions ?: KeyboardActions(
+        onNext = {
+            focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
+        }
+    )
 
     val borderColor = when {
         isAnsweredMode -> Color(0xFFC7C7C7)
@@ -312,6 +324,8 @@ fun MedTextField(
         textStyle = TextStyle(color = textColor, fontSize = 13.sp),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         interactionSource = interactionSource,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = effectiveKeyboardActions,
         decorationBox = {
             Box(
                 modifier = Modifier

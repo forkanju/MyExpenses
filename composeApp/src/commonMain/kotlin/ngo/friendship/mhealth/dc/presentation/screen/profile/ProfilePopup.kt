@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.profile
+package ngo.friendship.mhealth.dc.presentation.screen.profile
 
 
 import androidx.compose.foundation.Image
@@ -80,7 +80,7 @@ fun ProfilePopup(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.03f))
+            .background(Color.Black.copy(alpha = 0.45f)) // Dimmed background to show current screen with low opacity
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }

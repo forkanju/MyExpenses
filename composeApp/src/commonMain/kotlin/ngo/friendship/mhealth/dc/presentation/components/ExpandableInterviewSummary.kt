@@ -115,7 +115,7 @@ fun ExpandableInterviewSummary(
     modifier: Modifier = Modifier,
     interviewItems: List<QAItem>,
     prescriptionItems: List<QAItem>,
-    uploadedText: String,
+    uploadedDateTime: String,
     selectedTab: Int,
     onTabSelect: (Int) -> Unit,
     onCopyClick: () -> Unit,
@@ -229,7 +229,7 @@ fun ExpandableInterviewSummary(
                 } else {
                     currentItems.forEachIndexed { index, qa ->
                         Text(
-                            text = qa.question,
+                            text = qa.question.replace("_", " "),
                             fontSize = 13.sp,
                             color = questionColor,
                             fontStyle = FontStyle.Italic,
@@ -237,7 +237,7 @@ fun ExpandableInterviewSummary(
                             fontFamily = RobotoCondensedFont()
                         )
 
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(1.dp))
 
                         Row(verticalAlignment = Alignment.Top) {
                             Text(
@@ -248,7 +248,7 @@ fun ExpandableInterviewSummary(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = qa.answer,
+                                text = qa.answer.replace("_", " "),
                                 fontSize = 14.sp,
                                 color = answerColor,
                                 fontFamily = RobotoCondensedFont()
@@ -256,12 +256,12 @@ fun ExpandableInterviewSummary(
                         }
 
                         if (index != currentItems.lastIndex) {
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(3.dp))
                             HorizontalDivider(
                                 color = dividerColor,
                                 thickness = 1.dp
                             )
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(3.dp))
                         }
                     }
                 }
@@ -285,7 +285,7 @@ fun ExpandableInterviewSummary(
             )
 
             Text(
-                text = uploadedText,
+                text = uploadedDateTime,
                 fontSize = 12.sp,
                 color = Color.White,
                 fontStyle = FontStyle.Italic,

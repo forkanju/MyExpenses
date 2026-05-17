@@ -13,10 +13,12 @@ data class DashboardState(
 sealed interface DashboardIntent {
     data class Navigate(val route: NavKey) : DashboardIntent
     data object LoadDashboard : DashboardIntent
+    data class ShowSnackbar(val message: String) : DashboardIntent
 }
 
 sealed interface DashboardEffect {
     data class NavigateTo(val route: NavKey) : DashboardEffect
+    data class ShowSnackbar(val message: String) : DashboardEffect
 }
 
 

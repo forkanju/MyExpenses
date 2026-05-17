@@ -144,7 +144,10 @@ data class DoctorFeedbackObject(
     val isGlobalPrescription: Int,
 
     @SerialName("prescription_id")
-    val prescriptionId: Long? = null
+    val prescriptionId: Long? = null,
+
+    @SerialName("is_called_back")
+    val isCalledBack: Long = 0L
 )
 
 @Serializable
@@ -208,6 +211,7 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
         prescriptionName = prescriptionName,
         isGlobalPrescription = isGlobalPrescription,
         doctorAdvice = doctorAdvice,
-        prescriptionId = prescriptionId
+        prescriptionId = prescriptionId,
+        isCalledBack = if (isCalledBack) 1L else 0L
     )
 }

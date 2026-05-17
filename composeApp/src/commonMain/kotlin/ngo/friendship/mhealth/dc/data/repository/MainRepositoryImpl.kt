@@ -11,6 +11,7 @@ import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
@@ -214,6 +215,17 @@ class MainRepositoryImpl(
         } catch (e: Exception) {
             false to e.message
         }
+    }
+
+    override suspend fun getDoctorFeedback(interviewId: Long): ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackResDto {
+        return api.getDoctorFeedback(
+            request = DoctorFeedbackReqDto.build(
+                userName = localSettings.user.userName,
+                password = localSettings.user.password,
+                requestTime = currentTimestamp.toDateTimeServerSlash(),
+                interviewId = interviewId
+            )
+        )
     }
 
     override suspend fun clearAllData() {

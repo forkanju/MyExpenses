@@ -24,9 +24,9 @@ import androidx.navigation3.scene.DialogSceneStrategy
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.ConfirmAction
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
-import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileEvent
-import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfilePopup
-import ngo.friendship.mhealth.dc.presentation.screens.profile.ProfileUiState
+import ngo.friendship.mhealth.dc.presentation.screen.profile.ProfileEvent
+import ngo.friendship.mhealth.dc.presentation.screen.profile.ProfilePopup
+import ngo.friendship.mhealth.dc.presentation.screen.profile.ProfileUiState
 
 fun EntryProviderScope<NavKey>.dialogRoute(
     viewModel: MainViewModel
@@ -40,48 +40,39 @@ fun EntryProviderScope<NavKey>.dialogRoute(
             )
         )
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.35f))
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() }
-                ) {
-                    viewModel.backStack.removeLastOrNull()
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            val userProfile by viewModel.userProfileState.collectAsStateWithLifecycle()
-            ProfilePopup(
-                uiState = ProfileUiState(
-                    name = userProfile?.userName ?: "Doctor Center",
-                    designation = userProfile?.location ?: "Friendship NGO",
-                    email = userProfile?.email ?: "",
-                    mobileNo = userProfile?.mobileNo ?: "",
-                    profileImage = userProfile?.getProfileImageSource()
-                ),
-                onDismiss = { viewModel.backStack.removeLastOrNull() },
-                onEvent = { event ->
-                    when (event) {
-                        ProfileEvent.OnSignOutClick -> {
-                            viewModel.backStack.removeLastOrNull()
-                            viewModel.logout()
-                        }
-
-                        ProfileEvent.OnChangePasswordClick -> {
-                            viewModel.backStack.removeLastOrNull()
-                            viewModel.backStack.add(Screens.ChangePassword)
-                        }
-
-                        else -> {
-                            viewModel.backStack.removeLastOrNull()
-                        }
+        val userProfile by viewModel.userProfileState.collectAsStateWithLifecycle()
+        ProfilePopup(
+            uiState = ProfileUiState(
+                name = userProfile?.userName ?: "Doctor Center",
+                designation = userProfile?.location ?: "Friendship NGO",
+                email = userProfile?.email ?: "",
+                mobileNo = userProfile?.mobileNo ?: "",
+                profileImage = userProfile?.getProfileImageSource()
+            ),
+            onDismiss = { viewModel.backStack.removeLastOrNull() },
+            onEvent = { event ->
+                when (event) {
+                    ProfileEvent.OnSignOutClick -> {
+                        viewModel.backStack.removeLastOrNull()
+                        viewModel.logout()
                     }
 
+                    ProfileEvent.OnChangePasswordClick -> {
+                        viewModel.backStack.removeLastOrNull()
+                        viewModel.backStack.add(Screens.ChangePassword)
+                    }
+
+                    ProfileEvent.OnCheckUpdateClick -> {
+                        viewModel.showSuccess("The app is already up to date")
+                    }
+
+                    else -> {
+                        viewModel.backStack.removeLastOrNull()
+                    }
                 }
-            )
-        }
+
+            }
+        )
     }
 
     entry<Screens.Dialog.Error>(

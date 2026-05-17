@@ -31,6 +31,7 @@ import ngo.friendship.mhealth.dc.presentation.components.DottedDivider
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
+import ngo.friendship.mhealth.dc.utils.toUiDate
 import ngo.friendship.mhealth.dc.utils.toUiDateTime
 import org.jetbrains.compose.resources.painterResource
 
@@ -76,7 +77,7 @@ fun CaseItem(
             Row(verticalAlignment = Alignment.Top) {
                 AvatarTileWithBadges(
                     modifier = Modifier.size(width = 56.dp, height = 68.dp),
-                    timeText = ui.startTime,
+                    timeText = ui.startTime.toUiDate(),
                     idText = ui.beneficiaryCode.substringAfter("-"),
                     isAnsweredStyle = isAnsweredStyle,
                     photo = {

@@ -5,14 +5,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,6 +68,7 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.toEpochMillisOrNull
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.utils.log
+import ngo.friendship.mhealth.dc.utils.toUiDateTime
 
 @Composable
 fun CaseDetailScreen(
@@ -123,7 +126,7 @@ fun CaseDetailScreen(
         }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.imePadding(),
         containerColor = if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White,
         topBar = {
             PrescriptionTopBar(
@@ -132,6 +135,7 @@ fun CaseDetailScreen(
                 onCall = onCall,
                 onWhatsApp = onWhatsApp,
                 onBack = onBack,
+                onMoreClick = onMoreClick,
                 showActions = !isFromTemplate,
                 detailsButtonText = if (isFromTemplate) "(View)" else "(View)"
             )
@@ -172,7 +176,7 @@ fun CaseDetailScreen(
                 PatientProfileCard(
                     benefName = state.interviewDetails.beneficiaryName,
                     benefCode = state.interviewDetails.beneficiaryCode.takeLast(5),
-                    benefAge = state.interviewDetails.beneficiaryAge,
+                    benefAge = "${state.interviewDetails.beneficiaryAge}", // | ${state.interviewDetails}",
                     questionnaireName = state.interviewDetails.questionnaireName,
                     isAnsweredMode = isAnsweredMode,
                     onDetailsClick = onBeneficiaryDetailsClick
@@ -182,7 +186,7 @@ fun CaseDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     interviewItems = interviewQaItems,
                     prescriptionItems = systemPrescriptionItems,
-                    uploadedText = state.interviewDetails.startTime,
+                    uploadedDateTime = state.interviewDetails.startTime.toUiDateTime(),
                     selectedTab = state.selectedSummaryTab,
                     onTabSelect = { onIntent(CaseIntent.SetSummaryTab(it)) },
                     onCopyClick = {},
@@ -277,7 +281,10 @@ fun CaseDetailScreen(
                         onIntent(CaseIntent.UpdateDoctorAdvice(it))
                     },
                     isError = false,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
                     enabled = !isAnsweredMode
                 )
 
@@ -292,7 +299,10 @@ fun CaseDetailScreen(
                             onIntent(CaseIntent.UpdateCommentsForFcm(it))
                         },
                         isError = false,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
                         enabled = !isAnsweredMode
                     )
 
@@ -306,7 +316,10 @@ fun CaseDetailScreen(
                             onIntent(CaseIntent.UpdateDoctorNotes(it))
                         },
                         isError = false,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        ),
                         enabled = !isAnsweredMode
                     )
 
@@ -349,7 +362,10 @@ fun CaseDetailScreen(
                             onIntent(CaseIntent.UpdateInvestigationResult(it))
                         },
                         isError = false,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
                         enabled = !isAnsweredMode,
                         singleLine = false,
                         maxLines = 2
@@ -364,7 +380,10 @@ fun CaseDetailScreen(
                             onIntent(CaseIntent.UpdateCommentsForFcm(it))
                         },
                         isError = false,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
                         enabled = !isAnsweredMode
                     )
 
@@ -392,7 +411,10 @@ fun CaseDetailScreen(
                             onIntent(CaseIntent.UpdateDoctorNotes(it))
                         },
                         isError = false,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        ),
                         enabled = !isAnsweredMode
                     )
                 }
@@ -438,17 +460,18 @@ fun CaseDetailScreen(
                 }
 
                 if (!isFromTemplate) {
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(
-                            modifier = Modifier.wrapContentWidth(),
-                            horizontalAlignment = Alignment.Start
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             CheckboxWithEditableText(
-                                text = "Prescription with SMS",
+                                text = "With SMS?",
                                 checked = state.isPrescriptionWithSmsChecked,
                                 onCheckedChange = { onIntent(CaseIntent.TogglePrescriptionSms(it)) },
                                 onEditClick = {
@@ -468,18 +491,26 @@ fun CaseDetailScreen(
                                 isAnsweredMode = isAnsweredMode
                             )
 
-                            Spacer(modifier = Modifier.height(18.dp))
-
-                            PrescriptionActionButtonRow(
-                                onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
-                                onShareClick = {
-                                    println("Share prescription")
-                                },
+                            CheckboxWithEditableText(
+                                text = "Called back?",
+                                checked = state.isCalledBackChecked,
+                                onCheckedChange = { onIntent(CaseIntent.ToggleCalledBack(it)) },
                                 enabled = !isAnsweredMode,
                                 isAnsweredMode = isAnsweredMode
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
+
+                        Spacer(modifier = Modifier.height(18.dp))
+
+                        PrescriptionActionButtonRow(
+                            onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
+                            onShareClick = {
+                                println("Share prescription")
+                            },
+                            enabled = !isAnsweredMode,
+                            isAnsweredMode = isAnsweredMode
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }

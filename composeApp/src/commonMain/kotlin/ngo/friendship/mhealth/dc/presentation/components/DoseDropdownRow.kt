@@ -10,6 +10,8 @@ import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -22,8 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.*
 import ngo.friendship.mhealth.dc.theme.*
@@ -42,7 +46,9 @@ fun DoseAndDrugAutoCompleteRow(
     suggestions: List<String>,
     rightPlaceholder: String = "Type generic name",
     onSuggestionSelected: (TextFieldValue) -> Unit,
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions? = null
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -63,7 +69,9 @@ fun DoseAndDrugAutoCompleteRow(
             suggestions = suggestions,
             placeholder = rightPlaceholder,
             onSuggestionSelected = onSuggestionSelected,
-            isAnsweredMode = isAnsweredMode
+            isAnsweredMode = isAnsweredMode,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions
         )
     }
 }
@@ -169,13 +177,23 @@ fun GenericNameAutoCompleteTextField(
     placeholder: String,
     onSuggestionSelected: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val effectiveKeyboardActions = keyboardActions ?: KeyboardActions(
+        onNext = {
+            focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
+        }
+    )
 
     var expanded by remember { mutableStateOf(false) }
+    var selectingSuggestion by remember { mutableStateOf(false) }
 
     val borderColor = when {
         isAnsweredMode -> Color(0xFFC7C7C7)
@@ -193,12 +211,16 @@ fun GenericNameAutoCompleteTextField(
 
     ExposedDropdownMenuBox(
         modifier = modifier,
-        expanded = expanded && filtered.isNotEmpty(),
+        expanded = if (selectingSuggestion) false else expanded && filtered.isNotEmpty(),
         onExpandedChange = { expanded = it }
     ) {
         BasicTextField(
             value = value,
             onValueChange = {
+                if (selectingSuggestion) {
+                    selectingSuggestion = false
+                    return@BasicTextField
+                }
                 onValueChange(it)
                 expanded = true
             },
@@ -209,6 +231,8 @@ fun GenericNameAutoCompleteTextField(
             textStyle = TextStyle(color = textColor, fontSize = 13.sp),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             interactionSource = interactionSource,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = effectiveKeyboardActions,
             decorationBox = {
                 Row(
                     modifier = Modifier
@@ -238,7 +262,7 @@ fun GenericNameAutoCompleteTextField(
         )
 
         ExposedDropdownMenu(
-            expanded = expanded && filtered.isNotEmpty(),
+            expanded = if (selectingSuggestion) false else expanded && filtered.isNotEmpty(),
             onDismissRequest = { expanded = false },
             modifier = Modifier.background(bgColor)
         ) {
@@ -246,10 +270,11 @@ fun GenericNameAutoCompleteTextField(
                 DropdownMenuItem(
                     text = { Text(item, color = textColor) },
                     onClick = {
+                        selectingSuggestion = true
                         val newValue = TextFieldValue(item, TextRange(item.length))
-                        onValueChange(newValue)
                         onSuggestionSelected(newValue)
                         expanded = false
+                        keyboardController?.hide()
                         focusManager.clearFocus()
                     }
                 )

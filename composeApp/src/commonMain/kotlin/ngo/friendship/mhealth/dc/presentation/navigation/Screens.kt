@@ -65,6 +65,9 @@ object Screens {
     data object ChangePassword : NavKey
 
     @Serializable
+    data object Dashboard : NavKey
+
+    @Serializable
     data object LocalTreatment : NavKey
 
     @Serializable
@@ -125,6 +128,7 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.LocalPrescriptionForm::class, Screens.LocalPrescriptionForm.serializer())
     polymorphic(NavKey::class, Screens.LocalTreatmentDetails::class, Screens.LocalTreatmentDetails.serializer())
     polymorphic(NavKey::class, Screens.ChangePassword::class, Screens.ChangePassword.serializer())
+    polymorphic(NavKey::class, Screens.Dashboard::class, Screens.Dashboard.serializer())
     //dialog
     polymorphic(NavKey::class, Screens.Dialog.Error::class, Screens.Dialog.Error.serializer())
     polymorphic(

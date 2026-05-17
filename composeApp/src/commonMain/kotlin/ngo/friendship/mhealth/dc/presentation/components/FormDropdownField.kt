@@ -1,6 +1,5 @@
 package ngo.friendship.mhealth.dc.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,12 +18,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -216,11 +218,19 @@ fun <T> FormAutoCompleteDropdownField(
     height: Dp = 44.dp,
     cornerRadius: Dp = 6.dp,
     borderWidth: Dp = 1.dp,
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val focusManager = LocalFocusManager.current
+
+    val effectiveKeyboardActions = keyboardActions ?: KeyboardActions(
+        onNext = {
+            focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
+        }
+    )
 
     var value by remember(selected) {
         mutableStateOf(
@@ -286,89 +296,74 @@ fun <T> FormAutoCompleteDropdownField(
             Spacer(modifier = Modifier.height(6.dp))
         }
 
-        BasicTextField(
-            value = value,
-            onValueChange = {
-                if (selectingSuggestion) {
-                    selectingSuggestion = false
-                    return@BasicTextField
-                }
-
-                suppressNextExpand = false
-                value = it
-                expanded = true
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(height),
-            enabled = enabled,
-            singleLine = true,
-            interactionSource = interactionSource,
-            textStyle = TextStyle(
-                fontSize = 14.sp,
-                fontFamily = RobotoCondensedFont(),
-                color = textColor
-            ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(shape)
-                        .background(fieldBackground)
-                        .border(
-                            border = BorderStroke(borderWidth, strokeColor),
-                            shape = shape
-                        )
-                        .padding(horizontal = 12.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    if (value.text.isBlank()) {
-                        Text(
-                            text = placeholder,
-                            color = Gray,
-                            fontStyle = FontStyle.Italic,
-                            fontSize = 14.sp,
-                            fontFamily = RobotoCondensedFont(),
-                            maxLines = 1
-                        )
+        ExposedDropdownMenuBox(
+            expanded = if (enabled) expanded else false,
+            onExpandedChange = { if (enabled) expanded = it }
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = {
+                    if (selectingSuggestion) {
+                        selectingSuggestion = false
+                        return@BasicTextField
                     }
-                    innerTextField()
-                }
-            }
-        )
 
-        AnimatedVisibility(visible = expanded) {
-            Card(
+                    suppressNextExpand = false
+                    value = it
+                    expanded = true
+                },
                 modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
                     .fillMaxWidth()
-                    .padding(top = 4.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = fieldBackground),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    .height(height),
+                enabled = enabled,
+                singleLine = true,
+                interactionSource = interactionSource,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = effectiveKeyboardActions,
+                textStyle = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = RobotoCondensedFont(),
+                    color = textColor
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                decorationBox = { innerTextField ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(shape)
+                            .background(fieldBackground)
+                            .border(
+                                border = BorderStroke(borderWidth, strokeColor),
+                                shape = shape
+                            )
+                            .padding(horizontal = 12.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (value.text.isBlank()) {
+                            Text(
+                                text = placeholder,
+                                color = Gray,
+                                fontStyle = FontStyle.Italic,
+                                fontSize = 14.sp,
+                                fontFamily = RobotoCondensedFont(),
+                                maxLines = 1
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.background(fieldBackground)
             ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    filteredOptions.forEachIndexed { index, item ->
-                        val itemLabel = getLabel(item)
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    selectingSuggestion = true
-                                    suppressNextExpand = true
-
-                                    value = TextFieldValue(
-                                        text = itemLabel,
-                                        selection = TextRange(itemLabel.length)
-                                    )
-
-                                    onSelectedChange(item)
-                                    expanded = false
-                                    focusManager.clearFocus()
-                                }
-                                .padding(horizontal = 12.dp, vertical = 10.dp)
-                        ) {
+                filteredOptions.forEachIndexed { index, item ->
+                    val itemLabel = getLabel(item)
+                    DropdownMenuItem(
+                        text = {
                             Text(
                                 text = itemLabel,
                                 style = TextStyle(
@@ -378,14 +373,26 @@ fun <T> FormAutoCompleteDropdownField(
                                     color = textColor
                                 )
                             )
-                        }
+                        },
+                        onClick = {
+                            selectingSuggestion = true
+                            suppressNextExpand = true
 
-                        if (index != filteredOptions.lastIndex) {
-                            HorizontalDivider(
-                                thickness = 1.dp,
-                                color = GrayLighter
+                            value = TextFieldValue(
+                                text = itemLabel,
+                                selection = TextRange(itemLabel.length)
                             )
+
+                            onSelectedChange(item)
+                            expanded = false
+                            focusManager.clearFocus()
                         }
+                    )
+                    if (index != filteredOptions.lastIndex) {
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = GrayLighter
+                        )
                     }
                 }
             }

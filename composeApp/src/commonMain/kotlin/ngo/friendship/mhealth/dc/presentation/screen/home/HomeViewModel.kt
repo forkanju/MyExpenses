@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.home
+package ngo.friendship.mhealth.dc.presentation.screen.home
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +9,9 @@ import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
 import ngo.friendship.mhealth.dc.data.remote.dto.DashboardDataReqDto
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
+import ngo.friendship.mhealth.dc.presentation.screens.home.HomeIntent
+import ngo.friendship.mhealth.dc.presentation.screens.home.HomeUiEvent
+import ngo.friendship.mhealth.dc.presentation.screens.home.HomeUiState
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.KeyValueUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.SegmentUi
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.StatRingUi
@@ -50,8 +53,13 @@ class HomeViewModel(
                         password = localSettings.user.password
                     )
                 )
-                val statusSummary = response?.data?.statusSummary
-                val timeSummary = response?.data?.timeSummary
+//                println("Dashboard_Response: ${response.data?.statusSummary}")
+//                println("Dashboard_Response: ${response.data?.topUpazila}")
+//                println("Dashboard_Response: ${response.data?.timeSummary}")
+//                println("Dashboard_Response: ${response.data?.topQuestionnaires}")
+
+                val statusSummary = response.data?.statusSummary
+                val timeSummary = response.data?.timeSummary
                 val total = statusSummary?.total ?: 0
 
                 val stats = listOf(
@@ -85,7 +93,8 @@ class HomeViewModel(
                 )
 
                 val totalTime =
-                    ((timeSummary?.in30Min ?: 0) + (timeSummary?.after30Min ?: 0) + (timeSummary?.after2Hours
+                    ((timeSummary?.in30Min ?: 0) + (timeSummary?.after30Min
+                        ?: 0) + (timeSummary?.after2Hours
                         ?: 0)).coerceAtLeast(minimumValue = 1).toFloat()
                 val segments = listOf(
                     SegmentUi(

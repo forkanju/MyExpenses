@@ -28,6 +28,7 @@ data class CaseUiState(
     val isSendMessageDialogVisible: Boolean = false,
     val customMessageState: CustomMessageState = CustomMessageState(isFcmChecked = true),
     val isPrescriptionWithSmsChecked: Boolean = true,
+    val isCalledBackChecked: Boolean = false,
     val patientName: String = "",
     val selectedGender: String = "Male",
     val age: String = "",

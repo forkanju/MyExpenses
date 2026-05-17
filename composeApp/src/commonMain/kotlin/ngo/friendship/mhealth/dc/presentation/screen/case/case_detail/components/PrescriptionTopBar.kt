@@ -48,6 +48,7 @@ fun PrescriptionTopBar(
     onCall: () -> Unit,
     onWhatsApp: () -> Unit,
     onBack: () -> Unit,
+    onMoreClick: () -> Unit = {},
     showActions: Boolean = true,
     detailsButtonText: String = "(View)"
 ) {
@@ -114,6 +115,11 @@ fun PrescriptionTopBar(
                     painter = painterResource(Resources.Icon.Wapp),
                     contentDescription = "WhatsApp",
                     onClick = onWhatsApp
+                )
+                CircleActionIcon(
+                    painter = painterResource(Resources.Icon.VerticalMenu),
+                    contentDescription = "More",
+                    onClick = onMoreClick
                 )
                 Spacer(Modifier.width(6.dp))
             }

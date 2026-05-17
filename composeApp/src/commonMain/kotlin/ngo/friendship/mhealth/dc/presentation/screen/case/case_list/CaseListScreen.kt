@@ -3,6 +3,7 @@ package ngo.friendship.mhealth.dc.presentation.screen.case.case_list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -79,6 +80,7 @@ fun CaseListContent(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = Color(0xFFF3F3F3),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             Surface(
                 color = Color(0xFFF3F3F3),
@@ -105,9 +107,10 @@ fun CaseListContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(12.dp),
+            contentPadding = PaddingValues(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 4.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
+        )
+        {
             items(state.filteredInterviews, key = { it.interviewId }) { item ->
                 CaseItem(
                     ui = item,

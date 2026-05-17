@@ -74,7 +74,7 @@ fun PrescriptionHeader(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.clickable { onMoreClick() }
+                modifier = Modifier.clickable(enabled = !isAnsweredMode) { onMoreClick() }
             ) {
                 Text(
                     text = rightText,
