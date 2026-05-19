@@ -70,14 +70,14 @@ fun SearchRow(
                 }
             )
 
-            IconButton(onClick = onFilterClick, modifier = Modifier.size(32.dp)) {
-                Icon(
-                    painter = painterResource(Resources.Icon.Filter),
-                    contentDescription = "Filter",
-                    tint = Color(0xFF707070),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+//            IconButton(onClick = onFilterClick, modifier = Modifier.size(32.dp)) {
+//                Icon(
+//                    painter = painterResource(Resources.Icon.Filter),
+//                    contentDescription = "Filter",
+//                    tint = Color(0xFF707070),
+//                    modifier = Modifier.size(20.dp)
+//                )
+//            }
         }
         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
     }

@@ -142,7 +142,7 @@ fun CustomMessageDialogContent(
             OutlinedTextField(
                 value = state.phoneNumber,
                 onValueChange = onPhoneNumberChange,
-                modifier = Modifier.width(180.dp).height(44.dp),
+                modifier = Modifier.width(180.dp),
                 shape = RoundedCornerShape(8.dp),
                 placeholder = {
                     Text(
