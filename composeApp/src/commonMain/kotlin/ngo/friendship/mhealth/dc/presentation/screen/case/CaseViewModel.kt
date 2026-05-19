@@ -49,7 +49,7 @@ class CaseViewModel(
 
     private fun loadSetupData() {
         launch {
-            mainRepository.getSetupData().collectLatest { setupData ->
+            mainRepository.getSetupData(forceRefresh = false).collectLatest { setupData ->
                 _state.update { it ->
                     it.copy(
                         medicineBrandTypeList = setupData.medicineBrandTypes.map { it.type }
@@ -74,11 +74,15 @@ class CaseViewModel(
                         val mealTimeText = when (medDto.takingRule) {
                             "1" -> "Before"
                             "2" -> "After"
-                            else -> null
+                            else -> medDto.takingRule
                         }
 
                         val medicineName = if (medicine != null) {
                             "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
+                        } else if (!medDto.brandName.isNullOrBlank()) {
+                            medDto.brandName
+                        } else if (!medDto.genericName.isNullOrBlank()) {
+                            medDto.genericName
                         } else {
                             "Unknown"
                         }
@@ -144,7 +148,15 @@ class CaseViewModel(
             }
 
             is CaseIntent.AddPrescription -> {
-                updateFormState(_state.value.formState.copy(prescriptions = _state.value.formState.prescriptions + intent.item))
+                val exists = _state.value.formState.prescriptions.any {
+                    (it.medicineId != null && it.medicineId == intent.item.medicineId) ||
+                            (it.medicineName == intent.item.medicineName)
+                }
+                if (exists) {
+                    showError("Duplicate same medicine entry not allowed!")
+                } else {
+                    updateFormState(_state.value.formState.copy(prescriptions = _state.value.formState.prescriptions + intent.item))
+                }
             }
 
             is CaseIntent.RemovePrescription -> {
@@ -287,47 +299,54 @@ class CaseViewModel(
             }
 
             is CaseIntent.SelectPrescriptionTemplate -> {
-                val template = intent.template
-                val newPrescriptions = template.medicineList?.map { medDto ->
-                    val medicine =
-                        _state.value.medicineList.find { it.medicineId == medDto.medicineId?.toLongOrNull() }
+                launch {
+                    val template = intent.template
+                    val allMedicines = repository.getAllMedicines()
+                    val newPrescriptions = template.medicineList?.map { medDto ->
+                        val medicine =
+                            allMedicines.find { it.medicineId == medDto.medicineId?.toLongOrNull() }
 
-                    val mealTimeText = when (medDto.takingRule) {
-                        "1" -> "Before"
-                        "2" -> "After"
-                        else -> null
-                    }
+                        val mealTimeText = when (medDto.takingRule) {
+                            "1" -> "Before"
+                            "2" -> "After"
+                            else -> medDto.takingRule
+                        }
 
-                    val medicineName = if (medicine != null) {
-                        "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
-                    } else {
-                        "Unknown"
-                    }
+                        val medicineName = if (medicine != null) {
+                            "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
+                        } else if (!medDto.brandName.isNullOrBlank()) {
+                            medDto.brandName
+                        } else if (!medDto.genericName.isNullOrBlank()) {
+                            medDto.genericName
+                        } else {
+                            "Unknown"
+                        }
 
-                    PrescriptionItem(
-                        medicineName = medicineName,
-                        dose = medDto.dailyDose.orEmpty(),
-                        duration = medDto.durationDay.orEmpty(),
-                        medicineId = medDto.medicineId?.toLongOrNull(),
-                        mealTime = mealTimeText
-                    )
-                } ?: emptyList()
-
-                val templateName = template.prescLabel.orEmpty()
-                    .substringBefore(" Prescription").trim()
-
-                _state.update {
-                    it.copy(
-                        templateName = templateName,
-                        isGlobalTemplate = template.isGlobalPress == "1",
-                        formState = it.formState.copy(
-                            prescriptionName = templateName,
-                            doctorAdvice = template.doctorAdvice.orEmpty(),
-                            commentsForFcm = template.messageToFcm.orEmpty(),
-                            doctorNotes = template.doctorFindings.orEmpty(),
-                            prescriptions = newPrescriptions
+                        PrescriptionItem(
+                            medicineName = medicineName,
+                            dose = medDto.dailyDose.orEmpty(),
+                            duration = medDto.durationDay.orEmpty(),
+                            medicineId = medDto.medicineId?.toLongOrNull(),
+                            mealTime = mealTimeText
                         )
-                    )
+                    } ?: emptyList()
+
+                    val templateName = template.prescLabel.orEmpty()
+                        .substringBefore(" Prescription").trim()
+
+                    _state.update {
+                        it.copy(
+                            templateName = templateName,
+                            isGlobalTemplate = template.isGlobalPress == "1",
+                            formState = it.formState.copy(
+                                prescriptionName = templateName,
+                                doctorAdvice = template.doctorAdvice.orEmpty(),
+                                commentsForFcm = template.messageToFcm.orEmpty(),
+                                doctorNotes = template.doctorFindings.orEmpty(),
+                                prescriptions = newPrescriptions
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -453,6 +472,14 @@ class CaseViewModel(
     private fun saveDoctorFeedback() {
         launch {
             if (_state.value.formState.prescriptions.isNotEmpty()) {
+                val prescriptions = _state.value.formState.prescriptions
+                val hasDuplicates = prescriptions.groupBy { it.medicineId ?: it.medicineName }.any { it.value.size > 1 }
+                
+                if (hasDuplicates) {
+                    showError("Duplicate same medicine entry not allowed!")
+                    return@launch
+                }
+
                 _state.update { it.copy(isSaving = true) }
                 try {
                     val currentState = _state.value
@@ -473,7 +500,13 @@ class CaseViewModel(
                     )
 
                     // First, save the doctor feedback
-                    repository.saveDoctorFeedback(formState = finalFormState)
+                    val feedbackResult = repository.saveDoctorFeedback(formState = finalFormState)
+
+                    if (!feedbackResult.isSuccess) {
+                        _state.update { it.copy(isSaving = false) }
+                        showError(feedbackResult.message)
+                        return@launch
+                    }
 
                     // Only send SMS and update status if it's a real case (not a template creation)
                     if (!isFromTemplate) {
@@ -496,10 +529,15 @@ class CaseViewModel(
                         }
 
                         // After successful save, update interview status to "Close"
-                        repository.updateInterviewStatus(
+                        val (statusSuccess, statusError) = repository.updateInterviewStatus(
                             interviewId = currentState.formState.interviewId ?: 0,
                             status = CaseTab.Answered.apiParam // "Close"
                         )
+                        if (!statusSuccess) {
+                            _state.update { it.copy(isSaving = false) }
+                            showError(statusError ?: "Failed to update interview status")
+                            return@launch
+                        }
                     }
 
                     val successMessage = when {
@@ -514,7 +552,7 @@ class CaseViewModel(
                 } catch (e: Exception) {
                     _state.update { it.copy(isSaving = false) }
                     "Error saving feedback: ${e.message}".log("CASE_DEBUG")
-                    showError("Failed to save feedback")
+                    showError(e.message ?: "Something went wrong!")
                 }
             } else {
                 showSuccess("Please add the prescriptions")
@@ -549,7 +587,7 @@ class CaseViewModel(
                             }
                         }
 
-                        val setupData = mainRepository.getSetupData().firstOrNull()
+                        val setupData = mainRepository.getSetupData(forceRefresh = false).firstOrNull()
 
                         val selectedReferralCenter = setupData?.referralCenters?.find {
                             it.refCenterId == feedback.refCenterId

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import ngo.friendship.mhealth.dc.theme.*
@@ -33,8 +32,8 @@ fun PrescriptionActionRowAligned(
     daysItems: List<String>,
     onDaysSelect: (String) -> Unit,
 
-    toggleValue: ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime,
-    onToggleChange: (ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime) -> Unit,
+    toggleValue: MealTime,
+    onToggleChange: (MealTime) -> Unit,
 
     onMessageClick: () -> Unit,
     onAddClick: () -> Unit,
@@ -96,8 +95,8 @@ fun PrescriptionActionRowAligned(
 
 @Composable
 fun MealTimeToggle(
-    value: ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime,
-    onChange: (ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime) -> Unit,
+    value: MealTime,
+    onChange: (MealTime) -> Unit,
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false
 ) {
@@ -115,7 +114,7 @@ fun MealTimeToggle(
                 indication = ripple()
             ) {
                 onChange(
-                    if (value == ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.BEFORE) ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.AFTER else ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.BEFORE
+                    if (value == MealTime.BEFORE) MealTime.AFTER else MealTime.BEFORE
                 )
             },
         shape = RoundedCornerShape(14.dp),
@@ -136,7 +135,7 @@ fun MealTimeToggle(
             Spacer(Modifier.width(6.dp))
 
             Text(
-                text = if (value == ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.MealTime.BEFORE) "Before" else "After",
+                text = if (value == MealTime.BEFORE) "Before" else "After",
                 fontSize = 12.sp,
                 color = textColor,
                 maxLines = 1

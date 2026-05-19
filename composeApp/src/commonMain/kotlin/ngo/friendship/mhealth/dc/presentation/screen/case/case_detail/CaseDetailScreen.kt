@@ -95,8 +95,7 @@ fun CaseDetailScreen(
     val interviewQaItems = remember(state.interviewDetails.details) {
         state.interviewDetails.details.map {
             QAItem(
-                question = it.questionName,
-                answer = it.answer
+                question = it.questionName, answer = it.answer
             )
         }
     }
@@ -143,11 +142,8 @@ fun CaseDetailScreen(
         bottomBar = {
             if (isFromTemplate) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .navigationBarsPadding()
-                        .padding(16.dp)
+                    modifier = Modifier.fillMaxWidth().background(Color.White)
+                        .navigationBarsPadding().padding(16.dp)
                 ) {
                     PrescriptionActionButtonRow(
                         onSendClick = { onIntent(CaseIntent.SaveDoctorFeedback) },
@@ -160,12 +156,10 @@ fun CaseDetailScreen(
                     )
                 }
             }
-        }
-    ) { paddingValues ->
+        }) { paddingValues ->
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
                 .background(if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White)
                 .padding(paddingValues)
                 .then(if (isFromTemplate) Modifier else Modifier.padding(12.dp))
@@ -244,11 +238,9 @@ fun CaseDetailScreen(
                     if (state.formState.selectedDiagnoses.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         DiagnosisChipGroup(
-                            items = state.formState.selectedDiagnoses,
-                            onRemove = { item ->
+                            items = state.formState.selectedDiagnoses, onRemove = { item ->
                                 onIntent(CaseIntent.RemoveDiagnosis(item))
-                            },
-                            isAnsweredMode = isAnsweredMode
+                            }, isAnsweredMode = isAnsweredMode
                         )
                     }
 
@@ -268,8 +260,7 @@ fun CaseDetailScreen(
                     composerState = state.medicineComposerState,
                     onComposerStateChange = { composerState ->
                         onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
-                    }
-                )
+                    })
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -282,8 +273,7 @@ fun CaseDetailScreen(
                     },
                     isError = false,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                     ),
                     enabled = !isAnsweredMode
                 )
@@ -300,8 +290,7 @@ fun CaseDetailScreen(
                         },
                         isError = false,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next
+                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                         ),
                         enabled = !isAnsweredMode
                     )
@@ -317,8 +306,7 @@ fun CaseDetailScreen(
                         },
                         isError = false,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done
+                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
                         ),
                         enabled = !isAnsweredMode
                     )
@@ -344,11 +332,9 @@ fun CaseDetailScreen(
                     if (state.formState.selectedInvestigations.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         InvestigationChipGroup(
-                            items = state.formState.selectedInvestigations,
-                            onRemove = { item ->
+                            items = state.formState.selectedInvestigations, onRemove = { item ->
                                 onIntent(CaseIntent.RemoveInvestigation(item))
-                            },
-                            isAnsweredMode = isAnsweredMode
+                            }, isAnsweredMode = isAnsweredMode
                         )
                     }
 
@@ -363,8 +349,7 @@ fun CaseDetailScreen(
                         },
                         isError = false,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next
+                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                         ),
                         enabled = !isAnsweredMode,
                         singleLine = false,
@@ -381,8 +366,7 @@ fun CaseDetailScreen(
                         },
                         isError = false,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next
+                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                         ),
                         enabled = !isAnsweredMode
                     )
@@ -412,8 +396,7 @@ fun CaseDetailScreen(
                         },
                         isError = false,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Done
+                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
                         ),
                         enabled = !isAnsweredMode
                     )
@@ -424,26 +407,22 @@ fun CaseDetailScreen(
                 if (!isFromTemplate) {
                     FormActionRow(
                         leftText = if (state.formState.nextFollowUpDate.isBlank()) {
-                            "Next follow-up:"
-                        } else {
-                            "Next follow-up: ${state.formState.nextFollowUpDate}"
-                        },
-                        leftIcon = {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Calendar",
-                                tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        rightText = "Save as a template",//Save as a template
+                        "Next follow-up:"
+                    } else {
+                        "Next follow-up: ${state.formState.nextFollowUpDate}"
+                    }, leftIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Calendar",
+                            tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }, rightText = "Save as a template",//Save as a template
                         onLeftClick = {
                             onIntent(CaseIntent.ToggleDatePicker)
-                        },
-                        onRightClick = {
+                        }, onRightClick = {
                             onIntent(CaseIntent.ToggleSaveTemplateDialog)
-                        },
-                        isAnsweredMode = isAnsweredMode
+                        }, isAnsweredMode = isAnsweredMode
                     )
                 }
 
@@ -455,8 +434,7 @@ fun CaseDetailScreen(
                         },
                         onDismiss = {
                             onIntent(CaseIntent.ToggleDatePicker)
-                        }
-                    )
+                        })
                 }
 
                 if (!isFromTemplate) {
@@ -517,10 +495,7 @@ fun CaseDetailScreen(
 
             if (isFromTemplate) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.White)
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().background(Color.White).padding(16.dp),
                     content = formContent
                 )
             } else {
@@ -537,8 +512,7 @@ fun CaseDetailScreen(
                 onUpdateClick = { updatedState ->
                     onIntent(CaseIntent.UpdateCustomMessage(updatedState))
                     onIntent(CaseIntent.ToggleSendMessageDialog)
-                }
-            )
+                })
         }
 
         if (state.isSaveTemplateDialogVisible) {
@@ -548,8 +522,7 @@ fun CaseDetailScreen(
                 onNameChange = { onIntent(CaseIntent.UpdateTemplateName(it)) },
                 onGlobalToggle = { onIntent(CaseIntent.ToggleGlobalTemplate) },
                 onSave = { onIntent(CaseIntent.SaveAsTemplate) },
-                onDismiss = { onIntent(CaseIntent.ToggleSaveTemplateDialog) }
-            )
+                onDismiss = { onIntent(CaseIntent.ToggleSaveTemplateDialog) })
         }
     }
 }
@@ -561,67 +534,56 @@ fun CaseDetailScreenPrev() {
     FriendshipTheme {
         CaseDetailScreen(
             state = CaseUiState(
-                interviewDetails = InterviewDetails(
-                    interviewId = 1,
-                    beneficiaryId = 12345,
-                    beneficiaryName = "John Doe",
-                    beneficiaryCode = "B12345",
-                    location = "123 Main Street, Springfield, IL",
-                    status = "Completed",
-                    startTime = "2026-04-03 10:00 AM",
-                    questionnaireId = 2,
-                    questionnaireName = "Health Assessment",
-                    stCaption = "Screening Completed",
-                    printCaption = "For Prescription Fulfillment",
-                    userName = "Dr. Smith",
-                    isNotification = true,
-                    priority = 1,
-                    fcmInfo = "fcm_token_1234567890",
-                    waitingFor = "Lab Results",
-                    stName = "Routine Checkup",
-                    description = "Patient is waiting for lab results for further consultation.",
-                    details = listOf(
-                        InterviewAnswer(
-                            questionId = 1,
-                            questionName = "Do you have any allergies?",
-                            answer = "No"
-                        ),
-                        InterviewAnswer(
-                            questionId = 2,
-                            questionName = "Are you currently taking any medication?",
-                            answer = "Yes, Blood Pressure medication"
-                        )
-                    )
-                ),
-                medicineList = listOf(
-                    Medicine(
-                        medicineId = 101,
-                        genericName = "Paracetamol",
-                        brandName = "Tylenol",
-                        type = "Pain Reliever",
-                        boxSize = 20,
-                        unitType = "Tablets"
-                    ),
-                    Medicine(
-                        medicineId = 102,
-                        genericName = "Amlodipine",
-                        brandName = "Norvasc",
-                        type = "Antihypertensive",
-                        boxSize = 30,
-                        unitType = "Tablets"
+            interviewDetails = InterviewDetails(
+                interviewId = 1,
+                beneficiaryId = 12345,
+                beneficiaryName = "John Doe",
+                beneficiaryCode = "B12345",
+                location = "123 Main Street, Springfield, IL",
+                status = "Completed",
+                startTime = "2026-04-03 10:00 AM",
+                questionnaireId = 2,
+                questionnaireName = "Health Assessment",
+                stCaption = "Screening Completed",
+                printCaption = "For Prescription Fulfillment",
+                userName = "Dr. Smith",
+                isNotification = true,
+                priority = 1,
+                fcmInfo = "fcm_token_1234567890",
+                waitingFor = "Lab Results",
+                stName = "Routine Checkup",
+                description = "Patient is waiting for lab results for further consultation.",
+                details = listOf(
+                    InterviewAnswer(
+                        questionId = 1,
+                        questionName = "Do you have any allergies?",
+                        answer = "No"
+                    ), InterviewAnswer(
+                        questionId = 2,
+                        questionName = "Are you currently taking any medication?",
+                        answer = "Yes, Blood Pressure medication"
                     )
                 )
-            ),
-            setupData = SetupData(
-                diagnoses = listOf(),
-                investigations = listOf(),
-                referralCenters = listOf()
-            ),
-            onFcmDetailsClick = {},
-            onCall = {},
-            onWhatsApp = {},
-            onBack = {}
-        )
+            ), medicineList = listOf(
+                Medicine(
+                    medicineId = 101,
+                    genericName = "Paracetamol",
+                    brandName = "Tylenol",
+                    type = "Pain Reliever",
+                    boxSize = 20,
+                    unitType = "Tablets"
+                ), Medicine(
+                    medicineId = 102,
+                    genericName = "Amlodipine",
+                    brandName = "Norvasc",
+                    type = "Antihypertensive",
+                    boxSize = 30,
+                    unitType = "Tablets"
+                )
+            )
+        ), setupData = SetupData(
+            diagnoses = listOf(), investigations = listOf(), referralCenters = listOf()
+        ), onFcmDetailsClick = {}, onCall = {}, onWhatsApp = {}, onBack = {})
     }
 }
 
@@ -630,38 +592,30 @@ fun CaseDetailScreenPrev() {
 @Composable
 fun AppDatePickerDialog(
     initialDate: String? = null, // yyyy-MM-dd
-    onDateSelected: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDateSelected: (String) -> Unit, onDismiss: () -> Unit
 ) {
-    val initialMillis = initialDate
-        ?.takeIf { it.isNotBlank() }
-        ?.toEpochMillisOrNull()
+    val initialMillis = initialDate?.takeIf { it.isNotBlank() }?.toEpochMillisOrNull()
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialMillis
     )
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            Button(
-                onClick = {
-                    val selectedMillis = datePickerState.selectedDateMillis
-                    if (selectedMillis != null) {
-                        onDateSelected(selectedMillis.toDateString())
-                    }
-                    onDismiss()
+    DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
+        Button(
+            onClick = {
+                val selectedMillis = datePickerState.selectedDateMillis
+                if (selectedMillis != null) {
+                    onDateSelected(selectedMillis.toDateString())
                 }
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
+                onDismiss()
+            }) {
+            Text("OK")
         }
-    ) {
+    }, dismissButton = {
+        Button(onClick = onDismiss) {
+            Text("Cancel")
+        }
+    }) {
         DatePicker(state = datePickerState)
     }
 }

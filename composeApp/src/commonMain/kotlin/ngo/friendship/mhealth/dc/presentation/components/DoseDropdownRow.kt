@@ -95,6 +95,8 @@ fun AppExposedDropdownField(
     var expanded by remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val borderColor = when {
         isError -> MaterialTheme.colorScheme.error
@@ -157,6 +159,8 @@ fun AppExposedDropdownField(
                     onClick = {
                         onSelect(it)
                         expanded = false
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
                     }
                 )
             }

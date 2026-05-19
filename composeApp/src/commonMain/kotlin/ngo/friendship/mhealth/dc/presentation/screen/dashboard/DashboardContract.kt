@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.model.SectionData

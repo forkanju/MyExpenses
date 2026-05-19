@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,8 +34,7 @@ import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.base.ObserveAsEvents
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.presentation.screen.dashboard.MedicineListViewModel
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.NewMedicineDialog
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.NewMedicineDialog
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
@@ -44,7 +44,7 @@ fun MedicineListScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    ObserveAsEvents(viewModel.effect) { effect ->
+    ObserveAsEvents(flow = viewModel.effect) { effect ->
         when (effect) {
             is MedicineListEffect.ShowSnackbar -> {
                 SnackbarController.sendEvent(effect.message)
@@ -60,8 +60,8 @@ fun MedicineListScreen(
                     onBack = onBack,
                     showSearch = true,
                     searchQuery = state.searchQuery,
-                    onSearchQueryChange = { 
-                        viewModel.onIntent(MedicineListIntent.SearchQueryChanged(it)) 
+                    onSearchQueryChange = {
+                        viewModel.onIntent(MedicineListIntent.SearchQueryChanged(query = it))
                     }
                 )
             },
@@ -75,27 +75,34 @@ fun MedicineListScreen(
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 24.dp, end = 24.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
                 }
             }
         ) { paddingValues ->
-            Card(
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { viewModel.onIntent(MedicineListIntent.Refresh) },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(8.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(state.filteredMedicines) { item ->
-                            MedicineListItem(
-                                title = "${item.type} : ${item.genericName}",
-                                subtitle = item.brandName
-                            )
-                            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            items(state.filteredMedicines) { item ->
+                                MedicineListItem(
+                                    title = "${item.type} : ${item.genericName}",
+                                    subtitle = item.brandName
+                                )
+                                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                            }
                         }
                     }
                 }

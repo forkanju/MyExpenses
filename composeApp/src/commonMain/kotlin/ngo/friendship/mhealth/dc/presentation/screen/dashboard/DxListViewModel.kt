@@ -8,10 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxItemData
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListEffect
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListIntent
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DxListState
 
 class DxListViewModel(
     private val mainRepository: MainRepository
@@ -49,13 +45,20 @@ class DxListViewModel(
             DxListIntent.ClearError -> {
                 _state.value = _state.value.copy(error = null)
             }
+            DxListIntent.Refresh -> {
+                loadDxItems(forceRefresh = true)
+            }
         }
     }
 
-    private fun loadDxItems() {
+    private fun loadDxItems(forceRefresh: Boolean = false) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            mainRepository.getSetupData().collect { setupData ->
+            if (forceRefresh) {
+                _state.value = _state.value.copy(isRefreshing = true)
+            } else {
+                _state.value = _state.value.copy(isLoading = true)
+            }
+            mainRepository.getSetupData(forceRefresh = forceRefresh).collect { setupData ->
                 val items = setupData.diagnoses.map {
                     DxItemData(
                         title = it.diagName.replace("_", " "),
@@ -64,8 +67,9 @@ class DxListViewModel(
                     )
                 }
                 _state.value = _state.value.copy(
-                    dxItems = items.ifEmpty { _state.value.dxItems },
-                    isLoading = false
+                    dxItems = items,
+                    isLoading = false,
+                    isRefreshing = false
                 )
                 filterDxItems()
             }
@@ -91,12 +95,12 @@ class DxListViewModel(
     private fun createDx(title: String, advices: String) {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, showNewDxDialog = false)
-            val success = mainRepository.saveDiagnosis(title)
+            val (success, errorMessage) = mainRepository.saveDiagnosis(title)
             if (success) {
                 _effect.send(DxListEffect.DxCreated)
-                // Refresh data if needed, though getSetupData collect should handle it if it emits new values
+                loadDxItems(forceRefresh = true)
             } else {
-                _state.value = _state.value.copy(error = "Failed to save diagnosis")
+                _state.value = _state.value.copy(error = errorMessage ?: "Failed to save diagnosis")
             }
             _state.value = _state.value.copy(isLoading = false)
         }

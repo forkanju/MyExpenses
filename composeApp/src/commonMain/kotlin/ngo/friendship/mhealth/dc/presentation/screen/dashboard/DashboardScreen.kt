@@ -42,10 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.collectLatest
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardEffect
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardIntent
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardState
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.DashboardCard
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.DashboardCard
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.PrimaryColor

@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListEffect
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListIntent
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.MedicineListState
 
 class MedicineListViewModel(
     private val mainRepository: MainRepository,
@@ -28,7 +25,17 @@ class MedicineListViewModel(
 
     init {
         loadSetupData()
+        observeMedicines()
         onIntent(MedicineListIntent.LoadMedicines)
+    }
+
+    private fun observeMedicines() {
+        viewModelScope.launch {
+            caseRepository.observeAllMedicines().collect { medicines ->
+                _state.update { it.copy(medicines = medicines) }
+                filterMedicines()
+            }
+        }
     }
 
     fun onIntent(intent: MedicineListIntent) {
@@ -42,31 +49,43 @@ class MedicineListViewModel(
                 _state.update { it.copy(showNewMedicineDialog = !it.showNewMedicineDialog) }
             }
             is MedicineListIntent.SaveMedicine -> saveMedicine(intent.type, intent.genericName)
+            MedicineListIntent.Refresh -> {
+                loadSetupData(forceRefresh = true)
+                loadMedicines(forceRefresh = true)
+            }
         }
     }
 
-    private fun loadSetupData() {
+    private fun loadSetupData(forceRefresh: Boolean = false) {
         viewModelScope.launch {
-            mainRepository.getSetupData().collect { setupData ->
+            mainRepository.getSetupData(forceRefresh = forceRefresh).collect { setupData ->
                 _state.update { it.copy(medicineTypes = setupData.medicineBrandTypes) }
             }
         }
     }
 
-    private fun loadMedicines() {
+    private fun loadMedicines(forceRefresh: Boolean = false) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+            if (forceRefresh) {
+                _state.update { it.copy(isRefreshing = true) }
+            } else {
+                _state.update { it.copy(isLoading = true) }
+            }
             try {
-                val medicines = caseRepository.getMedicineList("Tab")
+                // Refresh common types to populate local DB
+                val types = listOf("Tab", "Syp", "Cap", "Inj")
+                types.forEach { type ->
+                    caseRepository.getMedicineList(type, forceRefresh = forceRefresh)
+                }
+                
                 _state.update { 
                     it.copy(
-                        medicines = medicines,
-                        isLoading = false 
+                        isLoading = false,
+                        isRefreshing = false
                     ) 
                 }
-                filterMedicines()
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false) }
+                _state.update { it.copy(isLoading = false, isRefreshing = false) }
                 _effect.send(MedicineListEffect.ShowSnackbar("Failed to load medicines"))
             }
         }
@@ -89,7 +108,7 @@ class MedicineListViewModel(
     private fun saveMedicine(type: String, genericName: String) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, showNewMedicineDialog = false) }
-            val isSuccess = mainRepository.saveMedicine(
+            val (isSuccess, errorMessage) = mainRepository.saveMedicine(
                 genericName = genericName,
                 brandName = genericName,
                 type = type,
@@ -98,9 +117,10 @@ class MedicineListViewModel(
             _state.update { it.copy(isLoading = false) }
             if (isSuccess) {
                 _effect.send(MedicineListEffect.ShowSnackbar("Medicine saved successfully"))
-                loadMedicines()
+                // No need to call loadMedicines manually, observeMedicines will pick up DB changes
+                // from mainRepository.saveMedicine() which calls medResponse...insertMedicines
             } else {
-                _effect.send(MedicineListEffect.ShowSnackbar("Failed to save medicine"))
+                _effect.send(MedicineListEffect.ShowSnackbar(errorMessage ?: "Failed to save medicine"))
             }
         }
     }

@@ -5,8 +5,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
-import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model.CustomMessageState
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.CustomMessageState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto

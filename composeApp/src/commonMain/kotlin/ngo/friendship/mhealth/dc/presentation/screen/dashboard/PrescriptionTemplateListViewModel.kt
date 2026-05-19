@@ -29,6 +29,7 @@ class PrescriptionTemplateListViewModel(
                 // Handle search if needed
             }
             is PrescriptionTemplateListIntent.DeleteTemplate -> deleteTemplate(intent.template)
+            PrescriptionTemplateListIntent.Refresh -> loadTemplates(isRefreshing = true)
         }
     }
 
@@ -42,7 +43,7 @@ class PrescriptionTemplateListViewModel(
                 )
                 val result = caseRepository.saveDoctorFeedback(formState)
                 if (result.isSuccess) {
-                    loadTemplates()
+                    loadTemplates(isRefreshing = true)
                 } else {
                     _state.value = _state.value.copy(
                         isLoading = false,
@@ -58,18 +59,24 @@ class PrescriptionTemplateListViewModel(
         }
     }
 
-    private fun loadTemplates() {
+    private fun loadTemplates(isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
+            if (isRefreshing) {
+                _state.value = _state.value.copy(isRefreshing = true)
+            } else {
+                _state.value = _state.value.copy(isLoading = true)
+            }
             try {
                 val templates = mainRepository.getPrescriptionTemplates()
                 _state.value = _state.value.copy(
                     templates = templates,
-                    isLoading = false
+                    isLoading = false,
+                    isRefreshing = false
                 )
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
+                    isRefreshing = false,
                     error = e.message ?: "An error occurred"
                 )
             }

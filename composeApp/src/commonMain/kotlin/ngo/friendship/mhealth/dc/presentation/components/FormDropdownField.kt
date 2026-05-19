@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -89,6 +90,8 @@ fun <T> FormDropdownField(
     val dropdownBackground = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
     val textColorSelected = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
     val iconColor = if (isAnsweredMode) Color(0xFF6A6A6A) else DarkerGray
+
+    val focusManager = LocalFocusManager.current
 
     Column(modifier = modifier.fillMaxWidth()) {
         if (label != null) {
@@ -174,6 +177,7 @@ fun <T> FormDropdownField(
                         onClick = {
                             expanded = false
                             onSelectedChange(item)
+                            focusManager.clearFocus()
                         },
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
                     )
@@ -224,11 +228,12 @@ fun <T> FormAutoCompleteDropdownField(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val focusManager = LocalFocusManager.current
+    val focusManager2 = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val effectiveKeyboardActions = keyboardActions ?: KeyboardActions(
         onNext = {
-            focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
+            focusManager2.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
         }
     )
 
@@ -281,6 +286,8 @@ fun <T> FormAutoCompleteDropdownField(
         isAnsweredMode -> Color(0xFFC7C7C7)
         else -> UnfocusedBorderColor
     }
+
+    val focusManager = LocalFocusManager.current
 
     Column(modifier = modifier.fillMaxWidth()) {
         if (label != null) {
@@ -385,6 +392,7 @@ fun <T> FormAutoCompleteDropdownField(
 
                             onSelectedChange(item)
                             expanded = false
+                            keyboardController?.hide()
                             focusManager.clearFocus()
                         }
                     )
@@ -397,6 +405,7 @@ fun <T> FormAutoCompleteDropdownField(
                 }
             }
         }
+
 
         if (supportingText != null) {
             Spacer(modifier = Modifier.height(6.dp))

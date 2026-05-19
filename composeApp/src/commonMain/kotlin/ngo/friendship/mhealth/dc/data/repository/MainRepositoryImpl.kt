@@ -13,6 +13,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveAdviceReqDto
@@ -25,7 +26,7 @@ import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.AdviceItemData
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 import ngo.friendship.mhealth.dc.utils.toDateTimeServerSlash
 
@@ -36,26 +37,23 @@ class MainRepositoryImpl(
 ) : MainRepository {
     private val setupDataDao = appDatabase.setupDataDao()
     private val userProfileDao = appDatabase.userProfileDao()
+    private val medicineDao = appDatabase.medicineDao()
 
     override suspend fun getAdviceList(): List<AdviceItemData> {
-        return try {
-            val response = api.getAdviceList(
-                request = AdviceListReqDto.build(
-                    userName = localSettings.user.userName,
-                    password = localSettings.user.password,
-                    requestTime = currentTimestamp.toDateTimeServerSlash()
-                )
+        val response = api.getAdviceList(
+            request = AdviceListReqDto.build(
+                userName = localSettings.user.userName,
+                password = localSettings.user.password,
+                requestTime = currentTimestamp.toDateTimeServerSlash()
             )
-            response.data?.adviceList?.map {
-                AdviceItemData(
-                    title = it.adviceName ?: "",
-                    subtitle = "Updated: ${currentTimestamp.toDateTimeServerSlash()}", // Subtitle not in API, using current time as placeholder
-                    details = listOf(it.adviceDetails ?: "")
-                )
-            } ?: emptyList()
-        } catch (e: Exception) {
-            emptyList()
-        }
+        )
+        return response.data?.adviceList?.map {
+            AdviceItemData(
+                title = it.adviceName ?: "",
+                subtitle = "Updated: ${currentTimestamp.toDateTimeServerSlash()}", // Subtitle not in API, using current time as placeholder
+                details = listOf(it.adviceDetails ?: "")
+            )
+        } ?: emptyList()
     }
 
     override suspend fun getPrescriptionTemplates(): List<PrescriptionTemplate> {
@@ -63,24 +61,18 @@ class MainRepositoryImpl(
     }
 
     override suspend fun getPrescriptionTemplateDtos(): List<PrescriptionTemplateDto> {
-        return try {
-            val response = api.getPrescriptionTemplates(
-                request = PrescriptionTemplateReqDto.build(
-                    userName = localSettings.user.userName,
-                    password = localSettings.user.password,
-                    requestTime = currentTimestamp.toDateTimeServerSlash()
-                )
+        val response = api.getPrescriptionTemplates(
+            request = PrescriptionTemplateReqDto.build(
+                userName = localSettings.user.userName,
+                password = localSettings.user.password,
+                requestTime = currentTimestamp.toDateTimeServerSlash()
             )
-            println("PRESCRIPTION_TEMPLATES RESPONSE: $response")
-            response.data?.prescriptionTemplates ?: emptyList()
-        } catch (e: Exception) {
-            println("ERROR fetching templates: ${e.message}")
-            e.printStackTrace()
-            emptyList()
-        }
+        )
+        println("PRESCRIPTION_TEMPLATES RESPONSE: $response")
+        return response.data?.prescriptionTemplates ?: emptyList()
     }
 
-    override suspend fun saveAdvice(title: String, content: String): Boolean {
+    override suspend fun saveAdvice(title: String, content: String): Pair<Boolean, String?> {
         return try {
             val response = api.saveAdvice(
                 request = SaveAdviceReqDto.build(
@@ -91,13 +83,14 @@ class MainRepositoryImpl(
                     adviceDetails = content
                 )
             )
-            response.responseCode == "01"
+            val isSuccess = response.responseCode == "01"
+            isSuccess to (if (isSuccess) null else response.errorDesc)
         } catch (e: Exception) {
-            false
+            false to e.message
         }
     }
 
-    override suspend fun saveDiagnosis(title: String): Boolean {
+    override suspend fun saveDiagnosis(title: String): Pair<Boolean, String?> {
         return try {
             val response = api.saveDiagnosis(
                 request = SaveDiagnosisReqDto.build(
@@ -107,13 +100,17 @@ class MainRepositoryImpl(
                     diagName = title
                 )
             )
-            response.responseCode == "01"
+            val isSuccess = response.responseCode == "01"
+            if (isSuccess) {
+                refreshSetupData()
+            }
+            isSuccess to (if (isSuccess) null else response.errorDesc)
         } catch (e: Exception) {
-            false
+            false to e.message
         }
     }
 
-    override suspend fun saveInvestigation(title: String): Boolean {
+    override suspend fun saveInvestigation(title: String): Pair<Boolean, String?> {
         return try {
             val response = api.saveInvestigation(
                 request = SaveInvestigationReqDto.build(
@@ -123,9 +120,13 @@ class MainRepositoryImpl(
                     investigationName = title
                 )
             )
-            response.responseCode == "01"
+            val isSuccess = response.responseCode == "01"
+            if (isSuccess) {
+                refreshSetupData()
+            }
+            isSuccess to (if (isSuccess) null else response.errorDesc)
         } catch (e: Exception) {
-            false
+            false to e.message
         }
     }
 
@@ -134,7 +135,7 @@ class MainRepositoryImpl(
         brandName: String,
         type: String,
         strength: String
-    ): Boolean {
+    ): Pair<Boolean, String?> {
         return try {
             val response = api.saveMedicine(
                 request = SaveMedicineReqDto.build(
@@ -147,25 +148,64 @@ class MainRepositoryImpl(
                     strength = strength
                 )
             )
-            response.responseCode == "01"
+            val isSuccess = response.responseCode == "01"
+            if (isSuccess) {
+                refreshSetupData()
+
+                // Refresh medicine list for this type
+                val medResponse = api.getMedicineList(
+                    request = MedicineListReqDto.build(
+                        userName = localSettings.user.userName,
+                        password = localSettings.user.password,
+                        requestTime = currentTimestamp.toDateTimeServerSlash(),
+                        type = type
+                    )
+                )
+                medResponse.data?.medicineList?.map { it.toDomain() }?.also { medicines ->
+                    if (medicines.isNotEmpty()) {
+                        medicineDao.deleteMedicinesByType(type)
+                        medicineDao.insertMedicines(medicines)
+                    }
+                }
+            }
+            isSuccess to (if (isSuccess) null else response.errorDesc)
         } catch (e: Exception) {
-            false
+            false to e.message
         }
     }
 
-    override fun getSetupData(): Flow<SetupData> = flow {
+    private suspend fun refreshSetupData() {
+        try {
+            val response = api.getSetupData(
+                request = SetupDataReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password
+                )
+            )
+            response.data?.toDomain()?.also {
+                setupDataDao.deleteAllData()
+                setupDataDao.insertAll(it)
+            }
+        } catch (e: Exception) {
+            println("refreshSetupData error: ${e.message}")
+        }
+    }
+
+    override fun getSetupData(forceRefresh: Boolean): Flow<SetupData> = flow {
         val cached = getCachedSetupData()
 
         // Check if cached data is not empty (checking investigations as a proxy for all setup data)
-        if (cached.investigations.isNotEmpty() ||
-            cached.diagnoses.isNotEmpty() ||
-            cached.medicineBrandTypes.isNotEmpty() ||
-            cached.referralCenters.isNotEmpty()) {
+        val hasCache = cached.investigations.isNotEmpty() ||
+                cached.diagnoses.isNotEmpty() ||
+                cached.medicineBrandTypes.isNotEmpty() ||
+                cached.referralCenters.isNotEmpty()
+
+        if (hasCache && !forceRefresh) {
             emit(cached)
             return@flow
         }
 
-        // If cache is empty, fetch from API
+        // Fetch from API
         val response = api.getSetupData(
             request = SetupDataReqDto.build(
                 userName = localSettings.user.userName,

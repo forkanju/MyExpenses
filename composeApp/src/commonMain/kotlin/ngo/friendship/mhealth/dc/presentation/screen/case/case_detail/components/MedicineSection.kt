@@ -49,7 +49,6 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
-import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.components.PrescriptionActionRowAligned
 import ngo.friendship.mhealth.dc.theme.DarkerGray
 import ngo.friendship.mhealth.dc.theme.FocusedBorderColor
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme

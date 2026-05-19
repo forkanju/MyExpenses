@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 data class DxItemData(
     val title: String,
@@ -15,7 +15,8 @@ data class DxListState(
     val showNewDxDialog: Boolean = false,
     val dxItems: List<DxItemData> = emptyList(),
     val filteredDxItems: List<DxItemData> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val isRefreshing: Boolean = false
 )
 
 sealed interface DxListIntent {
@@ -25,6 +26,7 @@ sealed interface DxListIntent {
     data class CreateDx(val title: String, val advices: String) : DxListIntent
     data class ToggleExpand(val title: String) : DxListIntent
     data object ClearError : DxListIntent
+    data object Refresh : DxListIntent
 }
 
 sealed interface DxListEffect {

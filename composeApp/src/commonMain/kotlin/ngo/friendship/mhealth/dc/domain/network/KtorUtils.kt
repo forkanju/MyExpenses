@@ -32,7 +32,6 @@ import kotlinx.io.IOException
 import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.properties.encodeToMap
 import ngo.friendship.mhealth.dc.data.remote.dto.BaseResponse
-import ngo.friendship.mhealth.dc.utils.addSpaceBetweenSmallAndLarge
 import ngo.friendship.mhealth.dc.utils.fromJson
 import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.removeNumberBackslashPrefix
@@ -256,12 +255,22 @@ suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
 }
 
 fun String.normalize(): String {
-    return removeNumberBackslashPrefix()
-        .addSpaceBetweenSmallAndLarge()
-        .replace("_", " ")
-        .replace("  ", " ")
-        .lowercase()
-        .replaceFirstChar(Char::uppercase)
+    val cleaned = removeNumberBackslashPrefix()
+        .replace("\n", " ")
+        .replace(Regex("\\s+"), " ")
+        .trim()
+    if (cleaned.isBlank()) return ""
+
+    // Replace underscores with space and capitalize the next letter
+    // e.g., taking_rule -> taking Rule
+    val underscoreHandled = cleaned.replace(Regex("_([a-zA-Z])")) {
+        " " + it.groupValues[1].uppercase()
+    }
+
+    // Capitalize first letter of the whole string
+    val formatted = underscoreHandled.replaceFirstChar { it.uppercase() }
+
+    return if (formatted.endsWith("!")) formatted else "$formatted!"
 }
 
 

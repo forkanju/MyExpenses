@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -26,6 +26,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,10 +40,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonFilterChip
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.components.CommonNewItemDialog
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.CommonFilterChip
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 
 @Composable
@@ -56,6 +58,7 @@ fun AdviceTemplateListScreen(
     var showNewAdviceDialog by remember { mutableStateOf(false) }
 
     val adviceItems by viewModel.adviceListState.collectAsState()
+    val isRefreshing by viewModel.loadingSecondaryFlow.collectAsStateWithLifecycle()
 
     val filteredAdviceItems = remember(searchQuery, adviceItems) {
         if (searchQuery.isBlank()) {
@@ -97,32 +100,42 @@ fun AdviceTemplateListScreen(
                 }
             }
         ) { paddingValues ->
-            Card(
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.loadAdviceList() },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(8.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        filters.forEach { filter ->
-                            CommonFilterChip(
-                                text = filter,
-                                isSelected = selectedFilter == filter,
-                                onClick = { selectedFilter = filter }
-                            )
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            filters.forEach { filter ->
+                                CommonFilterChip(
+                                    text = filter,
+                                    isSelected = selectedFilter == filter,
+                                    onClick = { selectedFilter = filter }
+                                )
+                            }
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(filteredAdviceItems) { item ->
-                            AdviceExpandableItem(item)
-                            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(filteredAdviceItems) { item ->
+                                AdviceExpandableItem(item)
+                                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                            }
                         }
                     }
                 }

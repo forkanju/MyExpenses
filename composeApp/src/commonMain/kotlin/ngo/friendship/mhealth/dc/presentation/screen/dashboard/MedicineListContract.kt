@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
@@ -9,7 +9,8 @@ data class MedicineListState(
     val filteredMedicines: List<Medicine> = emptyList(),
     val medicineTypes: List<MedicineBrandType> = emptyList(),
     val searchQuery: String = "",
-    val showNewMedicineDialog: Boolean = false
+    val showNewMedicineDialog: Boolean = false,
+    val isRefreshing: Boolean = false
 )
 
 sealed interface MedicineListIntent {
@@ -17,6 +18,7 @@ sealed interface MedicineListIntent {
     data class SearchQueryChanged(val query: String) : MedicineListIntent
     data object ToggleNewMedicineDialog : MedicineListIntent
     data class SaveMedicine(val type: String, val genericName: String) : MedicineListIntent
+    data object Refresh : MedicineListIntent
 }
 
 sealed interface MedicineListEffect {

@@ -174,7 +174,7 @@ data class PrescriptionItem(
     val dose: String,
     @SerialName("duration")
     val duration: String,
-    @SerialName("meal_time")
+    @SerialName("taking_rule")
     val mealTime: String? = null,
     @SerialName("medicine_id")
     val medicineId: Long? = null
@@ -186,10 +186,6 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
         doctorFindings = doctorNotes,
         commentsForFCM = commentsForFcm,
         refCenterId = selectedReferralCenter?.refCenterId.toString(),
-//        investigationResult = listOfNotNull(
-//            investigationResult.takeIf { it.isNotBlank() },
-//            doctorAdvice.takeIf { it.isNotBlank() }
-//        ).joinToString("\n"),
         investigationResult = investigationResult,
         nextFollowUpDate = nextFollowUpDate,
         investigation = selectedInvestigations.map {

@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard.components
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

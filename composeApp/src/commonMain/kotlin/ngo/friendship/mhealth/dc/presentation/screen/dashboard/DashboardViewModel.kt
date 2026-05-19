@@ -14,9 +14,6 @@ import ngo.friendship.mhealth.dc.domain.repository.MainRepository
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.model.DashboardCardData
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.model.SectionData
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardEffect
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardIntent
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.DashboardState
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.Report
 
@@ -63,7 +60,7 @@ class DashboardViewModel(
             }
 
             val medicineList = try {
-                caseRepository.getMedicineList("Tab")
+                caseRepository.getMedicineList("Tab", forceRefresh = false)
             } catch (_: Exception) {
                 emptyList()
             }
@@ -74,7 +71,7 @@ class DashboardViewModel(
                 emptyList()
             }
 
-            mainRepository.getSetupData().collect { setupData ->
+            mainRepository.getSetupData(forceRefresh = false).collect { setupData ->
                 updateSections(
                     setupData,
                     adviceList.size,

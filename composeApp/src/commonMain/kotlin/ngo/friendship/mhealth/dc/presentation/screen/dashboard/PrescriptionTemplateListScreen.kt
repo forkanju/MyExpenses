@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -85,33 +86,40 @@ fun PrescriptionTemplateListScreen(
             }
         }
     ) { paddingValues ->
-        Box(
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { viewModel.onIntent(PrescriptionTemplateListIntent.Refresh) },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
         ) {
-            if (state.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (state.templates.isEmpty()) {
-                Text(
-                    text = "No templates found",
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.Gray
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(state.templates) { template ->
-                        TemplateItem(
-                            template = template,
-                            onClick = { onTemplateClick(template) },
-                            onEdit = { onTemplateClick(template) },
-                            onDelete = { viewModel.onIntent(PrescriptionTemplateListIntent.DeleteTemplate(template)) }
-                        )
-                        HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                } else if (state.templates.isEmpty()) {
+                    Text(
+                        text = "No templates found",
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.Gray
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.templates) { template ->
+                            TemplateItem(
+                                template = template,
+                                onClick = { onTemplateClick(template) },
+                                onEdit = { onTemplateClick(template) },
+                                onDelete = { viewModel.onIntent(PrescriptionTemplateListIntent.DeleteTemplate(template)) }
+                            )
+                            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                        }
                     }
                 }
             }

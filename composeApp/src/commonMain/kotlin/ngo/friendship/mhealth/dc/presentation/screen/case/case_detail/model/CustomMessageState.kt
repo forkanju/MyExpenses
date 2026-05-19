@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.model
+package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model
 
 data class CustomMessageState(
     val messageText: String = "",

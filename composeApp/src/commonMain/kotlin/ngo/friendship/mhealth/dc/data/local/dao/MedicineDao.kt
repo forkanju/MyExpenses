@@ -9,6 +9,9 @@ import ngo.friendship.mhealth.dc.domain.model.Medicine
 @Dao
 interface MedicineDao {
     @Query("SELECT * FROM Medicine")
+    fun getAllMedicinesFlow(): kotlinx.coroutines.flow.Flow<List<Medicine>>
+
+    @Query("SELECT * FROM Medicine")
     suspend fun getAllMedicines(): List<Medicine>
 
     @Query("SELECT * FROM Medicine WHERE type = :type")

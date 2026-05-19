@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.dashboard
+package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -224,7 +226,7 @@ fun LocalTreatmentDetailsScreen(
                 "DX",
                 color = Color.Gray,
                 fontSize = 14.sp,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                fontStyle = FontStyle.Italic
             )
             Box(
                 modifier = Modifier
@@ -246,7 +248,7 @@ fun LocalTreatmentDetailsScreen(
                 "Medicine",
                 color = Color.Gray,
                 fontSize = 14.sp,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                fontStyle = FontStyle.Italic
             )
             Box(
                 modifier = Modifier
@@ -277,7 +279,7 @@ fun LocalTreatmentDetailsScreen(
                 "Advice",
                 color = Color.Gray,
                 fontSize = 14.sp,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                fontStyle = FontStyle.Italic
             )
             Box(
                 modifier = Modifier
@@ -313,7 +315,7 @@ fun LocalTreatmentDetailsScreen(
                 "Investigations",
                 color = Color.Gray,
                 fontSize = 14.sp,
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                fontStyle = FontStyle.Italic
             )
             Box(
                 modifier = Modifier
@@ -341,7 +343,7 @@ fun LocalTreatmentDetailsScreen(
                 text = "Next follow-up: 25 Nov 2026",
                 fontSize = 12.sp,
                 color = Color.Gray,
-                textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                textDecoration = TextDecoration.Underline,
                 modifier = Modifier.padding(top = 8.dp)
             )
 

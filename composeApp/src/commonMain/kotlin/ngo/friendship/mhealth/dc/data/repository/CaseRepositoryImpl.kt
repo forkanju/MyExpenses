@@ -109,14 +109,44 @@ class CaseRepositoryImpl(
 
         println("SAVE_API FINAL RESPONSE = $response")
 
-        return response.toDomain()
+        val domainResult = response.toDomain()
+        if (domainResult.isSuccess) {
+            refreshMedicineList()
+        }
+
+        return domainResult
+    }
+
+    private suspend fun refreshMedicineList() {
+        try {
+            // Usually we refresh based on the common types used in the app
+            val types = listOf("Tab", "Syp", "Cap", "Inj") // Add more if needed
+            types.forEach { type ->
+                val response = api.getMedicineList(
+                    request = MedicineListReqDto.build(
+                        userName = localSettings.user.userName,
+                        password = localSettings.user.password,
+                        requestTime = currentTimestamp.toDateTimeServerSlash(),
+                        type = type
+                    )
+                )
+                val medicines = response.data?.medicineList?.map { it.toDomain() }.orEmpty()
+                if (medicines.isNotEmpty()) {
+                    medicineDao.deleteMedicinesByType(type)
+                    medicineDao.insertMedicines(medicines)
+                }
+            }
+        } catch (e: Exception) {
+            println("refreshMedicineList error: ${e.message}")
+        }
     }
 
     override suspend fun getMedicineList(
-        type: String
+        type: String,
+        forceRefresh: Boolean
     ): List<Medicine> {
         val cached = medicineDao.getMedicinesByType(type)
-        if (cached.isNotEmpty()) {
+        if (cached.isNotEmpty() && !forceRefresh) {
             return cached
         }
 
@@ -140,6 +170,10 @@ class CaseRepositoryImpl(
         return medicineDao.getAllMedicines()
     }
 
+    override fun observeAllMedicines(): Flow<List<Medicine>> {
+        return medicineDao.getAllMedicinesFlow()
+    }
+
     override suspend fun getQuestionAnswerData(): QuestionAnswerJson {
         val response = api.getQuestionAnswerData(
             request = QuestionAnswerJsonReqDto.build(
@@ -154,7 +188,7 @@ class CaseRepositoryImpl(
     override suspend fun updateInterviewStatus(
         interviewId: Long,
         status: String
-    ): Boolean {
+    ): Pair<Boolean, String?> {
         val response = api.updateInterviewStatus(
             request = UpdateInterviewStatusReqDto.build(
                 userName = localSettings.user.userName,
@@ -172,7 +206,7 @@ class CaseRepositoryImpl(
                 }
             }
         }
-        return success
+        return success to (if (success) null else response.errorDesc)
     }
 
     override suspend fun getFcmProfile(fcmCode: String): FcmProfile? {

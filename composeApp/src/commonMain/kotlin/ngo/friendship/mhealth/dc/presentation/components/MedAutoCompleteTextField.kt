@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -54,6 +55,7 @@ fun MedAutoCompleteTextField(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     var suppressNextExpand by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
@@ -166,6 +168,7 @@ fun MedAutoCompleteTextField(
                                         )
                                     )
                                     expanded = false
+                                    keyboardController?.hide()
                                     focusManager.clearFocus()
                                 }
                                 .padding(horizontal = 12.dp, vertical = 10.dp)

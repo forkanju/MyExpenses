@@ -31,7 +31,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.components.replaceWith
 import ngo.friendship.mhealth.dc.presentation.navigation.navConfiguration
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
-import ngo.friendship.mhealth.dc.presentation.screens.dashboard.AdviceItemData
+import ngo.friendship.mhealth.dc.presentation.screen.dashboard.AdviceItemData
 
 sealed interface MainUiEvent {
     data object Idle : MainUiEvent
@@ -62,7 +62,7 @@ class MainViewModel(
     var selectedBottomTab by mutableStateOf(BottomNavItems.Cases)
         private set
 
-    val setupDataState = mainRepository.getSetupData().stateIn(
+    val setupDataState = mainRepository.getSetupData(forceRefresh = false).stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = SetupData()
@@ -242,13 +242,13 @@ class MainViewModel(
     fun saveAdvice(title: String, content: String) {
         viewModelScope.launch {
             loadingFlow.value = true
-            val isSuccess = mainRepository.saveAdvice(title, content)
+            val (isSuccess, errorMessage) = mainRepository.saveAdvice(title, content)
             loadingFlow.value = false
             if (isSuccess) {
                 showSuccess("Advice saved successfully")
                 loadAdviceList()
             } else {
-                showError("Failed to save advice")
+                showError(errorMessage ?: "Failed to save advice")
             }
         }
     }
@@ -256,12 +256,22 @@ class MainViewModel(
     fun saveInvestigation(title: String) {
         viewModelScope.launch {
             loadingFlow.value = true
-            val isSuccess = mainRepository.saveInvestigation(title)
+            val (isSuccess, errorMessage) = mainRepository.saveInvestigation(title)
             loadingFlow.value = false
             if (isSuccess) {
                 showSuccess("Investigation saved successfully")
+                refreshSetupData()
             } else {
-                showError("Failed to save investigation")
+                showError(errorMessage ?: "Failed to save investigation")
+            }
+        }
+    }
+
+    fun refreshSetupData() {
+        launch(loading = Loading.Secondary) {
+            mainRepository.getSetupData(forceRefresh = true).collectLatest {
+                // The setupDataState is already observing the repository flow
+                // so it will update automatically.
             }
         }
     }

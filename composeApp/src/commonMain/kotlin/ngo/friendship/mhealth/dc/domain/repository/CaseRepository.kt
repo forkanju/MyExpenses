@@ -17,15 +17,16 @@ interface CaseRepository {
 
     suspend fun getInterviewDetails(interviewId: Long): InterviewDetails
 
-    suspend fun getMedicineList(type: String): List<Medicine>
+    suspend fun getMedicineList(type: String, forceRefresh: Boolean = false): List<Medicine>
 
     suspend fun getAllMedicines(): List<Medicine>
+    fun observeAllMedicines(): Flow<List<Medicine>>
 
     suspend fun saveDoctorFeedback(formState: DoctorFeedbackFormState): SaveDoctorFeedbackResult
 
     suspend fun getQuestionAnswerData(): QuestionAnswerJson
 
-    suspend fun updateInterviewStatus(interviewId: Long, status: String): Boolean
+    suspend fun updateInterviewStatus(interviewId: Long, status: String): Pair<Boolean, String?>
 
     suspend fun getFcmProfile(fcmCode: String): FcmProfile?
 
