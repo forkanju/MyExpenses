@@ -38,7 +38,7 @@ class LoginViewModel(
                 backStack.replaceWith(Screens.Main)
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isLoading = false, error = e.message)
-                _effect.send(LoginEffect.ShowError(e.message ?: "Login failed"))
+                showError(e.message ?: "Login failed")
             }
         }
     }

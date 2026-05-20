@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -83,23 +84,22 @@ class MainViewModel(
     var selectedCaseTab by mutableStateOf(CaseTab.Pending)
         private set
 
-    var caseTabCounts by mutableStateOf(
-        CaseTab.entries.associateWith { 0 }
-    )
-        private set
+    val caseTabCounts: StateFlow<Map<CaseTab, Int>> = caseRepository.observeCaseCounts()
+        .map { counts ->
+            CaseTab.entries.associateWith { tab -> counts[tab.apiParam] ?: 0 }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = CaseTab.entries.associateWith { 0 }
+        )
 
     var isCaseCountsLoaded by mutableStateOf(false)
         private set
 
     init {
-        loadInterviewList(tab = CaseTab.Pending)
-
+        // Use a small delay or non-blocking load to avoid race with CaseListViewModel if it's appearing immediately
         viewModelScope.launch {
-            caseRepository.observeCases().collectLatest { interviews ->
-                caseTabCounts = CaseTab.entries.associateWith { tab ->
-                    interviews.count { it.status == tab.apiParam }
-                }
-            }
+            refreshAllCounts()
         }
 
         viewModelScope.launch {
@@ -108,6 +108,12 @@ class MainViewModel(
 
                 backStack.replaceWith(Screens.Main)
                 uiEvent.emit(MainUiEvent.OpenCasesTab(CaseTab.Pending))
+            }
+        }
+
+        viewModelScope.launch {
+            notifierManager.notificationReceivedFlow.collect {
+                refreshAllCounts()
             }
         }
 
@@ -145,31 +151,29 @@ class MainViewModel(
         selectedBottomTab = tab
     }
 
-    fun initializeCases(appVersion: Int = 3069) {
-        if (isCaseCountsLoaded && interviewListState.value.isNotEmpty()) return
+    fun refreshAllCounts(appVersion: Int = 3069) {
+        launch(loading = Loading.Gone) {
+            try {
+                // Fetch the currently selected case tab first
+                caseRepository.getInterviewList(
+                    appVersion = appVersion,
+                    type = selectedCaseTab.apiParam
+                )
 
-        launch(loading = Loading.Secondary) {
-            val counts = mutableMapOf<CaseTab, Int>()
+                // Then fetch others for counts
+                CaseTab.entries
+                    .filter { it != selectedCaseTab }
+                    .forEach { tab ->
+                        caseRepository.getInterviewList(
+                            appVersion = appVersion,
+                            type = tab.apiParam
+                        )
+                    }
 
-            val selectedList = caseRepository.getInterviewList(
-                appVersion = appVersion,
-                type = selectedCaseTab.apiParam
-            )
-            interviewListState.value = selectedList
-            counts[selectedCaseTab] = selectedList.size
-
-            CaseTab.entries
-                .filter { it != selectedCaseTab }
-                .forEach { tab ->
-                    val list = caseRepository.getInterviewList(
-                        appVersion = appVersion,
-                        type = tab.apiParam
-                    )
-                    counts[tab] = list.size
-                }
-
-            caseTabCounts = counts
-            isCaseCountsLoaded = true
+                isCaseCountsLoaded = true
+            } catch (e: Exception) {
+                println("DEBUG: refreshAllCounts error: ${e.message}")
+            }
         }
     }
 
@@ -192,10 +196,6 @@ class MainViewModel(
             println("DEBUG: Case List received for ${tab.name} = ${list.size} items")
 
             interviewListState.value = list
-
-            caseTabCounts = caseTabCounts.toMutableMap().apply {
-                this[tab] = list.size
-            }
         }
     }
 

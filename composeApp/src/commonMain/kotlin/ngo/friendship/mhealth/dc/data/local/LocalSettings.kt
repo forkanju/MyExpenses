@@ -13,7 +13,7 @@ class LocalSettings {
     private var _user: User? = null
 
     val isUserLoggedIn
-        get() = token != null
+        get() = !token.isNullOrBlank()
 
     var token
         get() = _token ?: settings.getStringOrNull("token").also { _token = it }

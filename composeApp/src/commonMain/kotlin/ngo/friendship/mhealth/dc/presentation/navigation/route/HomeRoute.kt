@@ -33,7 +33,8 @@ fun EntryProviderScope<NavKey>.homeRoute(
     viewModel: MainViewModel
 ) {
     entry<Screens.Main> {
-        val notificationCount = viewModel.caseTabCounts[CaseTab.Pending] ?: 0
+        val caseTabCounts by viewModel.caseTabCounts.collectAsStateWithLifecycle()
+        val notificationCount = caseTabCounts[CaseTab.Pending] ?: 0
         val userProfile by viewModel.userProfileState.collectAsStateWithLifecycle()
         val pagerState = rememberPagerState(
             initialPage = viewModel.selectedBottomTab.ordinal,

@@ -16,15 +16,17 @@ class LoginRepositoryImpl(
     override suspend fun login(userName: String, password: String): User {
         val request = LoginRequestDto(userName = userName, password = password)
         val response = api.login(request)
-        val data = response.data
-
-        if (data != null) {
+        
+        if (response.responseCode == "01" && response.data != null) {
+            val data = response.data
             val user = data.toDomain(password)
             settings.token = data.token
             settings.user = user
             return user
         } else {
-            error("No user data found")
+            val errorMessage = response.errorDesc ?: "Login failed"
+            println("DEBUG: Login failed. Code: ${response.responseCode}, Desc: $errorMessage")
+            error(errorMessage)
         }
     }
 }

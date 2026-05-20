@@ -43,12 +43,23 @@ class CaseListViewModel(
                         item.beneficiaryCode.contains(query, ignoreCase = true) ||
                         item.location.contains(query, ignoreCase = true) ||
                         item.questionnaireName.contains(query, ignoreCase = true)
+            }.let { list ->
+                try {
+                    list.sortedByDescending { it.startTime }
+                } catch (e: Exception) {
+                    list
+                }
             }
-            .sortedByDescending { it.startTime }
 
         CaseListState(
             isLoading = loading,
-            interviews = allInterviews.filter { it.status == tab.apiParam }.sortedByDescending { it.startTime },
+            interviews = allInterviews.filter { it.status == tab.apiParam }.let { list ->
+                try {
+                    list.sortedByDescending { it.startTime }
+                } catch (e: Exception) {
+                    list
+                }
+            },
             filteredInterviews = filtered,
             selectedTab = tab,
             tabCounts = counts,
@@ -66,7 +77,6 @@ class CaseListViewModel(
 
     init {
         // Initial data loading
-        loadAllTabCounts()
         loadInterviews()
     }
 
@@ -116,19 +126,6 @@ class CaseListViewModel(
             } catch (e: Exception) {
                 _error.value = e.message ?: "Failed to load cases"
                 _isLoading.value = false
-            }
-        }
-    }
-
-    private fun loadAllTabCounts() {
-        viewModelScope.launch {
-            CaseTab.entries.forEach { tab ->
-                try {
-                    // Fetch each tab to populate the repository's internal list
-                    repository.getInterviewList(appVersion = 3069, type = tab.apiParam)
-                } catch (e: Exception) {
-                    // Ignore individual tab loading errors for background count update
-                }
             }
         }
     }

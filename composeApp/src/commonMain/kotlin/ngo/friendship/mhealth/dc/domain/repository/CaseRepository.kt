@@ -38,6 +38,7 @@ interface CaseRepository {
     ): JsonObject
 
     fun observeCases(): Flow<List<Interview>>
+    fun observeCaseCounts(): Flow<Map<String, Int>>
     suspend fun markAsOpened(interviewId: String)
 
 }

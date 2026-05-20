@@ -3,6 +3,7 @@ package ngo.friendship.mhealth.dc.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -45,6 +46,10 @@ class CaseRepositoryImpl(
 
     override fun observeCases(): Flow<List<Interview>> = _interviews.asStateFlow()
 
+    override fun observeCaseCounts(): Flow<Map<String, Int>> = _interviews.map { interviews ->
+        interviews.groupBy { it.status }.mapValues { it.value.size }
+    }
+
     override suspend fun getInterviewList(appVersion: Int, type: String): List<Interview> {
         println("DEBUG: Repository getInterviewList started for type=$type")
         val response = api.getInterviewList(
@@ -59,19 +64,17 @@ class CaseRepositoryImpl(
 
         val result = response.data
             ?.interviewList
-            ?.map { it.toDomain() }
+            ?.map { it.toDomain().copy(status = type) }
             ?: emptyList()
 
         _interviews.update { current ->
             val updated = current.toMutableList()
-            result.forEach { newItem ->
-                val index = updated.indexOfFirst { it.interviewId == newItem.interviewId }
-                if (index != -1) {
-                    updated[index] = newItem
-                } else {
-                    updated.add(newItem)
-                }
-            }
+            // Remove all current items of the same type (status)
+            // so we don't have stale items if they were moved/deleted on server
+            updated.removeAll { it.status == type }
+            
+            // Add all items from the new result
+            updated.addAll(result)
             updated
         }
 

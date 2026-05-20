@@ -192,12 +192,14 @@ fun CaseDetailScreen(
 
             val formContent: @Composable ColumnScope.() -> Unit = {
                 if (state.prescriptionTemplates.isNotEmpty() && !isFromTemplate) {
-                    PrescriptionTemplateChipGroup(
-                        items = state.prescriptionTemplates,
-                        onSelect = { onIntent(CaseIntent.SelectPrescriptionTemplate(it)) },
-                        isAnsweredMode = isAnsweredMode
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    if (!isAnsweredMode){
+                        PrescriptionTemplateChipGroup(
+                            items = state.prescriptionTemplates,
+                            onSelect = { onIntent(CaseIntent.SelectPrescriptionTemplate(it)) },
+                            isAnsweredMode = isAnsweredMode
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
 
                 PrescriptionHeader(

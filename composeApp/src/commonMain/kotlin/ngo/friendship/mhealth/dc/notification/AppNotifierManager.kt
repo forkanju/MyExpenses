@@ -15,6 +15,9 @@ class AppNotifierManager {
     val notificationClickFlow: SharedFlow<PayloadData>
         field = MutableSharedFlow(extraBufferCapacity = 1)
 
+    val notificationReceivedFlow: SharedFlow<PayloadData>
+        field = MutableSharedFlow(extraBufferCapacity = 1)
+
     init {
         if (isDebugBuild) {
             setLogger()
@@ -30,6 +33,13 @@ class AppNotifierManager {
                 println("AppNotifierManager: notification clicked = $data")
                 MainScope().launch {
                     notificationClickFlow.emit(data)
+                }
+            }
+
+            override fun onPayloadData(data: PayloadData) {
+                println("AppNotifierManager: notification payload received = $data")
+                MainScope().launch {
+                    notificationReceivedFlow.emit(data)
                 }
             }
         })

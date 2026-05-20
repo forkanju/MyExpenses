@@ -62,15 +62,16 @@ val networkModule = module {
             }
         }.apply {
             plugin(HttpSend).intercept { request ->
-                settings.token?.let {
-                    request.header(HttpHeaders.Authorization, "Bearer $it")
+                val token = settings.token
+                if (!token.isNullOrBlank()) {
+                    request.header(HttpHeaders.Authorization, "Bearer $token")
                 }
-                execute(request).apply {
-                    if (response.status == HttpStatusCode.Unauthorized) {
-                        settings.token = null
-                        isUnauthorizedFlow.emit(true)
-                    }
+                val call = execute(request)
+                if (call.response.status == HttpStatusCode.Unauthorized) {
+                    settings.token = null
+                    isUnauthorizedFlow.emit(true)
                 }
+                call
             }
         }
     }
