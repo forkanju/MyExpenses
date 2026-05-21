@@ -43,7 +43,7 @@ abstract class BaseViewModel: ViewModel() {
     }
 
     init {
-        viewModelScope.launch(Dispatchers.Main.immediate) {
+        viewModelScope.launch(mainContext) {
             errorFlow.collect {
                 if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
                 if (it.message.length > 50) {
@@ -58,7 +58,7 @@ abstract class BaseViewModel: ViewModel() {
                 }
             }
         }
-        viewModelScope.launch(Dispatchers.Main.immediate) {
+        viewModelScope.launch(mainContext) {
             successFlow.collect {
                 if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
                 if (::snackBarState.isInitialized) {
@@ -70,7 +70,7 @@ abstract class BaseViewModel: ViewModel() {
     }
 
     fun listenSnackbarControllerEvents() {
-        viewModelScope.launch(Dispatchers.Main.immediate) {
+        viewModelScope.launch(mainContext) {
             SnackbarController.events.collect {
                 if (it.message.isBlank()) return@collect
                 if (::snackBarState.isInitialized) {
@@ -88,7 +88,7 @@ abstract class BaseViewModel: ViewModel() {
     }
 
     protected fun launch(
-        dispatcher: CoroutineContext = EmptyCoroutineContext,
+        dispatcher: CoroutineContext = mainContext,
         loading: Loading = Loading.Primary,
         coroutineExceptionHandler: CoroutineExceptionHandler = defaultErrorHandler,
         onEnd: (() -> Unit) = {},

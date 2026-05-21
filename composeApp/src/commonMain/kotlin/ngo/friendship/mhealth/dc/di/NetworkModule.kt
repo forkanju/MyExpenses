@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -56,6 +57,7 @@ val networkModule = module {
                 connectTimeoutMillis = 20_000L
                 socketTimeoutMillis = 20_000L
             }
+            install(HttpCache)
             install(ContentNegotiation) {
                 json(defJson)
                 register(ContentType.Text.Plain, KotlinxSerializationConverter(defJson))

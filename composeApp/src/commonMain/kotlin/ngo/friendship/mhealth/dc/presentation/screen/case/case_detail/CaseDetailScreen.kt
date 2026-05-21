@@ -192,7 +192,7 @@ fun CaseDetailScreen(
 
             val formContent: @Composable ColumnScope.() -> Unit = {
                 if (state.prescriptionTemplates.isNotEmpty() && !isFromTemplate) {
-                    if (!isAnsweredMode){
+                    if (!isAnsweredMode) {
                         PrescriptionTemplateChipGroup(
                             items = state.prescriptionTemplates,
                             onSelect = { onIntent(CaseIntent.SelectPrescriptionTemplate(it)) },
@@ -409,17 +409,17 @@ fun CaseDetailScreen(
                 if (!isFromTemplate) {
                     FormActionRow(
                         leftText = if (state.formState.nextFollowUpDate.isBlank()) {
-                        "Next follow-up:"
-                    } else {
-                        "Next follow-up: ${state.formState.nextFollowUpDate}"
-                    }, leftIcon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = "Calendar",
-                            tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }, rightText = "Save as a template",//Save as a template
+                            "Next follow-up:"
+                        } else {
+                            "Next follow-up: ${state.formState.nextFollowUpDate}"
+                        }, leftIcon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Calendar",
+                                tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }, rightText = "Save as a template",//Save as a template
                         onLeftClick = {
                             onIntent(CaseIntent.ToggleDatePicker)
                         }, onRightClick = {
@@ -536,56 +536,56 @@ fun CaseDetailScreenPrev() {
     FriendshipTheme {
         CaseDetailScreen(
             state = CaseUiState(
-            interviewDetails = InterviewDetails(
-                interviewId = 1,
-                beneficiaryId = 12345,
-                beneficiaryName = "John Doe",
-                beneficiaryCode = "B12345",
-                location = "123 Main Street, Springfield, IL",
-                status = "Completed",
-                startTime = "2026-04-03 10:00 AM",
-                questionnaireId = 2,
-                questionnaireName = "Health Assessment",
-                stCaption = "Screening Completed",
-                printCaption = "For Prescription Fulfillment",
-                userName = "Dr. Smith",
-                isNotification = true,
-                priority = 1,
-                fcmInfo = "fcm_token_1234567890",
-                waitingFor = "Lab Results",
-                stName = "Routine Checkup",
-                description = "Patient is waiting for lab results for further consultation.",
-                details = listOf(
-                    InterviewAnswer(
-                        questionId = 1,
-                        questionName = "Do you have any allergies?",
-                        answer = "No"
-                    ), InterviewAnswer(
-                        questionId = 2,
-                        questionName = "Are you currently taking any medication?",
-                        answer = "Yes, Blood Pressure medication"
+                interviewDetails = InterviewDetails(
+                    interviewId = 1,
+                    beneficiaryId = 12345,
+                    beneficiaryName = "John Doe",
+                    beneficiaryCode = "B12345",
+                    location = "123 Main Street, Springfield, IL",
+                    status = "Completed",
+                    startTime = "2026-04-03 10:00 AM",
+                    questionnaireId = 2,
+                    questionnaireName = "Health Assessment",
+                    stCaption = "Screening Completed",
+                    printCaption = "For Prescription Fulfillment",
+                    userName = "Dr. Smith",
+                    isNotification = true,
+                    priority = 1,
+                    fcmInfo = "fcm_token_1234567890",
+                    waitingFor = "Lab Results",
+                    stName = "Routine Checkup",
+                    description = "Patient is waiting for lab results for further consultation.",
+                    details = listOf(
+                        InterviewAnswer(
+                            questionId = 1,
+                            questionName = "Do you have any allergies?",
+                            answer = "No"
+                        ), InterviewAnswer(
+                            questionId = 2,
+                            questionName = "Are you currently taking any medication?",
+                            answer = "Yes, Blood Pressure medication"
+                        )
+                    )
+                ), medicineList = listOf(
+                    Medicine(
+                        medicineId = 101,
+                        genericName = "Paracetamol",
+                        brandName = "Tylenol",
+                        type = "Pain Reliever",
+                        boxSize = 20,
+                        unitType = "Tablets"
+                    ), Medicine(
+                        medicineId = 102,
+                        genericName = "Amlodipine",
+                        brandName = "Norvasc",
+                        type = "Antihypertensive",
+                        boxSize = 30,
+                        unitType = "Tablets"
                     )
                 )
-            ), medicineList = listOf(
-                Medicine(
-                    medicineId = 101,
-                    genericName = "Paracetamol",
-                    brandName = "Tylenol",
-                    type = "Pain Reliever",
-                    boxSize = 20,
-                    unitType = "Tablets"
-                ), Medicine(
-                    medicineId = 102,
-                    genericName = "Amlodipine",
-                    brandName = "Norvasc",
-                    type = "Antihypertensive",
-                    boxSize = 30,
-                    unitType = "Tablets"
-                )
-            )
-        ), setupData = SetupData(
-            diagnoses = listOf(), investigations = listOf(), referralCenters = listOf()
-        ), onFcmDetailsClick = {}, onCall = {}, onWhatsApp = {}, onBack = {})
+            ), setupData = SetupData(
+                diagnoses = listOf(), investigations = listOf(), referralCenters = listOf()
+            ), onFcmDetailsClick = {}, onCall = {}, onWhatsApp = {}, onBack = {})
     }
 }
 

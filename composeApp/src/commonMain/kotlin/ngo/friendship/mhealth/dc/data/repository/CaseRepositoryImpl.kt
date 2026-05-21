@@ -72,7 +72,7 @@ class CaseRepositoryImpl(
             // Remove all current items of the same type (status)
             // so we don't have stale items if they were moved/deleted on server
             updated.removeAll { it.status == type }
-            
+
             // Add all items from the new result
             updated.addAll(result)
             updated

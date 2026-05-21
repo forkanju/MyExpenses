@@ -146,7 +146,7 @@ data class DoctorFeedbackObject(
     @SerialName("prescription_id")
     val prescriptionId: Long? = null,
 
-    @SerialName("is_called_back")
+    @SerialName("call_back_on_phn")
     val isCalledBack: Long = 0L
 )
 

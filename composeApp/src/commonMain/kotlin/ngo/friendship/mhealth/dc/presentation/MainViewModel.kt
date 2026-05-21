@@ -8,14 +8,20 @@ import androidx.lifecycle.serialization.saved
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
@@ -40,6 +46,7 @@ sealed interface MainUiEvent {
     data object OpenMoreTab : MainUiEvent
 }
 
+@OptIn(FlowPreview::class)
 class MainViewModel(
     val settings: LocalSettings,
     private val caseRepository: CaseRepository,
@@ -97,27 +104,33 @@ class MainViewModel(
         private set
 
     init {
-        // Use a small delay or non-blocking load to avoid race with CaseListViewModel if it's appearing immediately
-        viewModelScope.launch {
-            refreshAllCounts()
+        // Observe backstack to trigger refresh when user lands on Main screen (e.g. after login)
+        viewModelScope.launch(mainContext) {
+            snapshotFlow { backStack }.collect {
+                if (isUserLoggedIn && !isCaseCountsLoaded) {
+                    println("DEBUG: MainViewModel triggered refreshAllCounts via BackStack observer")
+                    refreshAllCounts()
+                }
+            }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(mainContext) {
             notifierManager.notificationClickFlow.collect { data ->
                 println("MainViewModel: Notification click received = $data")
-
                 backStack.replaceWith(Screens.Main)
                 uiEvent.emit(MainUiEvent.OpenCasesTab(CaseTab.Pending))
             }
         }
 
-        viewModelScope.launch {
-            notifierManager.notificationReceivedFlow.collect {
-                refreshAllCounts()
-            }
+        viewModelScope.launch(mainContext) {
+            notifierManager.notificationReceivedFlow
+                .debounce(3000) // Debounce to avoid multiple rapid notifications causing multiple refreshes
+                .collect {
+                    refreshAllCounts()
+                }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(mainContext) {
             isUnauthorizedFlow.collect { isUnauthorized ->
                 if (isUnauthorized) {
                     showError("Session Expired. Please login again.")
@@ -149,28 +162,29 @@ class MainViewModel(
 
     fun selectBottomTab(tab: BottomNavItems) {
         selectedBottomTab = tab
+        if (tab == BottomNavItems.Cases && !isCaseCountsLoaded) {
+            refreshAllCounts()
+        }
     }
 
     fun refreshAllCounts(appVersion: Int = 3069) {
+        if (!isUserLoggedIn) return
+
         launch(loading = Loading.Gone) {
             try {
-                // Fetch the currently selected case tab first
-                caseRepository.getInterviewList(
-                    appVersion = appVersion,
-                    type = selectedCaseTab.apiParam
-                )
-
-                // Then fetch others for counts
-                CaseTab.entries
-                    .filter { it != selectedCaseTab }
-                    .forEach { tab ->
+                println("DEBUG: refreshAllCounts started parallel load")
+                // Load all tab counts in parallel to avoid one failure blocking others
+                CaseTab.entries.map { tab ->
+                    async {
                         caseRepository.getInterviewList(
                             appVersion = appVersion,
                             type = tab.apiParam
                         )
                     }
+                }.awaitAll()
 
                 isCaseCountsLoaded = true
+                println("DEBUG: refreshAllCounts completed successfully")
             } catch (e: Exception) {
                 println("DEBUG: refreshAllCounts error: ${e.message}")
             }
@@ -219,9 +233,8 @@ class MainViewModel(
     }
 
 
-
     fun logout() {
-        viewModelScope.launch {
+        viewModelScope.launch(mainContext) {
             val user = settings.user
             if (user.userName.isNotEmpty()) {
                 notifierManager.unsubscribeFromTopic(FcmTopics.doctorCaseList(user.userName))
@@ -229,6 +242,7 @@ class MainViewModel(
             }
             mainRepository.clearAllData()
             settings.clear()
+            isCaseCountsLoaded = false
             backStack.replaceWith(Screens.Auth)
         }
     }
@@ -240,7 +254,7 @@ class MainViewModel(
     }
 
     fun saveAdvice(title: String, content: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(mainContext) {
             loadingFlow.value = true
             val (isSuccess, errorMessage) = mainRepository.saveAdvice(title, content)
             loadingFlow.value = false
@@ -254,7 +268,7 @@ class MainViewModel(
     }
 
     fun saveInvestigation(title: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(mainContext) {
             loadingFlow.value = true
             val (isSuccess, errorMessage) = mainRepository.saveInvestigation(title)
             loadingFlow.value = false
@@ -277,7 +291,7 @@ class MainViewModel(
     }
 
     fun changePassword(old: String, new: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(mainContext) {
             loadingFlow.value = true
             val (isSuccess, message) = mainRepository.changePassword(old, new)
             loadingFlow.value = false
