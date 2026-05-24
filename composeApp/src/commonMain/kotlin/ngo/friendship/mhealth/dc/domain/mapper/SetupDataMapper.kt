@@ -37,7 +37,7 @@ fun SetupDataResDto.InvestigationDto.toDomain(): Investigation {
 
 fun SetupDataResDto.DiagnosisDto.toDomain(): Diagnosis {
     return Diagnosis(
-        diagId = diagId ?: 0L,
+        diagId = diagId ?: "",
         diagName = diagName.orEmpty()
     )
 }

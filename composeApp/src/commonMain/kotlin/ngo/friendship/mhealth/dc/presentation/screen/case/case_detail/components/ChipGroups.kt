@@ -137,9 +137,9 @@ fun InvestigationChipGroup(
 @Composable
 fun DiagnosisChipGroupPreview() {
     val sampleDiagnoses = listOf(
-        Diagnosis(diagId = 1, diagName = "Fever"),
-        Diagnosis(diagId = 2, diagName = "Cough"),
-        Diagnosis(diagId = 3, diagName = "Headache")
+        Diagnosis(diagId = "1", diagName = "Fever"),
+        Diagnosis(diagId = "2", diagName = "Cough"),
+        Diagnosis(diagId = "3", diagName = "Headache")
     )
     FriendshipTheme {
         DiagnosisChipGroup(
@@ -153,9 +153,9 @@ fun DiagnosisChipGroupPreview() {
 @Composable
 fun DiagnosisChipGroupAnsweredPreview() {
     val sampleDiagnoses = listOf(
-        Diagnosis(diagId = 1, diagName = "Fever"),
-        Diagnosis(diagId = 2, diagName = "Cough"),
-        Diagnosis(diagId = 3, diagName = "Headache")
+        Diagnosis(diagId = "1", diagName = "Fever"),
+        Diagnosis(diagId = "2", diagName = "Cough"),
+        Diagnosis(diagId = "3", diagName = "Headache")
     )
     FriendshipTheme {
         DiagnosisChipGroup(

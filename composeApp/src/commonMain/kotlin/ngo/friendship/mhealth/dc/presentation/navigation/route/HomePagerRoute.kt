@@ -26,7 +26,6 @@ fun HomePagerRoute(
     mainViewModel: MainViewModel,
     modifier: Modifier
 ) {
-    val isLoading by mainViewModel.loadingSecondaryFlow.collectAsStateWithLifecycle()
     var forcedCaseTab by remember { mutableStateOf<CaseTab?>(null) }
 
     LaunchedEffect(Unit) {
@@ -67,46 +66,31 @@ fun HomePagerRoute(
         mainViewModel.selectBottomTab(currentTab)
     }
 
-    PullToRefreshBox(
-        isRefreshing = isLoading,
-        onRefresh = {
-            when (BottomNavItems.entries[pagerState.currentPage]) {
-                BottomNavItems.Home -> Unit
-                BottomNavItems.Cases -> {
-                    // Refresh is now handled internally by CaseListViewModel
-                    // or can be triggered via a shared event if needed.
-                }
-
-                BottomNavItems.More -> Unit
-            }
-        },
+    HorizontalPager(
+        state = pagerState,
         modifier = modifier
-    ) {
-        HorizontalPager(
-            state = pagerState,
-        ) { page ->
-            when (BottomNavItems.entries[page]) {
+    ) { page ->
+        when (BottomNavItems.entries[page]) {
 
-                BottomNavItems.Home -> HomeScreen()
+            BottomNavItems.Home -> HomeScreen()
 
-                BottomNavItems.Cases -> CaseListScreen(
-                    initialTab = forcedCaseTab,
-                    onTabConsumed = { forcedCaseTab = null },
-                    onNavigateToDetails = { interview, sourceTab ->
-                        forcedCaseTab = null // Clear it once we navigate away or interact
-                        mainViewModel.openCase(
-                            interview = interview,
-                            sourceTab = sourceTab
-                        )
-                    }
-                )
+            BottomNavItems.Cases -> CaseListScreen(
+                initialTab = forcedCaseTab,
+                onTabConsumed = { forcedCaseTab = null },
+                onNavigateToDetails = { interview, sourceTab ->
+                    forcedCaseTab = null // Clear it once we navigate away or interact
+                    mainViewModel.openCase(
+                        interview = interview,
+                        sourceTab = sourceTab
+                    )
+                }
+            )
 
-                BottomNavItems.More -> DashboardScreen(
-                    onNavigate = { route ->
-                        mainViewModel.backStack.add(route)
-                    }
-                )
-            }
+            BottomNavItems.More -> DashboardScreen(
+                onNavigate = { route ->
+                    mainViewModel.backStack.add(route)
+                }
+            )
         }
     }
 }

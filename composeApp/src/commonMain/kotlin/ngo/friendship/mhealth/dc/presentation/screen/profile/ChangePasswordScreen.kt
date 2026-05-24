@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.components.PasswordSecureFloatingLabeledTextField
 import ngo.friendship.mhealth.dc.presentation.components.PrimaryButton
@@ -86,15 +87,15 @@ fun ChangePasswordScreen(
                 onClick = {
                     focusManager.clearFocus()
                     if (oldPassword.isBlank()) {
-                        SnackbarController.sendEvent("Please enter current password")
+                        SnackbarController.sendEvent("Please enter current password", type = SnackbarType.WARNING)
                         return@PrimaryButton
                     }
                     if (newPassword.isBlank()) {
-                        SnackbarController.sendEvent("Please enter new password")
+                        SnackbarController.sendEvent("Please enter new password", type = SnackbarType.WARNING)
                         return@PrimaryButton
                     }
                     if (newPassword != confirmPassword) {
-                        SnackbarController.sendEvent("Passwords do not match")
+                        SnackbarController.sendEvent("Passwords do not match", type = SnackbarType.WARNING)
                         return@PrimaryButton
                     }
                     onChangePassword(oldPassword, newPassword)

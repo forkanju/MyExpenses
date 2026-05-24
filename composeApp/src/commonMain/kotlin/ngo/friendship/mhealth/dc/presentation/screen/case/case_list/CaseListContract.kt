@@ -5,6 +5,7 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.C
 
 data class CaseListState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val interviews: List<Interview> = emptyList(),
     val filteredInterviews: List<Interview> = emptyList(),
     val selectedTab: CaseTab = CaseTab.Pending,

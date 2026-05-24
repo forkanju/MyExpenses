@@ -1,5 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.base
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
@@ -15,8 +17,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ngo.friendship.mhealth.dc.utils.currentTimestamp
 
+enum class SnackbarType {
+    SUCCESS, ERROR, WARNING, DEFAULT
+}
+
+class ColoredSnackbarVisuals(
+    override val message: String,
+    override val actionLabel: String? = null,
+    override val duration: SnackbarDuration = SnackbarDuration.Short,
+    override val withDismissAction: Boolean = false,
+    val type: SnackbarType = SnackbarType.DEFAULT
+) : SnackbarVisuals
+
 data class SnackbarEvent(
     val message: String,
+    val type: SnackbarType = SnackbarType.DEFAULT,
     val action: SnackbarAction? = null
 )
 
@@ -35,6 +50,7 @@ object SnackbarController {
 
     fun sendEvent(
         message: String,
+        type: SnackbarType = SnackbarType.DEFAULT,
         actionLabel: String? = null,
         onAction: suspend () -> Unit = {}
     ) {
@@ -48,6 +64,7 @@ object SnackbarController {
             _events.send(
                 SnackbarEvent(
                     message = message,
+                    type = type,
                     action = actionLabel?.let {
                         SnackbarAction(
                             label = actionLabel,

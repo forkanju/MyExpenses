@@ -32,6 +32,7 @@ abstract class BaseViewModel: ViewModel() {
 
     val errorFlow = MutableSharedFlow<Info>()
     val successFlow = MutableSharedFlow<Info>()
+    val warningFlow = MutableSharedFlow<Info>()
     val loadingFlow = MutableStateFlow(false)
     val loadingSecondaryFlow = MutableStateFlow(false)
 
@@ -53,7 +54,12 @@ abstract class BaseViewModel: ViewModel() {
                 } else {
                     if (::snackBarState.isInitialized) {
                         snackBarState.currentSnackbarData?.dismiss()
-                        snackBarState.showSnackbar(it.message)
+                        snackBarState.showSnackbar(
+                            ColoredSnackbarVisuals(
+                                message = it.message,
+                                type = SnackbarType.ERROR
+                            )
+                        )
                     }
                 }
             }
@@ -63,7 +69,26 @@ abstract class BaseViewModel: ViewModel() {
                 if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
                 if (::snackBarState.isInitialized) {
                     snackBarState.currentSnackbarData?.dismiss()
-                    snackBarState.showSnackbar(it.message)
+                    snackBarState.showSnackbar(
+                        ColoredSnackbarVisuals(
+                            message = it.message,
+                            type = SnackbarType.SUCCESS
+                        )
+                    )
+                }
+            }
+        }
+        viewModelScope.launch(mainContext) {
+            warningFlow.collect {
+                if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
+                if (::snackBarState.isInitialized) {
+                    snackBarState.currentSnackbarData?.dismiss()
+                    snackBarState.showSnackbar(
+                        ColoredSnackbarVisuals(
+                            message = it.message,
+                            type = SnackbarType.WARNING
+                        )
+                    )
                 }
             }
         }
@@ -76,9 +101,12 @@ abstract class BaseViewModel: ViewModel() {
                 if (::snackBarState.isInitialized) {
                     snackBarState.currentSnackbarData?.dismiss()
                     val result = snackBarState.showSnackbar(
-                        message = it.message,
-                        actionLabel = it.action?.label,
-                        withDismissAction = it.action?.onAction != null,
+                        ColoredSnackbarVisuals(
+                            message = it.message,
+                            actionLabel = it.action?.label,
+                            withDismissAction = it.action?.onAction != null,
+                            type = it.type
+                        )
                     )
                     if (result == SnackbarResult.ActionPerformed)
                         it.action?.onAction()
@@ -126,6 +154,12 @@ abstract class BaseViewModel: ViewModel() {
     fun showSuccess(message: String){
         launch(mainContext, loading = Loading.Gone) {
             successFlow.emit(Info(message))
+        }
+    }
+
+    fun showWarning(message: String){
+        launch(mainContext, loading = Loading.Gone) {
+            warningFlow.emit(Info(message))
         }
     }
 

@@ -170,7 +170,7 @@ class MainViewModel(
     fun refreshAllCounts(appVersion: Int = 3069) {
         if (!isUserLoggedIn) return
 
-        launch(loading = Loading.Gone) {
+        launch(loading = Loading.Secondary) {
             try {
                 println("DEBUG: refreshAllCounts started parallel load")
                 // Load all tab counts in parallel to avoid one failure blocking others

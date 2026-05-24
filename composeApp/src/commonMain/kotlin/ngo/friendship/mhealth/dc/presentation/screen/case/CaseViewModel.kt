@@ -153,7 +153,7 @@ class CaseViewModel(
                             (it.medicineName == intent.item.medicineName)
                 }
                 if (exists) {
-                    showError("Duplicate same medicine entry not allowed!")
+                    showWarning("Duplicate same medicine entry not allowed!")
                 } else {
                     updateFormState(_state.value.formState.copy(prescriptions = _state.value.formState.prescriptions + intent.item))
                 }
@@ -471,91 +471,130 @@ class CaseViewModel(
 
     private fun saveDoctorFeedback() {
         launch {
-            if (_state.value.formState.prescriptions.isNotEmpty()) {
-                val prescriptions = _state.value.formState.prescriptions
-                val hasDuplicates = prescriptions.groupBy { it.medicineId ?: it.medicineName }.any { it.value.size > 1 }
-                
-                if (hasDuplicates) {
-                    showError("Duplicate same medicine entry not allowed!")
+            val currentState = _state.value
+            val formState = currentState.formState
+            val isFromTemplate = currentState.interviewDetails.interviewId == -1L
+
+            // 1. Prescription Validation (Always required)
+            if (formState.prescriptions.isEmpty()) {
+                showWarning("Please add the prescriptions")
+                return@launch
+            }
+
+            // Check for duplicate medicines
+            val duplicates = formState.prescriptions.groupBy { it.medicineId ?: it.medicineName }.any { it.value.size > 1 }
+            if (duplicates) {
+                showWarning("Duplicate same medicine entry not allowed!")
+                return@launch
+            }
+
+            // 2. Case-specific field validation (Skip if saving as Template)
+            if (!isFromTemplate) {
+                if (formState.selectedDiagnoses.isEmpty()) {
+                    showWarning("Please add at least one diagnosis")
                     return@launch
                 }
 
-                _state.update { it.copy(isSaving = true) }
-                try {
-                    val currentState = _state.value
-                    val isFromTemplate = currentState.interviewDetails.interviewId == -1L
-                    val isUpdate = isFromTemplate && currentState.prescriptionId != null
+                if (formState.investigationResult.isNotBlank() && formState.selectedInvestigations.isEmpty()) {
+                    showWarning("Please add an investigation for the result provided")
+                    return@launch
+                }
 
-                    // Update formState with correct template save status and comments for FCM if needed
-                    val finalFormState = currentState.formState.copy(
-                        isPresTempSave = if (isFromTemplate) 1 else currentState.formState.isPresTempSave,
-                        prescriptionId = currentState.prescriptionId,
-                        prescriptionName = if (isFromTemplate) currentState.templateName else currentState.formState.prescriptionName,
-                        isGlobalPrescription = if (isFromTemplate) (if (currentState.isGlobalTemplate) 1 else 0) else currentState.formState.isGlobalPrescription,
-                        commentsForFcm = if (!isFromTemplate && currentState.isPrescriptionWithSmsChecked && currentState.customMessageState.isFcmChecked) {
-                            currentState.customMessageState.messageText
-                        } else {
-                            currentState.formState.commentsForFcm
+                if (formState.doctorAdvice.isBlank()) {
+                    showWarning("Please enter doctor advice")
+                    return@launch
+                }
+
+                if (formState.commentsForFcm.isBlank() && !currentState.isPrescriptionWithSmsChecked) {
+                    showWarning("Please enter comments for FCM")
+                    return@launch
+                }
+
+                if (formState.doctorNotes.isBlank()) {
+                    showWarning("Please enter doctor notes")
+                    return@launch
+                }
+
+                // Next Follow Up Date is optional as per requirement
+            } else {
+                // Template specific validation
+                if (currentState.templateName.isBlank()) {
+                    showWarning("Please enter template name")
+                    return@launch
+                }
+            }
+
+            _state.update { it.copy(isSaving = true) }
+            try {
+                val isUpdate = isFromTemplate && currentState.prescriptionId != null
+
+                // Update formState with correct template save status and comments for FCM if needed
+                val finalFormState = formState.copy(
+                    isPresTempSave = if (isFromTemplate) 1 else formState.isPresTempSave,
+                    prescriptionId = currentState.prescriptionId,
+                    prescriptionName = if (isFromTemplate) currentState.templateName else formState.prescriptionName,
+                    isGlobalPrescription = if (isFromTemplate) (if (currentState.isGlobalTemplate) 1 else 0) else formState.isGlobalPrescription,
+                    commentsForFcm = if (!isFromTemplate && currentState.isPrescriptionWithSmsChecked && currentState.customMessageState.isFcmChecked) {
+                        currentState.customMessageState.messageText
+                    } else {
+                        formState.commentsForFcm
+                    }
+                )
+
+                // First, save the doctor feedback
+                val feedbackResult = repository.saveDoctorFeedback(formState = finalFormState)
+
+                if (!feedbackResult.isSuccess) {
+                    _state.update { it.copy(isSaving = false) }
+                    showError(feedbackResult.message)
+                    return@launch
+                }
+
+                // Only send SMS and update status if it's a real case (not a template creation)
+                if (!isFromTemplate) {
+                    // If SMS is checked, send the SMS
+                    if (currentState.isPrescriptionWithSmsChecked) {
+                        val smsText = currentState.customMessageState.messageText
+                        val phoneNumber = currentState.customMessageState.phoneNumber.ifBlank {
+                            currentState.fcmProfileState.fcmProfile?.mobileNo
+                                ?: formState.mobile
                         }
+
+                        if (phoneNumber.isNotBlank() && smsText.isNotBlank()) {
+                            try {
+                                repository.sendSms(msisdn = phoneNumber, message = smsText)
+                                "SMS sent successfully to $phoneNumber".log("CASE_DEBUG")
+                            } catch (e: Exception) {
+                                "Failed to send SMS: ${e.message}".log("CASE_DEBUG")
+                            }
+                        }
+                    }
+
+                    // After successful save, update interview status to "Close"
+                    val (statusSuccess, statusError) = repository.updateInterviewStatus(
+                        interviewId = formState.interviewId ?: 0,
+                        status = CaseTab.Answered.apiParam // "Close"
                     )
-
-                    // First, save the doctor feedback
-                    val feedbackResult = repository.saveDoctorFeedback(formState = finalFormState)
-
-                    if (!feedbackResult.isSuccess) {
+                    if (!statusSuccess) {
                         _state.update { it.copy(isSaving = false) }
-                        showError(feedbackResult.message)
+                        showError(statusError ?: "Failed to update interview status")
                         return@launch
                     }
-
-                    // Only send SMS and update status if it's a real case (not a template creation)
-                    if (!isFromTemplate) {
-                        // If SMS is checked, send the SMS
-                        if (currentState.isPrescriptionWithSmsChecked) {
-                            val smsText = currentState.customMessageState.messageText
-                            val phoneNumber = currentState.customMessageState.phoneNumber.ifBlank {
-                                currentState.fcmProfileState.fcmProfile?.mobileNo
-                                    ?: currentState.formState.mobile
-                            }
-
-                            if (phoneNumber.isNotBlank() && smsText.isNotBlank()) {
-                                try {
-                                    repository.sendSms(msisdn = phoneNumber, message = smsText)
-                                    "SMS sent successfully to $phoneNumber".log("CASE_DEBUG")
-                                } catch (e: Exception) {
-                                    "Failed to send SMS: ${e.message}".log("CASE_DEBUG")
-                                }
-                            }
-                        }
-
-                        // After successful save, update interview status to "Close"
-                        val (statusSuccess, statusError) = repository.updateInterviewStatus(
-                            interviewId = currentState.formState.interviewId ?: 0,
-                            status = CaseTab.Answered.apiParam // "Close"
-                        )
-                        if (!statusSuccess) {
-                            _state.update { it.copy(isSaving = false) }
-                            showError(statusError ?: "Failed to update interview status")
-                            return@launch
-                        }
-                    }
-
-                    val successMessage = when {
-                        isUpdate -> "Template updated successfully"
-                        isFromTemplate -> "Template saved successfully"
-                        else -> "Feedback saved successfully"
-                    }
-                    showSuccess(successMessage)
-
-                    _state.update { it.copy(isSaving = false) }
-                    _uiEvent.send(CaseUiEvent.NavigateBack)
-                } catch (e: Exception) {
-                    _state.update { it.copy(isSaving = false) }
-                    "Error saving feedback: ${e.message}".log("CASE_DEBUG")
-                    showError(e.message ?: "Something went wrong!")
                 }
-            } else {
-                showSuccess("Please add the prescriptions")
+
+                val successMessage = when {
+                    isUpdate -> "Template updated successfully"
+                    isFromTemplate -> "Template saved successfully"
+                    else -> "Feedback saved successfully"
+                }
+                showSuccess(successMessage)
+
+                _state.update { it.copy(isSaving = false) }
+                _uiEvent.send(CaseUiEvent.NavigateBack)
+            } catch (e: Exception) {
+                _state.update { it.copy(isSaving = false) }
+                "Error saving feedback: ${e.message}".log("CASE_DEBUG")
+                showError(e.message ?: "Something went wrong!")
             }
         }
     }
@@ -594,39 +633,37 @@ class CaseViewModel(
                         }
 
                         val selectedDiagnoses = mutableListOf<Diagnosis>()
-                        if (feedback.diagId != null && feedback.diagId != 0L) {
+                        if (!feedback.diagId.isNullOrBlank() && feedback.diagId != "0") {
                             setupData?.diagnoses?.find { it.diagId == feedback.diagId }?.let {
                                 selectedDiagnoses.add(it)
                             }
                         } else if (!feedback.diagDesc.isNullOrBlank()) {
-                            // If ID is 0 but description exists, maybe it's a custom diagnosis or we try to match by name
-                            setupData?.diagnoses?.find {
-                                it.diagName.equals(
-                                    feedback.diagDesc,
-                                    ignoreCase = true
-                                )
-                            }?.let {
-                                selectedDiagnoses.add(it)
-                            } ?: run {
-                                selectedDiagnoses.add(Diagnosis(diagName = feedback.diagDesc))
+                            // Handle comma separated diagnoses
+                            val names = feedback.diagDesc.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                            names.forEach { name ->
+                                setupData?.diagnoses?.find {
+                                    it.diagName.equals(name, ignoreCase = true)
+                                }?.let {
+                                    selectedDiagnoses.add(it)
+                                } ?: run {
+                                    selectedDiagnoses.add(Diagnosis(diagName = name))
+                                }
                             }
                         }
 
                         val selectedInvestigations = mutableListOf<Investigation>()
                         if (!feedback.investigationAdvice.isNullOrBlank()) {
-                            setupData?.investigations?.find {
-                                it.investigationName.equals(
-                                    feedback.investigationAdvice,
-                                    ignoreCase = true
-                                ) ||
-                                        it.investigationCode.equals(
-                                            feedback.investigationAdvice,
-                                            ignoreCase = true
-                                        )
-                            }?.let {
-                                selectedInvestigations.add(it)
-                            } ?: run {
-                                selectedInvestigations.add(Investigation(investigationName = feedback.investigationAdvice))
+                            // Handle comma separated investigations
+                            val names = feedback.investigationAdvice.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                            names.forEach { name ->
+                                setupData?.investigations?.find {
+                                    it.investigationName.equals(name, ignoreCase = true) ||
+                                            it.investigationCode.equals(name, ignoreCase = true)
+                                }?.let {
+                                    selectedInvestigations.add(it)
+                                } ?: run {
+                                    selectedInvestigations.add(Investigation(investigationName = name))
+                                }
                             }
                         }
 

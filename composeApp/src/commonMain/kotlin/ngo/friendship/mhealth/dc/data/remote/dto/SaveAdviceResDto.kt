@@ -8,6 +8,7 @@ data class SaveAdviceResDto(
     @SerialName("responseType") val responseType: String? = null,
     @SerialName("data") val data: Data? = null,
     @SerialName("errorDesc") val errorDesc: String? = null,
+    @SerialName("errorCode") val errorCode: String? = null,
     @SerialName("responseCode") val responseCode: String? = null,
     @SerialName("responseName") val responseName: String? = null,
     @SerialName("param1") val param1: Map<String, String>? = null

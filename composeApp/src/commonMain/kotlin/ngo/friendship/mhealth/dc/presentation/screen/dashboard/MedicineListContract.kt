@@ -3,6 +3,8 @@ package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
 
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
+
 data class MedicineListState(
     val isLoading: Boolean = false,
     val medicines: List<Medicine> = emptyList(),
@@ -22,5 +24,5 @@ sealed interface MedicineListIntent {
 }
 
 sealed interface MedicineListEffect {
-    data class ShowSnackbar(val message: String) : MedicineListEffect
+    data class ShowSnackbar(val message: String, val type: SnackbarType = SnackbarType.DEFAULT) : MedicineListEffect
 }

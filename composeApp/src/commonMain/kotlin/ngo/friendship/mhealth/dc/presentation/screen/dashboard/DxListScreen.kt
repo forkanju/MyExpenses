@@ -19,6 +19,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,6 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ngo.friendship.mhealth.dc.presentation.base.ColoredSnackbarVisuals
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.CommonNewItemDialog
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
@@ -79,7 +82,12 @@ fun DxListScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 DxListEffect.DxCreated -> {
-                    snackbarHostState.showSnackbar("Diagnosis saved successfully")
+                    snackbarHostState.showSnackbar(
+                        ColoredSnackbarVisuals(
+                            message = "Diagnosis saved successfully",
+                            type = SnackbarType.SUCCESS
+                        )
+                    )
                 }
             }
         }
@@ -87,7 +95,12 @@ fun DxListScreen(
 
     LaunchedEffect(state.error) {
         state.error?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(
+                ColoredSnackbarVisuals(
+                    message = it,
+                    type = SnackbarType.ERROR
+                )
+            )
             viewModel.onIntent(DxListIntent.ClearError)
         }
     }
@@ -109,7 +122,24 @@ fun DxListContent(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            snackbarHost = { SnackbarHost(snackbarHostState) },
+            snackbarHost = {
+                SnackbarHost(snackbarHostState) { data ->
+                    val visuals = data.visuals as? ColoredSnackbarVisuals
+                    val containerColor = when (visuals?.type) {
+                        SnackbarType.SUCCESS -> Color(0xFF4CAF50)
+                        SnackbarType.ERROR -> Color(0xFFE57373)
+                        else -> Color.DarkGray
+                    }
+                    val contentColor = Color.White
+
+                    Snackbar(
+                        snackbarData = data,
+                        containerColor = containerColor,
+                        contentColor = contentColor,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                }
+            },
             topBar = {
                 CommonTopBar(
                     title = "DX List",

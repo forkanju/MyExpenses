@@ -219,7 +219,8 @@ fun CaseDetailScreen(
                         placeholder = "Enter template name",
                         value = state.templateName,
                         onValueChange = { onIntent(CaseIntent.UpdateTemplateName(it)) },
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                 }
@@ -229,21 +230,25 @@ fun CaseDetailScreen(
                         label = "DX",
                         placeholder = "Type",
                         options = setupData.diagnoses,
-                        selected = null,//selectedDiagnosis
+                        selected = if (isAnsweredMode) state.formState.selectedDiagnoses.firstOrNull() else null,
                         getLabel = { it.diagName },
                         onSelectedChange = { selected ->
                             onIntent(CaseIntent.AddDiagnosis(selected))
                         },
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
 
                     if (state.formState.selectedDiagnoses.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DiagnosisChipGroup(
-                            items = state.formState.selectedDiagnoses, onRemove = { item ->
-                                onIntent(CaseIntent.RemoveDiagnosis(item))
-                            }, isAnsweredMode = isAnsweredMode
-                        )
+                        val displayDiagnoses = if (isAnsweredMode) state.formState.selectedDiagnoses.drop(1) else state.formState.selectedDiagnoses
+                        if (displayDiagnoses.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            DiagnosisChipGroup(
+                                items = displayDiagnoses, onRemove = { item ->
+                                    onIntent(CaseIntent.RemoveDiagnosis(item))
+                                }, isAnsweredMode = isAnsweredMode
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -277,7 +282,8 @@ fun CaseDetailScreen(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                     ),
-                    enabled = !isAnsweredMode
+                    enabled = !isAnsweredMode,
+                    isAnsweredMode = isAnsweredMode
                 )
 
                 if (isFromTemplate) {
@@ -294,7 +300,8 @@ fun CaseDetailScreen(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                         ),
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -310,7 +317,8 @@ fun CaseDetailScreen(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
                         ),
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -323,21 +331,25 @@ fun CaseDetailScreen(
                         label = "Investigation",
                         placeholder = "Type",
                         options = setupData.investigations,
-                        selected = null,
+                        selected = if (isAnsweredMode) state.formState.selectedInvestigations.firstOrNull() else null,
                         getLabel = { it.investigationName },
                         onSelectedChange = { selected ->
                             onIntent(CaseIntent.AddInvestigation(selected))
                         },
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
 
                     if (state.formState.selectedInvestigations.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        InvestigationChipGroup(
-                            items = state.formState.selectedInvestigations, onRemove = { item ->
-                                onIntent(CaseIntent.RemoveInvestigation(item))
-                            }, isAnsweredMode = isAnsweredMode
-                        )
+                        val displayInvestigations = if (isAnsweredMode) state.formState.selectedInvestigations.drop(1) else state.formState.selectedInvestigations
+                        if (displayInvestigations.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            InvestigationChipGroup(
+                                items = displayInvestigations, onRemove = { item ->
+                                    onIntent(CaseIntent.RemoveInvestigation(item))
+                                }, isAnsweredMode = isAnsweredMode
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -355,7 +367,8 @@ fun CaseDetailScreen(
                         ),
                         enabled = !isAnsweredMode,
                         singleLine = false,
-                        maxLines = 2
+                        maxLines = 2,
+                        isAnsweredMode = isAnsweredMode
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -370,7 +383,8 @@ fun CaseDetailScreen(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                         ),
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -384,7 +398,8 @@ fun CaseDetailScreen(
                         onSelectedChange = { selected ->
                             onIntent(CaseIntent.UpdateReferralCenter(selected))
                         },
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -400,7 +415,8 @@ fun CaseDetailScreen(
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
                         ),
-                        enabled = !isAnsweredMode
+                        enabled = !isAnsweredMode,
+                        isAnsweredMode = isAnsweredMode
                     )
                 }
 

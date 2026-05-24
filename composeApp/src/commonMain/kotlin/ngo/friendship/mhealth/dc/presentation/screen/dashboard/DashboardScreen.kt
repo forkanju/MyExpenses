@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.collectLatest
+import ngo.friendship.mhealth.dc.presentation.base.ColoredSnackbarVisuals
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.DashboardCard
 import ngo.friendship.mhealth.dc.theme.FontSize
@@ -65,9 +68,26 @@ fun DashboardScreen(
             when (effect) {
                 is DashboardEffect.NavigateTo -> onNavigate(effect.route)
                 is DashboardEffect.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(effect.message)
+                    snackbarHostState.showSnackbar(
+                        ColoredSnackbarVisuals(
+                            message = effect.message,
+                            type = effect.type
+                        )
+                    )
                 }
             }
+        }
+    }
+
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(
+                ColoredSnackbarVisuals(
+                    message = it,
+                    type = SnackbarType.ERROR
+                )
+            )
+            viewModel.onIntent(DashboardIntent.ClearError)
         }
     }
 
@@ -75,11 +95,18 @@ fun DashboardScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
-        DashboardContent(
-            modifier = modifier.padding(padding),
-            state = state,
-            onIntent = viewModel::onIntent
-        )
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { viewModel.onIntent(DashboardIntent.Refresh) },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            DashboardContent(
+                state = state,
+                onIntent = viewModel::onIntent
+            )
+        }
     }
 }
 

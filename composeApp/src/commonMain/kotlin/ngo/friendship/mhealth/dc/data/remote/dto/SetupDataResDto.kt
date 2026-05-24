@@ -65,7 +65,7 @@ data class SetupDataResDto(
     @Serializable
     data class DiagnosisDto(
         @SerialName("DIAG_ID")
-        val diagId: Long? = null,
+        val diagId: String? = null,
         @SerialName("DIAG_NAME")
         val diagName: String? = null
     )

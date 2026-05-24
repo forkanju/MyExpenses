@@ -251,7 +251,7 @@ suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
 
     if (!status.isSuccess()) error(massage)
     if (body == null) error(massage)
-    if (baseResponse.responseCode == null || baseResponse.responseCode != "01") error(massage)
+    if (baseResponse.responseCode == null || baseResponse.responseCode != "01" || baseResponse.errorCode == "01") error(massage)
     return body
 }
 

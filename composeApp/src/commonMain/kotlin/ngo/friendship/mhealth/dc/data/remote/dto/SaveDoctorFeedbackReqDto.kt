@@ -153,7 +153,7 @@ data class DoctorFeedbackObject(
 @Serializable
 data class IdNameItem(
     @SerialName("id")
-    val id: Long,
+    val id: String,
     @SerialName("name")
     val name: String
 )
@@ -161,7 +161,7 @@ data class IdNameItem(
 @Serializable
 data class QuestionAnswerItem(
     @SerialName("question_id")
-    val questionId: Long,
+    val questionId: String,
     @SerialName("answer")
     val answer: String
 )
@@ -190,7 +190,7 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
         nextFollowUpDate = nextFollowUpDate,
         investigation = selectedInvestigations.map {
             IdNameItem(
-                id = it.investigationId,
+                id = it.investigationId.toString(),
                 name = it.investigationName
             )
         },

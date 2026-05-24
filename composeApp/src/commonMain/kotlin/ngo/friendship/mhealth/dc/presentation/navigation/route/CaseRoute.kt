@@ -14,6 +14,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseIntent
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseUiEvent
+import ngo.friendship.mhealth.dc.presentation.base.ColoredSnackbarVisuals
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.CaseDetailScreen
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
@@ -67,7 +68,12 @@ fun EntryProviderScope<NavKey>.caseRoute(
             viewModel.uiEvent.collect { event ->
                 when (event) {
                     is CaseUiEvent.ShowSnackbar -> {
-                        snackBarState.showSnackbar(event.message)
+                        snackBarState.showSnackbar(
+                            ColoredSnackbarVisuals(
+                                message = event.message,
+                                type = event.type
+                            )
+                        )
                     }
 
                     CaseUiEvent.NavigateBack -> {

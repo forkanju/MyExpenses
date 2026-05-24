@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,10 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
-import androidx.compose.foundation.clickable
-import androidx.compose.runtime.LaunchedEffect
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
-import ngo.friendship.mhealth.dc.presentation.screen.dashboard.PrescriptionTemplateListIntent
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.utils.toUiDate
 import org.koin.compose.viewmodel.koinViewModel
@@ -58,7 +57,7 @@ fun PrescriptionTemplateListScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    
+
     // Trigger load templates if not loaded
     LaunchedEffect(Unit) {
         viewModel.onIntent(PrescriptionTemplateListIntent.LoadTemplates)
@@ -116,7 +115,13 @@ fun PrescriptionTemplateListScreen(
                                 template = template,
                                 onClick = { onTemplateClick(template) },
                                 onEdit = { onTemplateClick(template) },
-                                onDelete = { viewModel.onIntent(PrescriptionTemplateListIntent.DeleteTemplate(template)) }
+                                onDelete = {
+                                    viewModel.onIntent(
+                                        PrescriptionTemplateListIntent.DeleteTemplate(
+                                            template
+                                        )
+                                    )
+                                }
                             )
                             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
                         }

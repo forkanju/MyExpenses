@@ -17,7 +17,7 @@ class LoginRepositoryImpl(
         val request = LoginRequestDto(userName = userName, password = password)
         val response = api.login(request)
         
-        if (response.responseCode == "01" && response.data != null) {
+        if (response.responseCode == "01" && response.errorCode != "01" && response.data != null) {
             val data = response.data
             val user = data.toDomain(password)
             settings.token = data.token

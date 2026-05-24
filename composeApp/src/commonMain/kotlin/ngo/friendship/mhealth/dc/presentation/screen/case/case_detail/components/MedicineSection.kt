@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.components.DoseAndDrugAutoCompleteRow
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.MedicineComposerState
 import ngo.friendship.mhealth.dc.theme.DarkerGray
@@ -246,11 +247,11 @@ fun MedicineComposerCard(
                     val type = state.doseType
 
                     if (type.isBlank()) {
-                        SnackbarController.sendEvent("Please select a medicine type")
+                        SnackbarController.sendEvent("Please select a medicine type", type = SnackbarType.WARNING)
                     } else if (genericName.isBlank()) {
-                        SnackbarController.sendEvent("Please enter a generic name")
+                        SnackbarController.sendEvent("Please enter a generic name", type = SnackbarType.WARNING)
                     } else if (brandName.isBlank()) {
-                        SnackbarController.sendEvent("Please enter a medicine name")
+                        SnackbarController.sendEvent("Please enter a medicine name", type = SnackbarType.WARNING)
                     } else {
                         val finalMedicineName = "$type: $genericName ($brandName)"
                         val mealTimeText = when (state.mealTime) {

@@ -40,7 +40,6 @@ class CaseRepositoryImpl(
     private val localSettings: LocalSettings,
     private val appDatabase: AppDatabase
 ) : CaseRepository {
-
     private val _interviews = MutableStateFlow<List<Interview>>(emptyList())
     private val medicineDao = appDatabase.medicineDao()
 
@@ -201,7 +200,7 @@ class CaseRepositoryImpl(
                 status = status
             )
         )
-        val success = response.responseCode == "01"
+        val success = response.responseCode == "01" && response.errorCode != "01"
         if (success) {
             _interviews.update { current ->
                 current.map {

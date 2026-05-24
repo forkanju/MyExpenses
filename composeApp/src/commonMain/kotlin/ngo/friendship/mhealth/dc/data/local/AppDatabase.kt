@@ -11,9 +11,9 @@ import ngo.friendship.mhealth.dc.domain.model.*
         Diagnosis::class,
         ReferralCenter::class,
         UserProfile::class,
-        Medicine::class
+        Medicine::class,
     ],
-    version = 1
+    version = 2
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {

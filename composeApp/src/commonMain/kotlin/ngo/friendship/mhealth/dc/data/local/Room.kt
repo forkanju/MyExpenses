@@ -17,6 +17,7 @@ expect fun Scope.getAppDatabaseBuilder(): RoomDatabase.Builder<AppDatabase>
 
 fun <T : RoomDatabase> RoomDatabase.Builder<T>.buildPlatformWise(): T =
     setQueryCoroutineContext(Dispatchers.IO)
+        .fallbackToDestructiveMigration()
         .applyIf(getPlatform() == Platform.iOS) {
             setDriver(BundledSQLiteDriver())
         }.build()

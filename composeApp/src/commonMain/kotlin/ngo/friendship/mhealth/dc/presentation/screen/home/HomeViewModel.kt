@@ -40,12 +40,13 @@ class HomeViewModel(
     fun onIntent(intent: HomeIntent) {
         when (intent) {
             HomeIntent.LoadDashboard -> loadDashboard()
+            HomeIntent.Refresh -> loadDashboard(isRefreshing = true)
         }
     }
 
-    private fun loadDashboard() {
-        launch {
-            _state.update { it.copy(isLoading = true) }
+    private fun loadDashboard(isRefreshing: Boolean = false) {
+        launch(loading = if (isRefreshing) Loading.Gone else Loading.Primary) {
+            _state.update { it.copy(isLoading = !isRefreshing, isRefreshing = isRefreshing) }
             try {
                 val response = api.getDashboardData(
                     DashboardDataReqDto.build(
@@ -131,12 +132,12 @@ class HomeViewModel(
                         segments = segments,
                         byServices = byServices,
                         byArea = byArea,
-                        isLoading = false
                     )
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false) }
                 _uiEvent.send(HomeUiEvent.ShowError(e.message ?: "Error loading dashboard"))
+            } finally {
+                _state.update { it.copy(isLoading = false, isRefreshing = false) }
             }
         }
     }

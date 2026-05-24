@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
@@ -41,45 +42,56 @@ class DashboardViewModel(
             }
 
             DashboardIntent.LoadDashboard -> loadDashboardData()
+            DashboardIntent.ClearError -> _state.update { it.copy(error = null) }
+            is DashboardIntent.Refresh -> loadDashboardData(isRefreshing = true)
             is DashboardIntent.ShowSnackbar -> {
                 viewModelScope.launch {
-                    _effect.send(DashboardEffect.ShowSnackbar(intent.message))
+                    _effect.send(DashboardEffect.ShowSnackbar(intent.message, type = intent.type))
                 }
             }
         }
     }
 
-    private fun loadDashboardData() {
+    private fun loadDashboardData(isRefreshing: Boolean = false) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-
-            val adviceList = try {
-                mainRepository.getAdviceList()
-            } catch (_: Exception) {
-                emptyList()
+            if (isRefreshing) {
+                _state.update { it.copy(isRefreshing = true) }
+            } else {
+                _state.update { it.copy(isLoading = true) }
             }
 
-            val medicineList = try {
-                caseRepository.getMedicineList("Tab", forceRefresh = false)
-            } catch (_: Exception) {
-                emptyList()
-            }
+            try {
+                val adviceList = try {
+                    mainRepository.getAdviceList()
+                } catch (_: Exception) {
+                    emptyList()
+                }
 
-            val prescriptionTemplates = try {
-                mainRepository.getPrescriptionTemplates()
-            } catch (_: Exception) {
-                emptyList()
-            }
+                val medicineList = try {
+                    caseRepository.getMedicineList("Tab", forceRefresh = false)
+                } catch (_: Exception) {
+                    emptyList()
+                }
 
-            mainRepository.getSetupData(forceRefresh = false).collect { setupData ->
-                updateSections(
-                    setupData,
-                    adviceList.size,
-                    medicineList.size,
-                    prescriptionTemplates.size
-                )
+                val prescriptionTemplates = try {
+                    mainRepository.getPrescriptionTemplates()
+                } catch (_: Exception) {
+                    emptyList()
+                }
+
+                mainRepository.getSetupData(forceRefresh = isRefreshing).collect { setupData ->
+                    updateSections(
+                        setupData,
+                        adviceList.size,
+                        medicineList.size,
+                        prescriptionTemplates.size
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "An error occurred") }
+            } finally {
+                _state.update { it.copy(isLoading = false, isRefreshing = false) }
             }
-            _state.value = _state.value.copy(isLoading = false)
         }
     }
 
@@ -171,6 +183,6 @@ class DashboardViewModel(
                 )
             )
         )
-        _state.value = _state.value.copy(sections = sections)
+        _state.update { it.copy(sections = sections) }
     }
 }

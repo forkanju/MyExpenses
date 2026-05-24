@@ -37,7 +37,7 @@ data class Investigation(
 @Serializable
 @Entity
 data class Diagnosis(
-    val diagId: Long = 0L,
+    val diagId: String = "",
     val diagName: String = "",
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L

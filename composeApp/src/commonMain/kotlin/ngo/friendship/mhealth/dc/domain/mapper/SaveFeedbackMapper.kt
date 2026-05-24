@@ -4,9 +4,10 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveDoctorFeedbackResDto
 import ngo.friendship.mhealth.dc.domain.model.SaveDoctorFeedbackResult
 
 fun SaveDoctorFeedbackResDto.toDomain(): SaveDoctorFeedbackResult {
+    val isSuccess = responseCode == "01" && errorCode != "01"
     return SaveDoctorFeedbackResult(
-        isSuccess = responseCode == "01",
-        message = if (responseCode == "01") {
+        isSuccess = isSuccess,
+        message = if (isSuccess) {
             "Saved successfully"
         } else {
             errorDesc.ifEmpty { "Save failed" }

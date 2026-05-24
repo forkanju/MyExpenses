@@ -13,5 +13,6 @@ data class HomeUiState(
     val segments: List<SegmentUi> = emptyList(),
     val byServices: List<KeyValueUi> = emptyList(),
     val byArea: List<KeyValueUi> = emptyList(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false
 )

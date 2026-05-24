@@ -16,6 +16,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -24,14 +25,16 @@ import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import fcmProfileRoute
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
+import ngo.friendship.mhealth.dc.presentation.base.ColoredSnackbarVisuals
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
-import ngo.friendship.mhealth.dc.presentation.navigation.route.profileRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.authRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.beneficiaryProfileRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.caseRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.dashboardRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
-import ngo.friendship.mhealth.dc.presentation.navigation.route.dashboardRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.profileRoute
 import ngo.friendship.mhealth.dc.theme.Dimen
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -46,8 +49,22 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxSize(),
             snackbarHost = {
                 SnackbarHost(hostState = snackBarState) { data ->
+                    val visuals = data.visuals as? ColoredSnackbarVisuals
+                    val containerColor = when (visuals?.type) {
+                        SnackbarType.SUCCESS -> Color(0xFF4CAF50)
+                        SnackbarType.ERROR -> Color(0xFFE57373)
+                        SnackbarType.WARNING -> Color(0xFFFFA726)
+                        else -> MaterialTheme.colorScheme.inverseSurface
+                    }
+                    val contentColor = when (visuals?.type) {
+                        SnackbarType.SUCCESS, SnackbarType.ERROR, SnackbarType.WARNING -> Color.White
+                        else -> MaterialTheme.colorScheme.inverseOnSurface
+                    }
+
                     Snackbar(
                         snackbarData = data,
+                        containerColor = containerColor,
+                        contentColor = contentColor,
                         shape = MaterialTheme.shapes.large,
                         modifier = Modifier.padding(Dimen.Standard)
                     )

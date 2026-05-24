@@ -68,7 +68,8 @@ fun ForgotPasswordScreen(
         PrimaryButton(
             text = "Click here to reset your password",
             onClick = {
-                uriHandler.openUri("https://mhealth.apps.friendship.ngo/mHealth/")
+//                uriHandler.openUri("https://mhealth.apps.friendship.ngo/mHealth/") //Live
+                uriHandler.openUri("http://devs2.apps.friendship.ngo:8080/mHealth/") //Devs
             },
             enabled = true,
             modifier = Modifier.fillMaxWidth(),

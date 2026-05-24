@@ -34,7 +34,7 @@ data class DoctorFeedbackData(
 @Serializable
 data class PatientInterviewFeedbackDto(
     @SerialName("DIAG_ID")
-    val diagId: Long? = null,
+    val diagId: String? = null,
     @SerialName("ORG_ID")
     val orgId: Int? = null,
     @SerialName("DOC_FOLLOWUP_ID")
@@ -71,7 +71,7 @@ data class PatientInterviewFeedbackDto(
     val gender: String? = null,
     @SerialName("TRANS_REF")
     val transRef: Int? = null,
-    @SerialName("DIAG_DESC")
+    @SerialName("DIAG_NAME")
     val diagDesc: String? = null,
     @SerialName("UPDATE_ON")
     val updateOn: Long? = null,

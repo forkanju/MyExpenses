@@ -83,7 +83,7 @@ class MainRepositoryImpl(
                     adviceDetails = content
                 )
             )
-            val isSuccess = response.responseCode == "01"
+            val isSuccess = response.responseCode == "01" && response.errorCode != "01"
             isSuccess to (if (isSuccess) null else response.errorDesc)
         } catch (e: Exception) {
             false to e.message
@@ -100,7 +100,7 @@ class MainRepositoryImpl(
                     diagName = title
                 )
             )
-            val isSuccess = response.responseCode == "01"
+            val isSuccess = response.responseCode == "01" && response.errorCode != "01"
             if (isSuccess) {
                 refreshSetupData()
             }
@@ -120,7 +120,7 @@ class MainRepositoryImpl(
                     investigationName = title
                 )
             )
-            val isSuccess = response.responseCode == "01"
+            val isSuccess = response.responseCode == "01" && response.errorCode != "01"
             if (isSuccess) {
                 refreshSetupData()
             }
@@ -148,7 +148,7 @@ class MainRepositoryImpl(
                     strength = strength
                 )
             )
-            val isSuccess = response.responseCode == "01"
+            val isSuccess = response.responseCode == "01" && response.errorCode != "01"
             if (isSuccess) {
                 refreshSetupData()
 
@@ -250,7 +250,7 @@ class MainRepositoryImpl(
                     newPassword = new
                 )
             )
-            val isSuccess = response.responseCode == "01"
+            val isSuccess = response.responseCode == "01" && response.errorCode != "01"
             isSuccess to (if (isSuccess) "Success" else response.errorDesc)
         } catch (e: Exception) {
             false to e.message

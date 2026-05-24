@@ -15,7 +15,14 @@ fun addDiagnosis(
     state: DoctorFeedbackFormState,
     item: Diagnosis
 ): DoctorFeedbackFormState {
-    if (state.selectedDiagnoses.any { it.diagId == item.diagId }) return state
+    val alreadyExists = state.selectedDiagnoses.any { 
+        if (item.diagId.isNotBlank() && item.diagId != "0") {
+            it.diagId == item.diagId
+        } else {
+            it.diagName.equals(item.diagName, ignoreCase = true)
+        }
+    }
+    if (alreadyExists) return state
     return state.copy(selectedDiagnoses = state.selectedDiagnoses + item)
 }
 
@@ -24,7 +31,13 @@ fun removeDiagnosis(
     item: Diagnosis
 ): DoctorFeedbackFormState {
     return state.copy(
-        selectedDiagnoses = state.selectedDiagnoses.filterNot { it.diagId == item.diagId }
+        selectedDiagnoses = state.selectedDiagnoses.filterNot { 
+            if (item.diagId.isNotBlank() && item.diagId != "0") {
+                it.diagId == item.diagId
+            } else {
+                it.diagName.equals(item.diagName, ignoreCase = true)
+            }
+        }
     )
 }
 
@@ -32,7 +45,14 @@ fun addInvestigation(
     state: DoctorFeedbackFormState,
     item: Investigation
 ): DoctorFeedbackFormState {
-    if (state.selectedInvestigations.any { it.investigationId == item.investigationId }) return state
+    val alreadyExists = state.selectedInvestigations.any {
+        if (item.investigationId != 0L) {
+            it.investigationId == item.investigationId
+        } else {
+            it.investigationName.equals(item.investigationName, ignoreCase = true)
+        }
+    }
+    if (alreadyExists) return state
     return state.copy(
         selectedInvestigations = state.selectedInvestigations + item
     )
@@ -44,7 +64,11 @@ fun removeInvestigation(
 ): DoctorFeedbackFormState {
     return state.copy(
         selectedInvestigations = state.selectedInvestigations.filterNot {
-            it.investigationId == item.investigationId
+            if (item.investigationId != 0L) {
+                it.investigationId == item.investigationId
+            } else {
+                it.investigationName.equals(item.investigationName, ignoreCase = true)
+            }
         }
     )
 }

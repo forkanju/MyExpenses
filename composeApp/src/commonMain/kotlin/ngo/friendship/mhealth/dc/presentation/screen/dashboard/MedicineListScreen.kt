@@ -47,7 +47,7 @@ fun MedicineListScreen(
     ObserveAsEvents(flow = viewModel.effect) { effect ->
         when (effect) {
             is MedicineListEffect.ShowSnackbar -> {
-                SnackbarController.sendEvent(effect.message)
+                SnackbarController.sendEvent(message = effect.message, type = effect.type)
             }
         }
     }
