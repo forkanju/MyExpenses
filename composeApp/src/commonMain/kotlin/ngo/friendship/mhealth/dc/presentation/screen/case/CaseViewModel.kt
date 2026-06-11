@@ -41,16 +41,16 @@ class CaseViewModel(
     }
 
     private fun loadPrescriptionTemplates() {
-        launch {
+        launch(loading = Loading.Gone) {
             val templates = mainRepository.getPrescriptionTemplateDtos()
             _state.update { it.copy(prescriptionTemplates = templates) }
         }
     }
 
     private fun loadSetupData() {
-        launch {
+        launch(loading = Loading.Gone) {
             mainRepository.getSetupData(forceRefresh = false).collectLatest { setupData ->
-                _state.update { it ->
+                _state.update {
                     it.copy(
                         medicineBrandTypeList = setupData.medicineBrandTypes.map { it.type }
                             .distinct()
@@ -63,7 +63,7 @@ class CaseViewModel(
     fun onIntent(intent: CaseIntent) {
         when (intent) {
             is CaseIntent.LoadFromTemplate -> {
-                launch {
+                launch(loading = Loading.Gone) {
                     val template = intent.template
                     val allMedicines = repository.getAllMedicines()
 
@@ -299,7 +299,7 @@ class CaseViewModel(
             }
 
             is CaseIntent.SelectPrescriptionTemplate -> {
-                launch {
+                launch(loading = Loading.Gone) {
                     val template = intent.template
                     val allMedicines = repository.getAllMedicines()
                     val newPrescriptions = template.medicineList?.map { medDto ->
@@ -445,7 +445,7 @@ class CaseViewModel(
     }
 
     private fun loadQuestionAnswerData(interviewId: Long) {
-        launch {
+        launch(loading = Loading.Gone) {
             val result = repository.getQuestionAnswerData()
             _state.update {
                 it.copy(
@@ -475,12 +475,7 @@ class CaseViewModel(
             val formState = currentState.formState
             val isFromTemplate = currentState.interviewDetails.interviewId == -1L
 
-            // 1. Prescription Validation (Always required)
-            if (formState.prescriptions.isEmpty()) {
-                showWarning("Please add the prescriptions")
-                return@launch
-            }
-
+            // 1. Prescription Validation (Optional)
             // Check for duplicate medicines
             val duplicates = formState.prescriptions.groupBy { it.medicineId ?: it.medicineName }.any { it.value.size > 1 }
             if (duplicates) {
@@ -490,16 +485,10 @@ class CaseViewModel(
 
             // 2. Case-specific field validation (Skip if saving as Template)
             if (!isFromTemplate) {
-                if (formState.selectedDiagnoses.isEmpty()) {
-                    showWarning("Please add at least one diagnosis")
-                    return@launch
-                }
+                // Diagnosis (DX) is optional
 
-                if (formState.investigationResult.isNotBlank() && formState.selectedInvestigations.isEmpty()) {
-                    showWarning("Please add an investigation for the result provided")
-                    return@launch
-                }
-
+                // Investigation Result is optional
+                
                 if (formState.doctorAdvice.isBlank()) {
                     showWarning("Please enter doctor advice")
                     return@launch
@@ -510,10 +499,7 @@ class CaseViewModel(
                     return@launch
                 }
 
-                if (formState.doctorNotes.isBlank()) {
-                    showWarning("Please enter doctor notes")
-                    return@launch
-                }
+                // Doctor notes is optional
 
                 // Next Follow Up Date is optional as per requirement
             } else {
@@ -600,7 +586,7 @@ class CaseViewModel(
     }
 
     private fun loadDoctorFeedback(interviewId: Long) {
-        launch {
+        launch(loading = Loading.Gone) {
             try {
                 val response = mainRepository.getDoctorFeedback(interviewId)
                 println("response69: ${response.data}")

@@ -41,7 +41,7 @@ fun DashboardCard(data: DashboardCardData, modifier: Modifier = Modifier) {
     val alignment = if (data.isCentered) Alignment.CenterHorizontally else Alignment.Start
     val textAlign = if (data.isCentered) TextAlign.Center else TextAlign.Start
     val iconContainerSize = if (data.isCentered) 48.dp else 36.dp
-    val iconSize = if (data.isCentered) 40.dp else 34 .dp
+    val iconSize = if (data.isCentered) 40.dp else 34.dp
 
     Card(
         // fillMaxHeight is crucial for the card to stretch to the parent's Intrinsic height

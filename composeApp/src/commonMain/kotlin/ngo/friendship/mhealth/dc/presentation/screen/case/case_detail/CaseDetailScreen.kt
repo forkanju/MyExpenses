@@ -240,7 +240,8 @@ fun CaseDetailScreen(
                     )
 
                     if (state.formState.selectedDiagnoses.isNotEmpty()) {
-                        val displayDiagnoses = if (isAnsweredMode) state.formState.selectedDiagnoses.drop(1) else state.formState.selectedDiagnoses
+                        val displayDiagnoses =
+                            if (isAnsweredMode) state.formState.selectedDiagnoses.drop(1) else state.formState.selectedDiagnoses
                         if (displayDiagnoses.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             DiagnosisChipGroup(
@@ -341,7 +342,8 @@ fun CaseDetailScreen(
                     )
 
                     if (state.formState.selectedInvestigations.isNotEmpty()) {
-                        val displayInvestigations = if (isAnsweredMode) state.formState.selectedInvestigations.drop(1) else state.formState.selectedInvestigations
+                        val displayInvestigations =
+                            if (isAnsweredMode) state.formState.selectedInvestigations.drop(1) else state.formState.selectedInvestigations
                         if (displayInvestigations.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(8.dp))
                             InvestigationChipGroup(

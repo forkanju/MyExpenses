@@ -4,6 +4,7 @@ import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.Query
 import androidx.room3.Transaction
+import kotlinx.coroutines.flow.Flow
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.MedicineBrandType
@@ -12,6 +13,18 @@ import ngo.friendship.mhealth.dc.domain.model.SetupData
 
 @Dao
 interface SetupDataDao {
+    @Query("SELECT * FROM MedicineBrandType")
+    fun observeMedicineBrandTypes(): Flow<List<MedicineBrandType>>
+
+    @Query("SELECT * FROM Investigation")
+    fun observeInvestigations(): Flow<List<Investigation>>
+
+    @Query("SELECT * FROM Diagnosis")
+    fun observeDiagnoses(): Flow<List<Diagnosis>>
+
+    @Query("SELECT * FROM ReferralCenter")
+    fun observeReferralCenters(): Flow<List<ReferralCenter>>
+
     @Query("SELECT * FROM MedicineBrandType")
     suspend fun getMedicineBrandTypes(): List<MedicineBrandType>
     @Query("SELECT * FROM Investigation")
@@ -48,7 +61,8 @@ interface SetupDataDao {
     }
 
     @Transaction
-    suspend fun insertAll(setupData: SetupData) {
+    suspend fun replaceData(setupData: SetupData) {
+        deleteAllData()
         insertMedicineBrandTypes(setupData.medicineBrandTypes)
         insertInvestigations(setupData.investigations)
         insertDiagnoses(setupData.diagnoses)

@@ -60,6 +60,11 @@ class DashboardViewModel(
                 _state.update { it.copy(isLoading = true) }
             }
 
+            // Ensure sections are visible even while loading or if API fails
+            if (_state.value.sections.isEmpty()) {
+                updateSections(SetupData(), 0, 0, 0)
+            }
+
             try {
                 val adviceList = try {
                     mainRepository.getAdviceList()
@@ -78,6 +83,14 @@ class DashboardViewModel(
                 } catch (_: Exception) {
                     emptyList()
                 }
+
+                // Update with new counts immediately while preserving existing setupData
+                updateSections(
+                    setupData = _state.value.setupData,
+                    adviceCount = adviceList.size,
+                    medicineCount = medicineList.size,
+                    prescriptionCount = prescriptionTemplates.size
+                )
 
                 mainRepository.getSetupData(forceRefresh = isRefreshing).collect { setupData ->
                     updateSections(
@@ -183,6 +196,6 @@ class DashboardViewModel(
                 )
             )
         )
-        _state.update { it.copy(sections = sections) }
+        _state.update { it.copy(sections = sections, setupData = setupData) }
     }
 }

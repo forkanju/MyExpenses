@@ -3,9 +3,11 @@ package ngo.friendship.mhealth.dc.data.repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
 import ngo.friendship.mhealth.dc.data.local.AppDatabase
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.data.remote.ApiService
@@ -183,39 +185,34 @@ class MainRepositoryImpl(
                 )
             )
             response.data?.toDomain()?.also {
-                setupDataDao.deleteAllData()
-                setupDataDao.insertAll(it)
+                setupDataDao.replaceData(it)
             }
         } catch (e: Exception) {
             println("refreshSetupData error: ${e.message}")
         }
     }
 
-    override fun getSetupData(forceRefresh: Boolean): Flow<SetupData> = flow {
+    override fun getSetupData(forceRefresh: Boolean): Flow<SetupData> = combine(
+        setupDataDao.observeMedicineBrandTypes(),
+        setupDataDao.observeInvestigations(),
+        setupDataDao.observeDiagnoses(),
+        setupDataDao.observeReferralCenters()
+    ) { medicineBrandTypes, investigations, diagnoses, referralCenters ->
+        SetupData(
+            medicineBrandTypes = medicineBrandTypes,
+            investigations = investigations,
+            diagnoses = diagnoses,
+            referralCenters = referralCenters
+        )
+    }.onStart {
         val cached = getCachedSetupData()
-
-        // Check if cached data is not empty (checking investigations as a proxy for all setup data)
         val hasCache = cached.investigations.isNotEmpty() ||
                 cached.diagnoses.isNotEmpty() ||
                 cached.medicineBrandTypes.isNotEmpty() ||
                 cached.referralCenters.isNotEmpty()
 
-        if (hasCache && !forceRefresh) {
-            emit(cached)
-            return@flow
-        }
-
-        // Fetch from API
-        val response = api.getSetupData(
-            request = SetupDataReqDto.build(
-                userName = localSettings.user.userName,
-                password = localSettings.user.password
-            )
-        )
-        response.data?.toDomain()?.also {
-            setupDataDao.deleteAllData()
-            setupDataDao.insertAll(it)
-            emit(it)
+        if (!hasCache || forceRefresh) {
+            refreshSetupData()
         }
     }.flowOn(Dispatchers.IO)
 
