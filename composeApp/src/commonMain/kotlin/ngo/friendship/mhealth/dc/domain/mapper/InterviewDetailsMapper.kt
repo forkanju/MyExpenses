@@ -4,11 +4,15 @@ import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.SysPrescription
+import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.calculateAge
 
 fun InterviewDetailsResDto.InterviewDetails.toDomain(): InterviewDetails = InterviewDetails(
     interviewId = interviewId ?: -1,
     beneficiaryId = benefId ?: -1,
     beneficiaryName = benefName.orEmpty(),
+    beneficiaryGender = benefGender,
+    beneficiaryDob = benefDob,
+    beneficiaryAge = benefDob?.calculateAge() ?: "",
     beneficiaryCode = benefCode.orEmpty(),
     location = location.orEmpty(),
     status = status.orEmpty(),

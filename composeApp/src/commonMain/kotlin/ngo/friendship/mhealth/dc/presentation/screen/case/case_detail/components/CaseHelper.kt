@@ -1,6 +1,5 @@
 package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -10,12 +9,42 @@ import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
+import kotlin.time.Clock
+import kotlin.time.Instant
+
+fun String.calculateAge(): String {
+    if (this.isBlank()) return ""
+    return try {
+        val birthDate = LocalDate.parse(this.take(10)) // expects yyyy-MM-dd
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+        var years = today.year - birthDate.year
+        var months = today.month.ordinal - birthDate.month.ordinal
+        val days = today.day - birthDate.day
+
+        if (days < 0) {
+            months -= 1
+        }
+        if (months < 0) {
+            years -= 1
+            months += 12
+        }
+
+        when {
+            years > 0 -> "$years years"
+            months > 0 -> "$months months"
+            else -> "${maxOf(0, days)} days"
+        }
+    } catch (_: Exception) {
+        ""
+    }
+}
 
 fun addDiagnosis(
     state: DoctorFeedbackFormState,
     item: Diagnosis
 ): DoctorFeedbackFormState {
-    val alreadyExists = state.selectedDiagnoses.any { 
+    val alreadyExists = state.selectedDiagnoses.any {
         if (item.diagId.isNotBlank() && item.diagId != "0") {
             it.diagId == item.diagId
         } else {
@@ -31,7 +60,7 @@ fun removeDiagnosis(
     item: Diagnosis
 ): DoctorFeedbackFormState {
     return state.copy(
-        selectedDiagnoses = state.selectedDiagnoses.filterNot { 
+        selectedDiagnoses = state.selectedDiagnoses.filterNot {
             if (item.diagId.isNotBlank() && item.diagId != "0") {
                 it.diagId == item.diagId
             } else {

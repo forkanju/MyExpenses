@@ -26,6 +26,8 @@ data class InterviewDetailsResDto(
         @SerialName("INTERVIEW_ID") val interviewId: Long? = null,
         @SerialName("BENEF_ID") val benefId: Long? = null,
         @SerialName("BENEF_NAME") val benefName: String? = null,
+        @SerialName("GENDER") val benefGender: String? = null,
+        @SerialName("DOB") val benefDob: String? = null,
         @SerialName("BENEF_CODE") val benefCode: String? = null,
         @SerialName("LOCATION") val location: String? = null,
         @SerialName("STATUS") val status: String? = null,

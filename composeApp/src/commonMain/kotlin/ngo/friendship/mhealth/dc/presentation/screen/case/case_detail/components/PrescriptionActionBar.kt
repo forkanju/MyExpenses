@@ -7,9 +7,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material3.*
 import androidx.compose.material3.ripple
@@ -18,19 +19,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
 import ngo.friendship.mhealth.dc.theme.*
 
 @Composable
 fun PrescriptionActionRowAligned(
     doseValue: String,
-    doseItems: List<String>,
-    onDoseSelect: (String) -> Unit,
+    onDoseChange: (String) -> Unit,
 
     daysValue: String,
-    daysItems: List<String>,
-    onDaysSelect: (String) -> Unit,
+    onDaysChange: (String) -> Unit,
+
+    quantityValue: String,
+    onQuantityChange: (String) -> Unit,
 
     toggleValue: MealTime,
     onToggleChange: (MealTime) -> Unit,
@@ -48,26 +51,39 @@ fun PrescriptionActionRowAligned(
             .height(48.dp)
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
+
+
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
 
-            UnderlineDropdownMini(
+            UnderlineTextFieldMini(
                 value = doseValue,
-                items = doseItems,
-                onSelect = onDoseSelect,
-                width = 64.dp,
-                isAnsweredMode = isAnsweredMode
+                onValueChange = onDoseChange,
+                width = 48.dp,
+                isAnsweredMode = isAnsweredMode,
+                placeholder = "Dose"
             )
 
             Spacer(Modifier.width(9.dp))
 
-            UnderlineDropdownMini(
+            UnderlineTextFieldMini(
                 value = daysValue,
-                items = daysItems,
-                onSelect = onDaysSelect,
-                width = 64.dp,
-                isAnsweredMode = isAnsweredMode
+                onValueChange = onDaysChange,
+                width = 48.dp,
+                isAnsweredMode = isAnsweredMode,
+                placeholder = "Days"
+            )
+
+            Spacer(Modifier.width(9.dp))
+
+            UnderlineTextFieldMini(
+                value = quantityValue,
+                onValueChange = onQuantityChange,
+                width = 36.dp,
+                isAnsweredMode = isAnsweredMode,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = "Qty"
             )
 
             Spacer(Modifier.width(9.dp))
@@ -174,80 +190,47 @@ private fun AddMini(
 }
 
 @Composable
-fun UnderlineDropdownMini(
+fun UnderlineTextFieldMini(
     value: String,
-    items: List<String>,
-    onSelect: (String) -> Unit,
+    onValueChange: (String) -> Unit,
     width: Dp,
     modifier: Modifier = Modifier,
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    placeholder: String = ""
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
     val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Gray
     val dividerColor = if (isAnsweredMode) Color(0xFFC7C7C7) else Gray
-    val dropdownText = if (isAnsweredMode) Color(0xFF4F4F4F) else DarkerGray
 
     val finalModifier = if (modifier == Modifier) Modifier.width(width)
     else modifier
 
-    Box(modifier = finalModifier) {
+    Column(
+        modifier = finalModifier
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(color = textColor, fontSize = 13.sp),
+            singleLine = true,
+            readOnly = isAnsweredMode,
+            keyboardOptions = keyboardOptions,
+            decorationBox = { innerTextField ->
+                Box(contentAlignment = Alignment.CenterStart) {
+                    if (value.isEmpty()) {
+                        Text(placeholder, color = Gray.copy(alpha = 0.5f), fontSize = 13.sp)
+                    }
+                    innerTextField()
+                }
+            }
+        )
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true }
-        ) {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = value,
-                    fontSize = 13.sp,
-                    color = textColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Icon(
-                    imageVector = Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = textColor,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(dividerColor)
-            )
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            containerColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
-        ) {
-            items.forEach { item ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = item,
-                            fontSize = 13.sp,
-                            color = dropdownText
-                        )
-                    },
-                    onClick = {
-                        onSelect(item)
-                        expanded = false
-                    }
-                )
-            }
-        }
+                .height(1.dp)
+                .background(dividerColor)
+        )
     }
 }

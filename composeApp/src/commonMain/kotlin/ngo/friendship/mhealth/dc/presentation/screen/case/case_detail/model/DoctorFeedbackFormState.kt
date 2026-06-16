@@ -27,5 +27,7 @@ data class DoctorFeedbackFormState(
     val isGlobalPrescription: Int = 0,
     val prescriptionId: Long? = null,
     val requestName: String? = null,
-    val isCalledBack: Boolean = false
+    val isCalledBack: Boolean = false,
+    val isFcmChecked: Boolean = true,
+    val isBeneficiaryChecked: Boolean = true
 )

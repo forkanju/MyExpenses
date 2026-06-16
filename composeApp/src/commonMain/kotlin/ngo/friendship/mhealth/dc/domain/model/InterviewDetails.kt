@@ -7,6 +7,8 @@ data class InterviewDetails(
     val interviewId: Long = -1L,
     val beneficiaryId: Long = 0L,
     val beneficiaryName: String = "",
+    val beneficiaryGender: String? = null,
+    val beneficiaryDob: String? = null,
     val beneficiaryCode: String = "",
     val location: String = "",
     val status: String = "",

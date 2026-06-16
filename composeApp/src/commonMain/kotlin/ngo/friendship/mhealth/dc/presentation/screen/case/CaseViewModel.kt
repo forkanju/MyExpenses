@@ -214,14 +214,23 @@ class CaseViewModel(
             }
 
             is CaseIntent.UpdateCustomMessage -> {
-                _state.update { it.copy(customMessageState = intent.messageState) }
+                _state.update {
+                    it.copy(
+                        customMessageState = intent.messageState,
+                        formState = it.formState.copy(
+                            isFcmChecked = intent.messageState.isFcmChecked,
+                            isBeneficiaryChecked = intent.messageState.isBeneficiaryChecked
+                        )
+                    )
+                }
             }
 
             is CaseIntent.TogglePrescriptionSms -> {
                 _state.update {
                     it.copy(
                         isPrescriptionWithSmsChecked = intent.checked,
-                        customMessageState = it.customMessageState.copy(isFcmChecked = intent.checked)
+                        customMessageState = it.customMessageState.copy(isFcmChecked = intent.checked),
+                        formState = it.formState.copy(isFcmChecked = intent.checked)
                     )
                 }
             }
@@ -524,7 +533,9 @@ class CaseViewModel(
                         currentState.customMessageState.messageText
                     } else {
                         formState.commentsForFcm
-                    }
+                    },
+                    isFcmChecked = currentState.customMessageState.isFcmChecked,
+                    isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked
                 )
 
                 // First, save the doctor feedback
@@ -538,8 +549,8 @@ class CaseViewModel(
 
                 // Only send SMS and update status if it's a real case (not a template creation)
                 if (!isFromTemplate) {
-                    // If SMS is checked, send the SMS
-                    if (currentState.isPrescriptionWithSmsChecked) {
+                    // If SMS is checked and Beneficiary is selected, send the SMS
+                    if (currentState.isPrescriptionWithSmsChecked && currentState.customMessageState.isBeneficiaryChecked) {
                         val smsText = currentState.customMessageState.messageText
                         val phoneNumber = currentState.customMessageState.phoneNumber.ifBlank {
                             currentState.fcmProfileState.fcmProfile?.mobileNo

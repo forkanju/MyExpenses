@@ -350,7 +350,7 @@ fun String.toTimeStamp(): Long {
             val ld = LocalDate.parse(this)
             ld.atStartOfDayIn(TimeZone.currentSystemDefault()).toEpochMilliseconds() + (3600000 * 6) // add 6 hour for google calender
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         0L
     }
 }
@@ -803,7 +803,7 @@ fun main() {
         } else {
             null
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         Log.e("Geocoder Error", "Error fetching address", e)
         null
     }
@@ -834,7 +834,7 @@ fun main() {
 //            } else {
 //                null
 //            }
-//        } catch (e: Exception) {
+//        } catch (_: Exception) {
 //            Log.e("Geocoder Error", "Error fetching address", e)
 //            null
 //        }
@@ -862,7 +862,7 @@ fun String.toUiDateTime(): String {
             .take(3)
 
         "$hour:$minute, $day $month ${dt.year}"
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         this // fallback
     }
 }
@@ -875,7 +875,7 @@ fun String.toUiDate(): String {
 
         val dt = LocalDateTime.parse(cleaned)
 
-        val day = dt.dayOfMonth.toString().padStart(2, '0')
+        val day = dt.day.toString().padStart(2, '0')
 
         val month = dt.month.name
             .lowercase()
@@ -883,7 +883,7 @@ fun String.toUiDate(): String {
             .take(3)
 
         "$day $month ${dt.year}"
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         this
     }
 }

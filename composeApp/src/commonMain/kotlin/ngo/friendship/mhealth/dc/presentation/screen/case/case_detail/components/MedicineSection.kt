@@ -130,8 +130,9 @@ fun PrescriptionItemCard(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 val mealTimeText = item.mealTime?.let { " | $it" } ?: ""
+                val quantityText = item.quantity?.let { " | Qty: $it" } ?: ""
                 Text(
-                    text = "Dose: ${item.dose} | Days: ${item.duration}$mealTimeText",
+                    text = "Dose: ${item.dose} | Days: ${item.duration}$mealTimeText$quantityText",
                     color = subColor,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -233,11 +234,11 @@ fun MedicineComposerCard(
 
             PrescriptionActionRowAligned(
                 doseValue = state.dose,
-                doseItems = listOf("1+0+1", "0+0+1", "1+1+1"),
-                onDoseSelect = { onStateChange(state.copy(dose = it)) },
+                onDoseChange = { onStateChange(state.copy(dose = it)) },
                 daysValue = state.days,
-                daysItems = listOf("3 days", "5 days", "7 days", "10 days"),
-                onDaysSelect = { onStateChange(state.copy(days = it)) },
+                onDaysChange = { onStateChange(state.copy(days = it)) },
+                quantityValue = state.quantity,
+                onQuantityChange = { onStateChange(state.copy(quantity = it)) },
                 toggleValue = state.mealTime,
                 onToggleChange = { onStateChange(state.copy(mealTime = it)) },
                 onMessageClick = { },
@@ -263,7 +264,8 @@ fun MedicineComposerCard(
                             dose = state.dose,
                             duration = state.days,
                             mealTime = mealTimeText,
-                            medicineId = state.medicineId.takeIf { it != -1L }
+                            medicineId = state.medicineId.takeIf { it != -1L },
+                            quantity = state.quantity
                         )
 
                         onAddClick(item)
@@ -274,6 +276,7 @@ fun MedicineComposerCard(
                                 genericNameQuery = TextFieldValue(""),
                                 dose = "0+0+1",
                                 days = "7 days",
+                                quantity = "1",
                                 mealTime = MealTime.AFTER,
                                 medicineId = -1L
                             )

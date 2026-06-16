@@ -41,6 +41,7 @@ fun PatientProfileCard(
     benefName: String,
     benefCode: String,
     benefAge: String? = null,
+    benefGender: String? = null,
     questionnaireName: String? = null,
     isAnsweredMode: Boolean = false,
     onDetailsClick: () -> Unit = {}
@@ -100,14 +101,20 @@ fun PatientProfileCard(
                         .padding(start = 8.dp)
                 ) {
 
-                    Row {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        val details = listOfNotNull(
+                            benefAge.takeIf { it?.isNotBlank() == true },
+                            benefGender.takeIf { it?.isNotBlank() == true }
+                        ).joinToString(", ")
+
                         Text(
-                            text = if (benefAge.isNullOrBlank()) benefName else "$benefName ($benefAge)",
+                            text = if (details.isEmpty()) benefName else "$benefName ($details)",
                             style = TextStyle(
                                 color = titleColor,
                                 fontFamily = RobotoCondensedFont(),
                                 fontWeight = FontWeight.Medium
-                            )
+                            ),
+                            modifier = Modifier.weight(1f, fill = false)
                         )
 
                         Spacer(Modifier.width(6.dp))

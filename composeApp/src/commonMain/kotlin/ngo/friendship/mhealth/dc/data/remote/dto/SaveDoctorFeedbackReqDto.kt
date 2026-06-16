@@ -147,7 +147,13 @@ data class DoctorFeedbackObject(
     val prescriptionId: Long? = null,
 
     @SerialName("call_back_on_phn")
-    val isCalledBack: Long = 0L
+    val isCalledBack: Long = 0L,
+
+    @SerialName("is_fcm_checked")
+    val isFcmChecked: Int = 1,
+
+    @SerialName("is_beneficiary_checked")
+    val isBeneficiaryChecked: Int = 1
 )
 
 @Serializable
@@ -177,7 +183,9 @@ data class PrescriptionItem(
     @SerialName("taking_rule")
     val mealTime: String? = null,
     @SerialName("medicine_id")
-    val medicineId: Long? = null
+    val medicineId: Long? = null,
+    @SerialName("quantity")
+    val quantity: String? = null
 )
 
 fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
@@ -208,6 +216,8 @@ fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {
         isGlobalPrescription = isGlobalPrescription,
         doctorAdvice = doctorAdvice,
         prescriptionId = prescriptionId,
-        isCalledBack = if (isCalledBack) 1L else 0L
+        isCalledBack = if (isCalledBack) 1L else 0L,
+        isFcmChecked = if (isFcmChecked) 1 else 0,
+        isBeneficiaryChecked = if (isBeneficiaryChecked) 1 else 0
     )
 }

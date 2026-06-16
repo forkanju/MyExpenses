@@ -170,7 +170,8 @@ fun CaseDetailScreen(
                 PatientProfileCard(
                     benefName = state.interviewDetails.beneficiaryName,
                     benefCode = state.interviewDetails.beneficiaryCode.takeLast(5),
-                    benefAge = "${state.interviewDetails.beneficiaryAge}", // | ${state.interviewDetails}",
+                    benefAge = state.interviewDetails.beneficiaryAge,
+                    benefGender = state.interviewDetails.beneficiaryGender,
                     questionnaireName = state.interviewDetails.questionnaireName,
                     isAnsweredMode = isAnsweredMode,
                     onDetailsClick = onBeneficiaryDetailsClick
