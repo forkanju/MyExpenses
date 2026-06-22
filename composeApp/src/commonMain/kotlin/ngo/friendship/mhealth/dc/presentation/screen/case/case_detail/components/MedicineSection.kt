@@ -44,7 +44,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Medicine
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
@@ -64,13 +64,17 @@ enum class MealTime {
 @Composable
 fun MedicineSection(
     medicines: List<Medicine>,
-    prescriptionItems: List<PrescriptionItem>,
-    onAddMedicine: (PrescriptionItem) -> Unit,
+    prescriptionItems: List<PrescriptionItemDto>,
+    onAddMedicine: (PrescriptionItemDto) -> Unit,
     onRemoveMedicine: (Int) -> Unit,
     medicineBrandTypeList: List<String> = emptyList(),
     isAnsweredMode: Boolean = false,
     composerState: MedicineComposerState = MedicineComposerState(),
-    onComposerStateChange: (MedicineComposerState) -> Unit = {}
+    onComposerStateChange: (MedicineComposerState) -> Unit = {},
+    beneficiaryName: String = "",
+    beneficiaryCode: String = "",
+    beneficiaryAge: String = "",
+    doseSuggestions: List<String> = emptyList()
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         if (!isAnsweredMode) {
@@ -80,7 +84,11 @@ fun MedicineSection(
                 medicineBrandTypeList = medicineBrandTypeList,
                 isAnsweredMode = isAnsweredMode,
                 state = composerState,
-                onStateChange = onComposerStateChange
+                onStateChange = onComposerStateChange,
+                beneficiaryName = beneficiaryName,
+                beneficiaryCode = beneficiaryCode,
+                beneficiaryAge = beneficiaryAge,
+                doseSuggestions = doseSuggestions
             )
         }
 
@@ -96,7 +104,7 @@ fun MedicineSection(
 
 @Composable
 fun PrescriptionItemCard(
-    item: PrescriptionItem,
+    item: PrescriptionItemDto,
     onRemoveClick: () -> Unit,
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false
@@ -124,15 +132,15 @@ fun PrescriptionItemCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = item.medicineName,
+                    text = "${item.medType}: ${item.genName} (${item.medName})",
                     color = titleColor,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                val mealTimeText = item.mealTime?.let { " | $it" } ?: ""
-                val quantityText = item.quantity?.let { " | Qty: $it" } ?: ""
+                val mealTimeText = if (item.afm.isNotBlank()) " | ${item.afm}" else ""
+                val quantityText = if (item.medQty.isNotBlank()) " | Qty: ${item.medQty}" else ""
                 Text(
-                    text = "Dose: ${item.dose} | Days: ${item.duration}$mealTimeText$quantityText",
+                    text = "Dose: ${item.mtr} | Days: ${item.medDuration}$mealTimeText$quantityText",
                     color = subColor,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -154,11 +162,15 @@ fun PrescriptionItemCard(
 @Composable
 fun MedicineComposerCard(
     medicines: List<Medicine>,
-    onAddClick: (PrescriptionItem) -> Unit,
+    onAddClick: (PrescriptionItemDto) -> Unit,
     medicineBrandTypeList: List<String> = emptyList(),
     isAnsweredMode: Boolean = false,
     state: MedicineComposerState = MedicineComposerState(),
-    onStateChange: (MedicineComposerState) -> Unit = {}
+    onStateChange: (MedicineComposerState) -> Unit = {},
+    beneficiaryName: String = "",
+    beneficiaryCode: String = "",
+    beneficiaryAge: String = "",
+    doseSuggestions: List<String> = emptyList()
 ) {
     val colorScheme = MaterialTheme.colorScheme
     Surface(
@@ -242,6 +254,7 @@ fun MedicineComposerCard(
                 toggleValue = state.mealTime,
                 onToggleChange = { onStateChange(state.copy(mealTime = it)) },
                 onMessageClick = { },
+                doseSuggestions = doseSuggestions,
                 onAddClick = {
                     val genericName = state.genericNameQuery.text.trim()
                     val brandName = state.medicineQuery.text.trim()
@@ -254,18 +267,28 @@ fun MedicineComposerCard(
                     } else if (brandName.isBlank()) {
                         SnackbarController.sendEvent("Please enter a medicine name", type = SnackbarType.WARNING)
                     } else {
-                        val finalMedicineName = "$type: $genericName ($brandName)"
                         val mealTimeText = when (state.mealTime) {
                             MealTime.BEFORE -> "Before"
                             MealTime.AFTER -> "After"
                         }
-                        val item = PrescriptionItem(
-                            medicineName = finalMedicineName,
-                            dose = state.dose,
-                            duration = state.days,
-                            mealTime = mealTimeText,
-                            medicineId = state.medicineId.takeIf { it != -1L },
-                            quantity = state.quantity
+
+                        val smsSf = "Rx\r\n${beneficiaryName}, ${beneficiaryCode}, ${beneficiaryAge}y\r\n${genericName}. ${brandName} , ${state.days}d"
+
+                        val item = PrescriptionItemDto(
+                            medId = state.medicineId.toString(),
+                            genName = genericName,
+                            medType = type,
+                            medName = brandName,
+                            medQty = state.quantity,
+                            saleQty = state.quantity,
+                            medDuration = state.days,
+                            mtr = state.dose,
+                            mtrLbl = state.dose,
+                            mtrSf = state.dose,
+                            afm = mealTimeText,
+                            afmSf = mealTimeText,
+                            sf = "",
+                            smsSf = smsSf
                         )
 
                         onAddClick(item)
@@ -369,10 +392,21 @@ fun MedicineComposerCardPreview() {
             )
 
             PrescriptionItemCard(
-                item = PrescriptionItem(
-                    medicineName = "Napa 500mg",
-                    dose = "1+0+1",
-                    duration = "5 days"
+                item = PrescriptionItemDto(
+                    medId = "",
+                    genName = "Paracetamol",
+                    medType = "Tab",
+                    medName = "Napa 500mg",
+                    medQty = "",
+                    saleQty = "",
+                    medDuration = "5 days",
+                    mtr = "1+0+1",
+                    mtrLbl = "1+0+1",
+                    mtrSf = "1+0+1",
+                    afm = "",
+                    afmSf = "",
+                    sf = "",
+                    smsSf = ""
                 ),
                 onRemoveClick = {}
             )

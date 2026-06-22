@@ -281,7 +281,11 @@ fun LocalCaseDetailScreen(
                         composerState = state.medicineComposerState,
                         onComposerStateChange = { composerState ->
                             onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
-                        }
+                        },
+                        beneficiaryName = state.patientName,
+                        beneficiaryCode = state.officeId,
+                        beneficiaryAge = state.age,
+                        doseSuggestions = state.doseHistory
                     )
 
                     LabeledFormTextField(

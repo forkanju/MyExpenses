@@ -7,7 +7,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
@@ -21,8 +30,10 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.utils.defJson
+import ngo.friendship.mhealth.dc.utils.isNotNull
 import ngo.friendship.mhealth.dc.utils.log
 import ngo.friendship.mhealth.dc.utils.minusAt
+import ngo.friendship.mhealth.dc.utils.toJson
 
 class CaseViewModel(
     private val repository: CaseRepository,
@@ -38,6 +49,11 @@ class CaseViewModel(
         onIntent(CaseIntent.LoadMedicineList("Tab"))
         loadSetupData()
         loadPrescriptionTemplates()
+        loadDoseHistory()
+    }
+
+    private fun loadDoseHistory() {
+        _state.update { it.copy(doseHistory = repository.getDoseHistory()) }
     }
 
     private fun loadPrescriptionTemplates() {
@@ -77,22 +93,21 @@ class CaseViewModel(
                             else -> medDto.takingRule
                         }
 
-                        val medicineName = if (medicine != null) {
-                            "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
-                        } else if (!medDto.brandName.isNullOrBlank()) {
-                            medDto.brandName
-                        } else if (!medDto.genericName.isNullOrBlank()) {
-                            medDto.genericName
-                        } else {
-                            "Unknown"
-                        }
-
-                        PrescriptionItem(
-                            medicineName = medicineName,
-                            dose = medDto.dailyDose.orEmpty(),
-                            duration = medDto.durationDay.orEmpty(),
-                            medicineId = medDto.medicineId?.toLongOrNull(),
-                            mealTime = mealTimeText
+                        PrescriptionItemDto(
+                            medId = medDto.medicineId.orEmpty(),
+                            genName = medDto.genericName.orEmpty().ifBlank { medicine?.genericName.orEmpty() },
+                            medType = medicine?.type.orEmpty(),
+                            medName = medDto.brandName.orEmpty().ifBlank { medicine?.brandName.orEmpty() },
+                            medQty = medDto.qty.orEmpty(),
+                            saleQty = medDto.qty.orEmpty(),
+                            medDuration = medDto.durationDay.orEmpty(),
+                            mtr = medDto.dailyDose.orEmpty(),
+                            mtrLbl = medDto.dailyDose.orEmpty(),
+                            mtrSf = medDto.dailyDose.orEmpty(),
+                            afm = mealTimeText.orEmpty(),
+                            afmSf = mealTimeText.orEmpty(),
+                            sf = "",
+                            smsSf = ""
                         )
                     } ?: emptyList()
 
@@ -148,9 +163,11 @@ class CaseViewModel(
             }
 
             is CaseIntent.AddPrescription -> {
+                repository.saveDoseToHistory(intent.item.mtr)
+                loadDoseHistory()
                 val exists = _state.value.formState.prescriptions.any {
-                    (it.medicineId != null && it.medicineId == intent.item.medicineId) ||
-                            (it.medicineName == intent.item.medicineName)
+                    (it.medId.isNotBlank() && it.medId != "-1" && it.medId == intent.item.medId) ||
+                            (it.genName == intent.item.genName && it.medName == intent.item.medName)
                 }
                 if (exists) {
                     showWarning("Duplicate same medicine entry not allowed!")
@@ -321,22 +338,21 @@ class CaseViewModel(
                             else -> medDto.takingRule
                         }
 
-                        val medicineName = if (medicine != null) {
-                            "${medicine.type}: ${medicine.genericName} (${medicine.brandName})"
-                        } else if (!medDto.brandName.isNullOrBlank()) {
-                            medDto.brandName
-                        } else if (!medDto.genericName.isNullOrBlank()) {
-                            medDto.genericName
-                        } else {
-                            "Unknown"
-                        }
-
-                        PrescriptionItem(
-                            medicineName = medicineName,
-                            dose = medDto.dailyDose.orEmpty(),
-                            duration = medDto.durationDay.orEmpty(),
-                            medicineId = medDto.medicineId?.toLongOrNull(),
-                            mealTime = mealTimeText
+                        PrescriptionItemDto(
+                            medId = medDto.medicineId.orEmpty(),
+                            genName = medDto.genericName.orEmpty().ifBlank { medicine?.genericName.orEmpty() },
+                            medType = medicine?.type.orEmpty(),
+                            medName = medDto.brandName.orEmpty().ifBlank { medicine?.brandName.orEmpty() },
+                            medQty = medDto.qty.orEmpty(),
+                            saleQty = medDto.qty.orEmpty(),
+                            medDuration = medDto.durationDay.orEmpty(),
+                            mtr = medDto.dailyDose.orEmpty(),
+                            mtrLbl = medDto.dailyDose.orEmpty(),
+                            mtrSf = medDto.dailyDose.orEmpty(),
+                            afm = mealTimeText.orEmpty(),
+                            afmSf = mealTimeText.orEmpty(),
+                            sf = "",
+                            smsSf = ""
                         )
                     } ?: emptyList()
 
@@ -456,6 +472,7 @@ class CaseViewModel(
     private fun loadQuestionAnswerData(interviewId: Long) {
         launch(loading = Loading.Gone) {
             val result = repository.getQuestionAnswerData()
+
             _state.update {
                 it.copy(
                     questionAnswerData = result,
@@ -468,6 +485,57 @@ class CaseViewModel(
             }
         }
     }
+
+    fun modifyQuestionAnswerJson(
+        obj: JsonObject?,
+        key: String,
+        field: String,
+        value: String
+    ): JsonObject? {
+        if (obj == null) return null
+        return buildJsonObject {
+            for ((k, v) in obj) {
+                if (k == key && v is JsonObject) {
+                    put(k, buildJsonObject {
+                        for ((innerK, innerV) in v) put(innerK, innerV)
+                        put(field, JsonPrimitive(value))
+                    })
+                } else {
+                    put(k, v)
+                }
+            }
+        }
+    }
+    fun modifyQuestionAnswerJson2(
+        array: JsonArray,
+        index: Int,
+        value: String?
+    ): JsonArray {
+        if (index !in 0 until array.size) return array
+        if (value.isNullOrEmpty()) return array
+
+        return try {
+            buildJsonArray {
+                for (i in 0 until array.size) {
+                    if (i == index) {
+                        val oldObj = array[i].jsonObject
+                        add(buildJsonObject {
+                            for ((k, v) in oldObj) {
+                                put(k, v)
+                            }
+                            put("answer", JsonPrimitive(value))
+                        })
+                    } else {
+                        add(array[i])
+                    }
+                }
+            }
+        } catch (_: Exception) {
+            array
+        }
+    }
+
+
 
     private fun loadMedicineList(
         type: String = "Tab"
@@ -486,7 +554,7 @@ class CaseViewModel(
 
             // 1. Prescription Validation (Optional)
             // Check for duplicate medicines
-            val duplicates = formState.prescriptions.groupBy { it.medicineId ?: it.medicineName }.any { it.value.size > 1 }
+            val duplicates = formState.prescriptions.groupBy { it.medId.ifBlank { "${it.genName} ${it.medName}" } }.any { it.value.size > 1 }
             if (duplicates) {
                 showWarning("Duplicate same medicine entry not allowed!")
                 return@launch
@@ -538,6 +606,9 @@ class CaseViewModel(
                     isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked
                 )
 
+                // Log the prescriptions for debugging
+                finalFormState.prescriptions.toJson().log("PRESCRIPTION_DEBUG")
+
                 // First, save the doctor feedback
                 val feedbackResult = repository.saveDoctorFeedback(formState = finalFormState)
 
@@ -569,7 +640,7 @@ class CaseViewModel(
 
                     // After successful save, update interview status to "Close"
                     val (statusSuccess, statusError) = repository.updateInterviewStatus(
-                        interviewId = formState.interviewId ?: 0,
+                        interviewId = finalFormState.interviewId ?: 0,
                         status = CaseTab.Answered.apiParam // "Close"
                     )
                     if (!statusSuccess) {
@@ -607,15 +678,15 @@ class CaseViewModel(
                         val feedback = feedbackList[0]
 
                         // Parse prescriptions
-                        val prescriptions = mutableListOf<PrescriptionItem>()
+                        val prescriptions = mutableListOf<PrescriptionItemDto>()
                         feedback.prescribedMedicine?.let { jsonStr ->
                             try {
                                 if (jsonStr.startsWith("[")) {
                                     val list =
-                                        defJson.decodeFromString<List<PrescriptionItem>>(jsonStr)
+                                        defJson.decodeFromString<List<PrescriptionItemDto>>(jsonStr)
                                     prescriptions.addAll(list)
                                 } else if (jsonStr.startsWith("{")) {
-                                    val item = defJson.decodeFromString<PrescriptionItem>(jsonStr)
+                                    val item = defJson.decodeFromString<PrescriptionItemDto>(jsonStr)
                                     prescriptions.add(item)
                                 }
                             } catch (e: Exception) {

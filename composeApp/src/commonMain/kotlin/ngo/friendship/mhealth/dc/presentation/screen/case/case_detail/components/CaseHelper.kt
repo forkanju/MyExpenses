@@ -4,7 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.Investigation
@@ -119,7 +119,7 @@ fun Long.toDateString(): String {
 
 fun buildDefaultSmsMessage(
     interviewDetails: InterviewDetails,
-    prescriptions: List<PrescriptionItem>
+    prescriptions: List<PrescriptionItemDto>
 ): String {
 
     val headerLine = listOfNotNull(
@@ -129,9 +129,9 @@ fun buildDefaultSmsMessage(
     ).joinToString(", ")
 
     val medicineLines = prescriptions.mapIndexedNotNull { index, item ->
-        val medicineName = item.medicineName.trim()
-        val dose = item.dose.trim()
-        val duration = item.duration.trim()
+        val medicineName = "${item.medType}: ${item.genName} (${item.medName})".trim()
+        val dose = item.mtr.trim()
+        val duration = item.medDuration.trim()
 
         if (medicineName.isBlank()) return@mapIndexedNotNull null
 

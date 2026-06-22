@@ -38,5 +38,6 @@ data class CaseUiState(
     val templateName: String = "",
     val isGlobalTemplate: Boolean = false,
     val prescriptionId: Long? = null,
-    val prescriptionTemplates: List<PrescriptionTemplateDto> = emptyList()
+    val prescriptionTemplates: List<PrescriptionTemplateDto> = emptyList(),
+    val doseHistory: List<String> = emptyList()
 )

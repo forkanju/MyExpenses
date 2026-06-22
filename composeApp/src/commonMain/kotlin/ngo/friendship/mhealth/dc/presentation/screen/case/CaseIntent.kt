@@ -1,7 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.screen.case
 
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
@@ -27,7 +27,7 @@ sealed interface CaseIntent {
     // Finer grained intents for MVI if preferred, but starting with these to match existing ViewModel
     data class AddDiagnosis(val diagnosis: Diagnosis) : CaseIntent
     data class RemoveDiagnosis(val diagnosis: Diagnosis) : CaseIntent
-    data class AddPrescription(val item: PrescriptionItem) : CaseIntent
+    data class AddPrescription(val item: PrescriptionItemDto) : CaseIntent
     data class RemovePrescription(val index: Int) : CaseIntent
     data class UpdateDoctorAdvice(val advice: String) : CaseIntent
     data class AddInvestigation(val investigation: Investigation) : CaseIntent

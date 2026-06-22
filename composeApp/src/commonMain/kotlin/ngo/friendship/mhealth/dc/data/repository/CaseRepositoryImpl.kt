@@ -261,6 +261,16 @@ class CaseRepositoryImpl(
         )
     }
 
+    override fun getDoseHistory(): List<String> {
+        return localSettings.doseHistory
+    }
+
+    override fun saveDoseToHistory(dose: String) {
+        if (dose.isNotBlank()) {
+            localSettings.saveDoseToHistory(dose)
+        }
+    }
+
     override suspend fun markAsOpened(interviewId: String) {
         val idLong = interviewId.toLongOrNull() ?: return
         val currentCase = _interviews.value.find { it.interviewId == idLong }

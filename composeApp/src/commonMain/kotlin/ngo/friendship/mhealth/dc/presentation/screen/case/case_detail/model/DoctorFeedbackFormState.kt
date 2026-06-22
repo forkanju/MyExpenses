@@ -1,6 +1,6 @@
 package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model
 
-import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItem
+import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
 import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplate
@@ -21,7 +21,7 @@ data class DoctorFeedbackFormState(
     val sms: String = "",
     val questionAnswers: List<QuestionAnswerTemplate> = emptyList(),
     val questionAnswers2: List<QuestionAnswerTemplateDefault> = emptyList(),
-    val prescriptions: List<PrescriptionItem> = emptyList(),
+    val prescriptions: List<PrescriptionItemDto> = emptyList(),
     val isPresTempSave: Int = 0,
     val prescriptionName: String = "",
     val isGlobalPrescription: Int = 0,

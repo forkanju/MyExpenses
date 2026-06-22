@@ -42,71 +42,117 @@ fun PrescriptionActionRowAligned(
     onAddClick: () -> Unit,
 
     modifier: Modifier = Modifier,
-    isAnsweredMode: Boolean = false
+    isAnsweredMode: Boolean = false,
+    doseSuggestions: List<String> = emptyList()
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-
-
+            .height(48.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        UnderlineTextFieldMini(
+            value = doseValue,
+            onValueChange = onDoseChange,
+            width = 60.dp,
+            isAnsweredMode = isAnsweredMode,
+            placeholder = "Dose",
+            suggestions = doseSuggestions
+        )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        UnderlineTextFieldMini(
+            value = daysValue,
+            onValueChange = onDaysChange,
+            width = 60.dp,
+            isAnsweredMode = isAnsweredMode,
+            placeholder = "Days"
+        )
 
-            UnderlineTextFieldMini(
-                value = doseValue,
-                onValueChange = onDoseChange,
-                width = 48.dp,
-                isAnsweredMode = isAnsweredMode,
-                placeholder = "Dose"
-            )
+        UnderlineTextFieldMini(
+            value = quantityValue,
+            onValueChange = onQuantityChange,
+            width = 50.dp,
+            isAnsweredMode = isAnsweredMode,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            placeholder = "Qty"
+        )
 
-            Spacer(Modifier.width(9.dp))
+        MealTimeToggle(
+            value = toggleValue,
+            onChange = onToggleChange,
+            isAnsweredMode = isAnsweredMode
+        )
 
-            UnderlineTextFieldMini(
-                value = daysValue,
-                onValueChange = onDaysChange,
-                width = 48.dp,
-                isAnsweredMode = isAnsweredMode,
-                placeholder = "Days"
-            )
-
-            Spacer(Modifier.width(9.dp))
-
-            UnderlineTextFieldMini(
-                value = quantityValue,
-                onValueChange = onQuantityChange,
-                width = 36.dp,
-                isAnsweredMode = isAnsweredMode,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                placeholder = "Qty"
-            )
-
-            Spacer(Modifier.width(9.dp))
-
-            MealTimeToggle(
-                value = toggleValue,
-                onChange = onToggleChange,
-                isAnsweredMode = isAnsweredMode
-            )
-        }
-
-        Spacer(Modifier.width(9.dp))
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            Spacer(Modifier.width(9.dp))
-
-            AddMini(
-                onClick = onAddClick,
-                isAnsweredMode = isAnsweredMode
-            )
-        }
+        AddMini(
+            onClick = onAddClick,
+            isAnsweredMode = isAnsweredMode
+        )
     }
+
+//    Row(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .height(48.dp),
+//        verticalAlignment = Alignment.CenterVertically,
+//        horizontalArrangement = Arrangement.SpaceBetween
+//
+//
+//    ) {
+//
+//        Row(verticalAlignment = Alignment.CenterVertically) {
+//
+//            UnderlineTextFieldMini(
+//                value = doseValue,
+//                onValueChange = onDoseChange,
+//                width = 48.dp,
+//                isAnsweredMode = isAnsweredMode,
+//                placeholder = "Dose",
+//                suggestions = doseSuggestions
+//            )
+//
+//            Spacer(Modifier.width(9.dp))
+//
+//            UnderlineTextFieldMini(
+//                value = daysValue,
+//                onValueChange = onDaysChange,
+//                width = 48.dp,
+//                isAnsweredMode = isAnsweredMode,
+//                placeholder = "Days"
+//            )
+//
+//            Spacer(Modifier.width(9.dp))
+//
+//            UnderlineTextFieldMini(
+//                value = quantityValue,
+//                onValueChange = onQuantityChange,
+//                width = 36.dp,
+//                isAnsweredMode = isAnsweredMode,
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                placeholder = "Qty"
+//            )
+//
+//            Spacer(Modifier.width(9.dp))
+//
+//            MealTimeToggle(
+//                value = toggleValue,
+//                onChange = onToggleChange,
+//                isAnsweredMode = isAnsweredMode
+//            )
+//        }
+//
+//        Spacer(Modifier.width(9.dp))
+//
+//        Row(verticalAlignment = Alignment.CenterVertically) {
+//
+//            Spacer(Modifier.width(9.dp))
+//
+//            AddMini(
+//                onClick = onAddClick,
+//                isAnsweredMode = isAnsweredMode
+//            )
+//        }
+//    }
 }
 
 @Composable
@@ -189,6 +235,7 @@ private fun AddMini(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnderlineTextFieldMini(
     value: String,
@@ -197,7 +244,8 @@ fun UnderlineTextFieldMini(
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    placeholder: String = ""
+    placeholder: String = "",
+    suggestions: List<String> = emptyList()
 ) {
     val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Gray
     val dividerColor = if (isAnsweredMode) Color(0xFFC7C7C7) else Gray
@@ -205,32 +253,72 @@ fun UnderlineTextFieldMini(
     val finalModifier = if (modifier == Modifier) Modifier.width(width)
     else modifier
 
-    Column(
+    var expanded by remember { mutableStateOf(false) }
+    val filteredSuggestions = remember(value, suggestions) {
+        if (value.isEmpty()) emptyList()
+        else suggestions.filter { it.contains(value, ignoreCase = true) && it != value }
+    }
+
+    LaunchedEffect(filteredSuggestions) {
+        expanded = filteredSuggestions.isNotEmpty() && !isAnsweredMode
+    }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { if (!isAnsweredMode) expanded = it },
         modifier = finalModifier
     ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(color = textColor, fontSize = 13.sp),
-            singleLine = true,
-            readOnly = isAnsweredMode,
-            keyboardOptions = keyboardOptions,
-            decorationBox = { innerTextField ->
-                Box(contentAlignment = Alignment.CenterStart) {
-                    if (value.isEmpty()) {
-                        Text(placeholder, color = Gray.copy(alpha = 0.5f), fontSize = 13.sp)
+        Column(modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)) {
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(color = textColor, fontSize = 13.sp),
+                singleLine = true,
+                readOnly = isAnsweredMode,
+                keyboardOptions = keyboardOptions,
+                decorationBox = { innerTextField ->
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        if (value.isEmpty()) {
+                            Text(placeholder, color = Gray.copy(alpha = 0.5f), fontSize = 13.sp)
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(dividerColor)
+            )
+        }
+
+        if (filteredSuggestions.isNotEmpty() && !isAnsweredMode) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.width(IntrinsicSize.Max).background(Color.White)
+            ) {
+                filteredSuggestions.forEach { suggestion ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = suggestion,
+                                fontSize = 12.sp,
+                                color = TextPrimary
+                            )
+                        },
+                        onClick = {
+                            onValueChange(suggestion)
+                            expanded = false
+                        },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.heightIn(min = 32.dp)
+                    )
                 }
             }
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(dividerColor)
-        )
+        }
     }
 }

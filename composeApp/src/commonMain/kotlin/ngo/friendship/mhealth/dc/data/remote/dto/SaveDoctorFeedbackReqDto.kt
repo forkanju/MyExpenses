@@ -132,7 +132,7 @@ data class DoctorFeedbackObject(
     val questionAnswerJson2: List<QuestionAnswerTemplateDefault>,
 
     @SerialName("prescription")
-    val prescription: List<PrescriptionItem>,
+    val prescription: List<PrescriptionItemDto>,
 
     @SerialName("is_pres_temp_save")
     val isPresTempSave: Int,
@@ -173,19 +173,35 @@ data class QuestionAnswerItem(
 )
 
 @Serializable
-data class PrescriptionItem(
-    @SerialName("medicine_name")
-    val medicineName: String,
-    @SerialName("dose")
-    val dose: String,
-    @SerialName("duration")
-    val duration: String,
-    @SerialName("taking_rule")
-    val mealTime: String? = null,
-    @SerialName("medicine_id")
-    val medicineId: Long? = null,
-    @SerialName("quantity")
-    val quantity: String? = null
+data class PrescriptionItemDto(
+    @SerialName("MED_ID")
+    val medId: String,
+    @SerialName("GEN_NAME")
+    val genName: String,
+    @SerialName("MED_TYPE")
+    val medType: String,
+    @SerialName("MED_NAME")
+    val medName: String,
+    @SerialName("MED_QTY")
+    val medQty: String,
+    @SerialName("SALE_QTY")
+    val saleQty: String,
+    @SerialName("MED_DURATION")
+    val medDuration: String,
+    @SerialName("MTR")
+    val mtr: String,
+    @SerialName("MTR_LBL")
+    val mtrLbl: String,
+    @SerialName("MTR_SF")
+    val mtrSf: String,
+    @SerialName("AFM")
+    val afm: String,
+    @SerialName("AFM_SF")
+    val afmSf: String,
+    @SerialName("SF")
+    val sf: String,
+    @SerialName("SMS_SF")
+    val smsSf: String
 )
 
 fun DoctorFeedbackFormState.toDto(): DoctorFeedbackObject {

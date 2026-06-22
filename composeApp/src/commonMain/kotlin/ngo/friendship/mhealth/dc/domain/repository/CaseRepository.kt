@@ -37,6 +37,9 @@ interface CaseRepository {
         message: String
     ): JsonObject
 
+    fun getDoseHistory(): List<String>
+    fun saveDoseToHistory(dose: String)
+
     fun observeCases(): Flow<List<Interview>>
     fun observeCaseCounts(): Flow<Map<String, Int>>
     suspend fun markAsOpened(interviewId: String)

@@ -23,6 +23,22 @@ class LocalSettings {
         get() = _user ?: (settings.getStringOrNull("user").fromJson<User>() ?: User()).also { _user = it }
         set(value) = settings.putOrRemove("user", value).also { _user = value }
 
+    var doseHistory: List<String>
+        get() = settings.getStringOrNull("dose_history").fromJson<List<String>>() ?: emptyList()
+        set(value) = settings.putString("dose_history", value.toJson())
+
+    fun saveDoseToHistory(dose: String) {
+        val current = doseHistory.toMutableList()
+        current.remove(dose)
+        current.add(0, dose)
+        if (current.size > 50) {
+            val trimmed = current.take(50)
+            doseHistory = trimmed
+        } else {
+            doseHistory = current
+        }
+    }
+
     fun clear() {
         settings.clear()
         _token = null

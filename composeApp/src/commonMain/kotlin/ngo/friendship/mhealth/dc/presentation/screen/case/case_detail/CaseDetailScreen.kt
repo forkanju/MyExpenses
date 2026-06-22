@@ -269,7 +269,12 @@ fun CaseDetailScreen(
                     composerState = state.medicineComposerState,
                     onComposerStateChange = { composerState ->
                         onIntent(CaseIntent.UpdateMedicineComposerState(composerState))
-                    })
+                    },
+                    beneficiaryName = state.interviewDetails.beneficiaryName,
+                    beneficiaryCode = state.interviewDetails.beneficiaryCode,
+                    beneficiaryAge = state.interviewDetails.beneficiaryAge ?: "",
+                    doseSuggestions = state.doseHistory
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
