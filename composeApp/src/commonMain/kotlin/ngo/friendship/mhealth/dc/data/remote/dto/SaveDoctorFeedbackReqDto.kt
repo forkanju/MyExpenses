@@ -2,8 +2,7 @@ package ngo.friendship.mhealth.dc.data.remote.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplate
-import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplateDefault
+import kotlinx.serialization.json.JsonArray
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.utils.md5
 
@@ -102,9 +101,9 @@ data class DoctorFeedbackObject(
     val interviewId: Long?,
 
     @SerialName("doctorFindings")
-    val doctorFindings: String = "static findings",//static for temporary
+    val doctorFindings: String = "static findings",
 
-    @SerialName("advice_message_for_fcm") //comments
+    @SerialName("advice_message_for_fcm")
     val commentsForFCM: String,
 
     @SerialName("doctor_advice")
@@ -126,10 +125,10 @@ data class DoctorFeedbackObject(
     val diagnosisdx: List<IdNameItem>,
 
     @SerialName("QUESTION_ANSWER_JSON")
-    val questionAnswerJson: List<QuestionAnswerTemplate>,
+    val questionAnswerJson: JsonArray,
 
     @SerialName("QUESTION_ANSWER_JSON2")
-    val questionAnswerJson2: List<QuestionAnswerTemplateDefault>,
+    val questionAnswerJson2: JsonArray,
 
     @SerialName("prescription")
     val prescription: List<PrescriptionItemDto>,
@@ -162,14 +161,6 @@ data class IdNameItem(
     val id: String,
     @SerialName("name")
     val name: String
-)
-
-@Serializable
-data class QuestionAnswerItem(
-    @SerialName("question_id")
-    val questionId: String,
-    @SerialName("answer")
-    val answer: String
 )
 
 @Serializable

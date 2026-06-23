@@ -12,6 +12,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -104,8 +105,8 @@ class CaseViewModel(
                             mtr = medDto.dailyDose.orEmpty(),
                             mtrLbl = medDto.dailyDose.orEmpty(),
                             mtrSf = medDto.dailyDose.orEmpty(),
-                            afm = mealTimeText.orEmpty(),
-                            afmSf = mealTimeText.orEmpty(),
+                            afm = medDto.dailyDose.orEmpty(),
+                            afmSf = medDto.dailyDose.orEmpty(),
                             sf = "",
                             smsSf = ""
                         )
@@ -349,8 +350,8 @@ class CaseViewModel(
                             mtr = medDto.dailyDose.orEmpty(),
                             mtrLbl = medDto.dailyDose.orEmpty(),
                             mtrSf = medDto.dailyDose.orEmpty(),
-                            afm = mealTimeText.orEmpty(),
-                            afmSf = mealTimeText.orEmpty(),
+                            afm = medDto.dailyDose.orEmpty(),
+                            afmSf = medDto.dailyDose.orEmpty(),
                             sf = "",
                             smsSf = ""
                         )
@@ -471,73 +472,13 @@ class CaseViewModel(
 
     private fun loadQuestionAnswerData(interviewId: Long) {
         launch(loading = Loading.Gone) {
-            "loadQuestionAnswerData triggered. FormState values: comments=${_state.value.formState.commentsForFcm}, prescriptionsCount=${_state.value.formState.prescriptions.size}, refCenter=${_state.value.formState.selectedReferralCenter?.refCenterId}, followUp=${_state.value.formState.nextFollowUpDate}".log("CAPTION_DEBUG")
+            "loadQuestionAnswerData triggered. interviewId: $interviewId".log("CAPTION_DEBUG")
 
-            // val result = repository.getQuestionAnswerData()
-            val result = _state.value.questionAnswerData // Use current data to verify transformation
-
-            // Logging and parsing captions for debugging
-            val firstCaption = result.questionAnswerJson.firstOrNull()?.caption
-            if (!firstCaption.isNullOrBlank()) {
-                try {
-                    val jsonElement = defJson.parseToJsonElement(firstCaption)
-                    val questionnaire = jsonElement.jsonArray.getOrNull(0)
-                        ?.jsonObject?.get("QUESTIONNAIRE_DATA")
-                        ?.jsonObject?.get("questionnaire")
-                        ?.jsonObject
-
-                    val modifiedQuestionnaire = modifyQuestionAnswerJson(
-                        questionnaire,
-                        "question10001",
-                        "hidden",
-                        if (_state.value.formState.commentsForFcm.isNotBlank()) "false" else "true"
-                    )
-
-                    val modifiedQuestionnaire2 = modifyQuestionAnswerJson(
-                        questionnaire,
-                        "question10002",
-                        "hidden",
-                        if (_state.value.formState.prescriptions.isNotEmpty()) "false" else "true"
-                    )
-
-                    val modifiedQuestionnaire3 = modifyQuestionAnswerJson(
-                        questionnaire,
-                        "question10003",
-                        "hidden",
-                        if (_state.value.formState.selectedReferralCenter?.refCenterId.isNotNull()) "false" else "true"
-                    )
-
-
-                    val modifiedQuestionnaire4 = modifyQuestionAnswerJson(
-                        questionnaire,
-                        "question10004",
-                        "hidden",
-                        if (_state.value.formState.nextFollowUpDate.isNotNull()) "false" else "true"
-                    )
-
-                    val secondCaption = result.questionAnswerJson2.firstOrNull()?.caption
-                    if (!secondCaption.isNullOrBlank()) {
-                        var jsonArray = defJson.parseToJsonElement(secondCaption).jsonArray
-
-                        val comments = _state.value.formState.commentsForFcm.replace(Regex("[\\r\\n]"), " ")
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 1, comments)
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 2, _state.value.formState.prescriptions.toJson())
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 3, _state.value.formState.selectedReferralCenter?.refCenterId.toString())
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 4, _state.value.formState.nextFollowUpDate)
-
-                        "Modified Second Caption Array: $jsonArray".log("CAPTION_DEBUG")
-                    }
-
-                    "Parsed Questionnaire Object1: $modifiedQuestionnaire".log("CAPTION_DEBUG")
-                    "Parsed Questionnaire Object2: $modifiedQuestionnaire2".log("CAPTION_DEBUG")
-                    "Parsed Questionnaire Object3: $modifiedQuestionnaire3".log("CAPTION_DEBUG")
-                    "Parsed Questionnaire Object4: $modifiedQuestionnaire4".log("CAPTION_DEBUG")
-
-
-
-                } catch (e: Exception) {
-                    "Error parsing caption JSON: ${e.message}".log("CAPTION_DEBUG")
-                }
+            val result = try {
+                repository.getQuestionAnswerData()
+            } catch (e: Exception) {
+                "Error fetching QuestionAnswerData: ${e.message}".log("CAPTION_DEBUG")
+                _state.value.questionAnswerData
             }
 
             _state.update {
@@ -545,8 +486,8 @@ class CaseViewModel(
                     questionAnswerData = result,
                     formState = it.formState.copy(
                         interviewId = if (interviewId == -1L) null else interviewId,
-                        questionAnswers = result.questionAnswerJson,
-                        questionAnswers2 = result.questionAnswerJson2
+                        questionAnswers = JsonArray(emptyList()),
+                        questionAnswers2 = JsonArray(emptyList())
                     )
                 )
             }
@@ -615,24 +556,121 @@ class CaseViewModel(
 
     private fun saveDoctorFeedback() {
         launch {
+            var modifiedJsonArray1: JsonArray = _state.value.formState.questionAnswers
+            var modifiedJsonArray2: JsonArray = _state.value.formState.questionAnswers2
+            
+            var result = _state.value.questionAnswerData
+            if (result.questionAnswerJson.isEmpty() && result.questionAnswerJson2.isEmpty()) {
+                "QuestionAnswerData is empty in state, fetching from repository...".log("CAPTION_DEBUG")
+                try {
+                    result = repository.getQuestionAnswerData()
+                    _state.update { it.copy(questionAnswerData = result) }
+                } catch (e: Exception) {
+                    "Error fetching QuestionAnswerData in saveDoctorFeedback: ${e.message}".log("CAPTION_DEBUG")
+                }
+            }
+
+            var finalTemplateCaption = ""
+            var finalTemplateArray: JsonArray = JsonArray(emptyList())
+
+            // Logging and parsing captions for debugging
+            val firstCaption = result.questionAnswerJson.firstOrNull()?.caption
+            if (!firstCaption.isNullOrBlank()) {
+                try {
+                    val jsonElement = defJson.parseToJsonElement(firstCaption)
+                    val questionnaire = jsonElement.jsonArray.getOrNull(0)
+                        ?.jsonObject?.get("QUESTIONNAIRE_DATA")
+                        ?.jsonObject?.get("questionnaire")
+                        ?.jsonObject
+
+                    var updatedQ = questionnaire
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10001",
+                        "hidden",
+                        if (_state.value.formState.commentsForFcm.isNotBlank()) "false" else "true"
+                    )
+
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10002",
+                        "hidden",
+                        if (_state.value.formState.prescriptions.isNotEmpty()) "false" else "true"
+                    )
+
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10003",
+                        "hidden",
+                        if (_state.value.formState.selectedReferralCenter?.refCenterId.isNotNull()) "false" else "true"
+                    )
+
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10004",
+                        "hidden",
+                        if (_state.value.formState.nextFollowUpDate.isNotNull()) "false" else "true"
+                    )
+
+                    if (updatedQ != null) {
+                        val updatedJsonArray = buildJsonArray {
+                            jsonElement.jsonArray.forEach { element ->
+                                add(buildJsonObject {
+                                    element.jsonObject.forEach { (key, value) ->
+                                        if (key == "QUESTIONNAIRE_DATA") {
+                                            put("QUESTIONNAIRE_DATA", buildJsonObject {
+                                                value.jsonObject.forEach { (innerKey, innerValue) ->
+                                                    if (innerKey == "questionnaire") {
+                                                        put("questionnaire", updatedQ)
+                                                    } else {
+                                                        put(innerKey, innerValue)
+                                                    }
+                                                }
+                                            })
+                                        } else {
+                                            put(key, value)
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                        
+                        finalTemplateArray = updatedJsonArray
+                        "Modified First Caption JSON: $updatedJsonArray".log("CAPTION_DEBUG")
+                    }
+
+                    val secondCaption = result.questionAnswerJson2.firstOrNull()?.caption
+                    if (!secondCaption.isNullOrBlank()) {
+                        var jsonArray = defJson.parseToJsonElement(secondCaption).jsonArray
+                        "Modified Second Caption Array:modifyQuestionAnswerJson2 $jsonArray".log("CAPTION_DEBUG")
+                        val comments = _state.value.formState.commentsForFcm.replace(Regex("[\\r\\n]"), " ")
+                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 1, comments)
+                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 2, _state.value.formState.prescriptions.toJson())
+                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 3, _state.value.formState.selectedReferralCenter?.refCenterId.toString())
+                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 4, _state.value.formState.nextFollowUpDate)
+                        
+                        modifiedJsonArray2 = buildQuestionAnswerJson2(jsonArray)
+                        
+                        "Modified Second Caption Array:modifyQuestionAnswerJson2 $modifiedJsonArray2".log("CAPTION_DEBUG")
+                    }
+
+                } catch (e: Exception) {
+                    "Error parsing caption JSON: ${e.message}".log("CAPTION_DEBUG")
+                }
+            }
             val currentState = _state.value
             val formState = currentState.formState
             val isFromTemplate = currentState.interviewDetails.interviewId == -1L
 
             // 1. Prescription Validation (Optional)
-            // Check for duplicate medicines
             val duplicates = formState.prescriptions.groupBy { it.medId.ifBlank { "${it.genName} ${it.medName}" } }.any { it.value.size > 1 }
             if (duplicates) {
                 showWarning("Duplicate same medicine entry not allowed!")
                 return@launch
             }
 
-            // 2. Case-specific field validation (Skip if saving as Template)
+            // 2. Case-specific field validation
             if (!isFromTemplate) {
-                // Diagnosis (DX) is optional
-
-                // Investigation Result is optional
-
                 if (formState.doctorAdvice.isBlank()) {
                     showWarning("Please enter doctor advice")
                     return@launch
@@ -642,12 +680,7 @@ class CaseViewModel(
                     showWarning("Please enter comments for FCM")
                     return@launch
                 }
-
-                // Doctor notes is optional
-
-                // Next Follow Up Date is optional as per requirement
             } else {
-                // Template specific validation
                 if (currentState.templateName.isBlank()) {
                     showWarning("Please enter template name")
                     return@launch
@@ -658,7 +691,7 @@ class CaseViewModel(
             try {
                 val isUpdate = isFromTemplate && currentState.prescriptionId != null
 
-                // Update formState with correct template save status and comments for FCM if needed
+                // Update formState with correct values and SWAP fields for server requirement
                 val finalFormState = formState.copy(
                     isPresTempSave = if (isFromTemplate) 1 else formState.isPresTempSave,
                     prescriptionId = currentState.prescriptionId,
@@ -670,11 +703,16 @@ class CaseViewModel(
                         formState.commentsForFcm
                     },
                     isFcmChecked = currentState.customMessageState.isFcmChecked,
-                    isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked
+                    isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked,
+                    // SWAP: QUESTION_ANSWER_JSON gets modifiedJsonArray2 (answers)
+                    questionAnswers =  finalTemplateArray?: JsonArray(emptyList()),
+                    // SWAP: QUESTION_ANSWER_JSON2 gets finalTemplateArray (template string wrapped in JsonArray)
+                    questionAnswers2 = modifiedJsonArray2?: JsonArray(emptyList()),
                 )
 
-                // Log the prescriptions for debugging
-                finalFormState.prescriptions.toJson().log("PRESCRIPTION_DEBUG")
+                // Log final state for debugging
+                "Final Data to Server - QA1: ${finalFormState.questionAnswers}".log("SAVE_DEBUG")
+                "Final Data to Server - QA2: ${finalFormState.questionAnswers2}".log("SAVE_DEBUG")
 
                 // First, save the doctor feedback
                 val feedbackResult = repository.saveDoctorFeedback(formState = finalFormState)
@@ -731,6 +769,18 @@ class CaseViewModel(
                 "Error saving feedback: ${e.message}".log("CASE_DEBUG")
                 showError(e.message ?: "Something went wrong!")
             }
+        }
+    }
+    fun buildQuestionAnswerJson2(array: JsonArray): JsonArray {
+        return try {
+            JsonArray(
+                array.filter { element ->
+                    val answer = element.jsonObject["answer"]?.jsonPrimitive?.contentOrNull
+                    !answer.isNullOrEmpty() && answer != "0"
+                }
+            )
+        } catch (e: Exception) {
+            JsonArray(emptyList())
         }
     }
 

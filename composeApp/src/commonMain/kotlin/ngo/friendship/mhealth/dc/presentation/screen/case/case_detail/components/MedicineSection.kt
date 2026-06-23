@@ -285,8 +285,8 @@ fun MedicineComposerCard(
                             mtr = state.dose,
                             mtrLbl = state.dose,
                             mtrSf = state.dose,
-                            afm = mealTimeText,
-                            afmSf = mealTimeText,
+                            afm = state.dose,
+                            afmSf = state.dose,
                             sf = "",
                             smsSf = smsSf
                         )

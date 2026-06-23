@@ -1,10 +1,9 @@
 package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model
 
+import kotlinx.serialization.json.JsonArray
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.Investigation
-import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplate
-import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerTemplateDefault
 import ngo.friendship.mhealth.dc.domain.model.ReferralCenter
 
 data class DoctorFeedbackFormState(
@@ -19,8 +18,8 @@ data class DoctorFeedbackFormState(
     val nextFollowUpDate: String = "",
     val mobile: String = "",
     val sms: String = "",
-    val questionAnswers: List<QuestionAnswerTemplate> = emptyList(),
-    val questionAnswers2: List<QuestionAnswerTemplateDefault> = emptyList(),
+    val questionAnswers: JsonArray = JsonArray(emptyList()), // এটি সার্ভারে QUESTION_ANSWER_JSON হিসেবে যাবে
+    val questionAnswers2: JsonArray = JsonArray(emptyList()), // এটি সার্ভারে QUESTION_ANSWER_JSON2 হিসেবে যাবে
     val prescriptions: List<PrescriptionItemDto> = emptyList(),
     val isPresTempSave: Int = 0,
     val prescriptionName: String = "",
