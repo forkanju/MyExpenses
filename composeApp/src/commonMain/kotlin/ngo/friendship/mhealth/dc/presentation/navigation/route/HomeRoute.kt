@@ -94,7 +94,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
                     },
                     userName = userProfile?.userName ?: "Doctor Center",
                     userSubtitle = userProfile?.location ?: "Friendship NGO",
-                    profileIcon = Resources.Icon.Profile,
+                    profileImage = userProfile?.getProfileImageSource() ?: Resources.Icon.Profile,
                     onProfileClick = { viewModel.backStack.add(Screens.Dialog.ProfilePopup) }
                 )
             },

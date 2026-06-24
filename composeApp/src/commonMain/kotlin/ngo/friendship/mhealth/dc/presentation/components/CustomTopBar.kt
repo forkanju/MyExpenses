@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -27,12 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.SubcomposeAsyncImage
 import ngo.friendship.mhealth.dc.theme.Dimen
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
@@ -52,7 +55,7 @@ fun CustomTopBar(
     onNotificationClick: () -> Unit,
     userName: String,
     userSubtitle: String? = null,
-    profileIcon: DrawableResource,
+    profileImage: Any? = null,
     onProfileClick: () -> Unit,
 ) {
     Row(
@@ -129,12 +132,37 @@ fun CustomTopBar(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        painter = painterResource(profileIcon),
-                        contentDescription = "Profile",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+                    if (profileImage == null || (profileImage is String && profileImage.isEmpty())) {
+                        Icon(
+                            painter = painterResource(Resources.Icon.Profile),
+                            contentDescription = "Profile",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        SubcomposeAsyncImage(
+                            model = profileImage,
+                            contentDescription = "Profile",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    // Loading...
+                                }
+                            },
+                            error = {
+                                Icon(
+                                    painter = painterResource(Resources.Icon.Profile),
+                                    contentDescription = "Profile",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -209,7 +237,7 @@ private fun CustomTopBarPreview() {
             onNotificationClick = {},
             userName = "Dr. John Doe",
             userSubtitle = "Medical Officer",
-            profileIcon = Resources.Icon.Profile,
+            profileImage = Resources.Icon.Profile,
             onProfileClick = {}
         )
     }
