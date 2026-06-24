@@ -137,10 +137,11 @@ fun PrescriptionItemCard(
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                val mealTimeText = if (item.afm.isNotBlank()) " | ${item.afm}" else ""
                 val quantityText = if (item.medQty.isNotBlank()) " | Qty: ${item.medQty}" else ""
+                val mealTimeText = if (item.afm.isNotBlank()) " | ${item.afm}" else ""
+                val commentText = if (item.sf.isNotBlank()) " | ${item.sf}" else ""
                 Text(
-                    text = "Dose: ${item.mtr} | Days: ${item.medDuration}$quantityText$mealTimeText",
+                    text = "Dose: ${item.mtr} | Days: ${item.medDuration}$quantityText$mealTimeText$commentText",
                     color = subColor,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -276,12 +277,20 @@ fun MedicineComposerCard(
                     } else if (state.quantity.isBlank()) {
                         SnackbarController.sendEvent("Please enter quantity", type = SnackbarType.WARNING)
                     } else {
+                        val isOral = type in listOf("Cap", "Tab", "Syp", "Syrup")
                         val mealTimeText = when (state.mealTime) {
                             MealTime.BEFORE -> "Before"
                             MealTime.AFTER -> "After"
                         }
 
-                        val smsSf = "Rx\r\n${beneficiaryName}, ${beneficiaryCode}, ${beneficiaryAge}y\r\n${genericName}. ${brandName} , ${state.days}d"
+                        val instruction = if (isOral) {
+                            if (state.note.isNotBlank()) "$mealTimeText. ${state.note}" else mealTimeText
+                        } else {
+                            state.note
+                        }
+
+                        val smsSf =
+                            "Rx\r\n${beneficiaryName}, ${beneficiaryCode}, ${beneficiaryAge}y\r\n${genericName}. ${brandName} , ${state.days}d"
 
                         val item = PrescriptionItemDto(
                             medId = state.medicineId.toString(),
@@ -293,9 +302,9 @@ fun MedicineComposerCard(
                             medDuration = state.days,
                             mtr = state.dose,
                             mtrLbl = state.dose,
-                            mtrSf = state.note,
-                            afm = state.note,
-                            afmSf = state.note,
+                            mtrSf = instruction,
+                            afm = if (isOral) mealTimeText else "",
+                            afmSf = instruction,
                             sf = state.note,
                             smsSf = smsSf
                         )
