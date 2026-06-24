@@ -31,9 +31,9 @@ fun String.calculateAge(): String {
         }
 
         when {
-            years > 0 -> "$years years"
-            months > 0 -> "$months months"
-            else -> "${maxOf(0, days)} days"
+            years > 0 -> "$years y"
+            months > 0 -> "$months m"
+            else -> "${maxOf(0, days)} d"
         }
     } catch (_: Exception) {
         ""
