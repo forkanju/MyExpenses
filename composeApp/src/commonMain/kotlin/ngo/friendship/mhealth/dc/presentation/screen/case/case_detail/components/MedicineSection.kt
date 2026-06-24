@@ -269,6 +269,12 @@ fun MedicineComposerCard(
                         SnackbarController.sendEvent("Please enter a generic name", type = SnackbarType.WARNING)
                     } else if (brandName.isBlank()) {
                         SnackbarController.sendEvent("Please enter a medicine name", type = SnackbarType.WARNING)
+                    } else if (state.dose.isBlank()) {
+                        SnackbarController.sendEvent("Please enter dose", type = SnackbarType.WARNING)
+                    } else if (state.days.isBlank()) {
+                        SnackbarController.sendEvent("Please enter days", type = SnackbarType.WARNING)
+                    } else if (state.quantity.isBlank()) {
+                        SnackbarController.sendEvent("Please enter quantity", type = SnackbarType.WARNING)
                     } else {
                         val mealTimeText = when (state.mealTime) {
                             MealTime.BEFORE -> "Before"
