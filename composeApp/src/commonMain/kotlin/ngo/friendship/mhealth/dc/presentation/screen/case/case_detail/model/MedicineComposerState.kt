@@ -11,5 +11,7 @@ data class MedicineComposerState(
     val days: String = "",
     val quantity: String = "",
     val mealTime: MealTime = MealTime.AFTER,
-    val genericNameQuery: TextFieldValue = TextFieldValue("")
+    val genericNameQuery: TextFieldValue = TextFieldValue(""),
+    val note: String = "",
+    val isNoteVisible: Boolean = false
 )

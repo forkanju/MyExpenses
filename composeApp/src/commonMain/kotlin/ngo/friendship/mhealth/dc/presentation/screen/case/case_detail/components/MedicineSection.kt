@@ -140,7 +140,7 @@ fun PrescriptionItemCard(
                 val mealTimeText = if (item.afm.isNotBlank()) " | ${item.afm}" else ""
                 val quantityText = if (item.medQty.isNotBlank()) " | Qty: ${item.medQty}" else ""
                 Text(
-                    text = "Dose: ${item.mtr} | Days: ${item.medDuration}$mealTimeText$quantityText",
+                    text = "Dose: ${item.mtr} | Days: ${item.medDuration}$quantityText$mealTimeText",
                     color = subColor,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -256,6 +256,8 @@ fun MedicineComposerCard(
                 onMessageClick = { },
                 doseSuggestions = doseSuggestions,
                 showMealTime = state.doseType in listOf("Cap", "Tab", "Syp", "Syrup"),
+                noteValue = state.note,
+                onNoteChange = { onStateChange(state.copy(note = it)) },
                 onAddClick = {
                     val genericName = state.genericNameQuery.text.trim()
                     val brandName = state.medicineQuery.text.trim()
@@ -285,10 +287,10 @@ fun MedicineComposerCard(
                             medDuration = state.days,
                             mtr = state.dose,
                             mtrLbl = state.dose,
-                            mtrSf = state.dose,
-                            afm = state.dose,
-                            afmSf = state.dose,
-                            sf = "",
+                            mtrSf = state.note,
+                            afm = state.note,
+                            afmSf = state.note,
+                            sf = state.note,
                             smsSf = smsSf
                         )
 
@@ -298,11 +300,13 @@ fun MedicineComposerCard(
                             state.copy(
                                 medicineQuery = TextFieldValue(""),
                                 genericNameQuery = TextFieldValue(""),
-                                dose = "0+0+1",
-                                days = "7 days",
-                                quantity = "1",
+                                dose = "",
+                                days = "",
+                                quantity = "",
                                 mealTime = MealTime.AFTER,
-                                medicineId = -1L
+                                medicineId = -1L,
+                                note = "",
+                                isNoteVisible = false
                             )
                         )
                     }

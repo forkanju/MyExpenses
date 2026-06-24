@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,118 +45,70 @@ fun PrescriptionActionRowAligned(
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false,
     showMealTime: Boolean = true,
-    doseSuggestions: List<String> = emptyList()
+    doseSuggestions: List<String> = emptyList(),
+    noteValue: String = "",
+    onNoteChange: (String) -> Unit = {}
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        UnderlineTextFieldMini(
-            value = doseValue,
-            onValueChange = onDoseChange,
-            width = 60.dp,
-            isAnsweredMode = isAnsweredMode,
-            placeholder = "Dose",
-            suggestions = doseSuggestions
-        )
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            UnderlineTextFieldMini(
+                value = doseValue,
+                onValueChange = onDoseChange,
+                width = 80.dp,
+                isAnsweredMode = isAnsweredMode,
+                placeholder = "Dose",
+                suggestions = doseSuggestions
+            )
 
-        UnderlineTextFieldMini(
-            value = daysValue,
-            onValueChange = onDaysChange,
-            width = 60.dp,
-            isAnsweredMode = isAnsweredMode,
-            placeholder = "Days"
-        )
+            UnderlineTextFieldMini(
+                value = daysValue,
+                onValueChange = onDaysChange,
+                width = 30.dp,
+                isAnsweredMode = isAnsweredMode,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = "Days"
+            )
 
-        UnderlineTextFieldMini(
-            value = quantityValue,
-            onValueChange = onQuantityChange,
-            width = 50.dp,
-            isAnsweredMode = isAnsweredMode,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            placeholder = "Qty"
-        )
+            UnderlineTextFieldMini(
+                value = quantityValue,
+                onValueChange = onQuantityChange,
+                width = 30.dp,
+                isAnsweredMode = isAnsweredMode,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = "Qty"
+            )
 
-        if (showMealTime) {
-            MealTimeToggle(
-                value = toggleValue,
-                onChange = onToggleChange,
+            if (showMealTime) {
+                MealTimeToggle(
+                    value = toggleValue,
+                    onChange = onToggleChange,
+                    isAnsweredMode = isAnsweredMode
+                )
+            }
+
+            AddMini(
+                onClick = onAddClick,
                 isAnsweredMode = isAnsweredMode
             )
         }
 
-        AddMini(
-            onClick = onAddClick,
-            isAnsweredMode = isAnsweredMode
+        Spacer(Modifier.height(8.dp))
+        UnderlineTextFieldMini(
+            value = noteValue,
+            onValueChange = onNoteChange,
+            width = 0.dp, // Take full width
+            modifier = Modifier.fillMaxWidth(),
+            isAnsweredMode = isAnsweredMode,
+            placeholder = "Advice for this medicine (for FCM view)..."
         )
+        Spacer(Modifier.height(8.dp))
     }
-
-//    Row(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .height(48.dp),
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.SpaceBetween
-//
-//
-//    ) {
-//
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//
-//            UnderlineTextFieldMini(
-//                value = doseValue,
-//                onValueChange = onDoseChange,
-//                width = 48.dp,
-//                isAnsweredMode = isAnsweredMode,
-//                placeholder = "Dose",
-//                suggestions = doseSuggestions
-//            )
-//
-//            Spacer(Modifier.width(9.dp))
-//
-//            UnderlineTextFieldMini(
-//                value = daysValue,
-//                onValueChange = onDaysChange,
-//                width = 48.dp,
-//                isAnsweredMode = isAnsweredMode,
-//                placeholder = "Days"
-//            )
-//
-//            Spacer(Modifier.width(9.dp))
-//
-//            UnderlineTextFieldMini(
-//                value = quantityValue,
-//                onValueChange = onQuantityChange,
-//                width = 36.dp,
-//                isAnsweredMode = isAnsweredMode,
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                placeholder = "Qty"
-//            )
-//
-//            Spacer(Modifier.width(9.dp))
-//
-//            MealTimeToggle(
-//                value = toggleValue,
-//                onChange = onToggleChange,
-//                isAnsweredMode = isAnsweredMode
-//            )
-//        }
-//
-//        Spacer(Modifier.width(9.dp))
-//
-//        Row(verticalAlignment = Alignment.CenterVertically) {
-//
-//            Spacer(Modifier.width(9.dp))
-//
-//            AddMini(
-//                onClick = onAddClick,
-//                isAnsweredMode = isAnsweredMode
-//            )
-//        }
-//    }
 }
 
 @Composable
@@ -250,8 +203,16 @@ fun UnderlineTextFieldMini(
     placeholder: String = "",
     suggestions: List<String> = emptyList()
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
     val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Gray
-    val dividerColor = if (isAnsweredMode) Color(0xFFC7C7C7) else Gray
+    val dividerColor = when {
+        isAnsweredMode -> Color(0xFFC7C7C7)
+        isFocused -> FocusedBorderColor
+        else -> Gray
+    }
+    val dividerHeight = if (isFocused) 1.5.dp else 1.dp
 
     val finalModifier = if (modifier == Modifier) Modifier.width(width)
     else modifier
@@ -280,6 +241,7 @@ fun UnderlineTextFieldMini(
                 singleLine = true,
                 readOnly = isAnsweredMode,
                 keyboardOptions = keyboardOptions,
+                interactionSource = interactionSource,
                 decorationBox = { innerTextField ->
                     Box(contentAlignment = Alignment.CenterStart) {
                         if (value.isEmpty()) {
@@ -293,7 +255,7 @@ fun UnderlineTextFieldMini(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(1.dp)
+                    .height(dividerHeight)
                     .background(dividerColor)
             )
         }
