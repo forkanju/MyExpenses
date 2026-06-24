@@ -70,6 +70,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
         LaunchedEffect(Unit) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
                 viewModel.selectBottomTab(BottomNavItems.entries[page])
+                viewModel.refreshServerStatus()
                 if (page == BottomNavItems.Cases.ordinal)
                     viewModel.loadInterviewList()
             }

@@ -145,7 +145,6 @@ class MainViewModel(
     }
 
     fun refreshServerStatus() {
-        if (!isUserLoggedIn) return
         viewModelScope.launch {
             val status = mainRepository.checkServerStatus()
             (networkStatus as MutableStateFlow).value = status
