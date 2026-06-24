@@ -66,6 +66,11 @@ fun EntryProviderScope<NavKey>.dialogRoute(
                         viewModel.showSuccess("The app is already up to date")
                     }
 
+                    ProfileEvent.OnVersionClick -> {
+                        viewModel.backStack.removeLastOrNull()
+                        viewModel.backStack.add(Screens.VersionHistory)
+                    }
+
                     else -> {
                         viewModel.backStack.removeLastOrNull()
                     }

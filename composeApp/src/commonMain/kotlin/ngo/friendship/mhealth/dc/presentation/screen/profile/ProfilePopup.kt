@@ -65,6 +65,7 @@ sealed class ProfileEvent {
     object OnVideoTutorialClick : ProfileEvent()
     object OnSignOutClick : ProfileEvent()
     object OnCheckUpdateClick : ProfileEvent()
+    object OnVersionClick : ProfileEvent()
 }
 
 @Composable
@@ -289,7 +290,8 @@ private fun ProfileFooter(uiState: ProfileUiState, onEvent: (ProfileEvent) -> Un
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "Version: ${uiState.versionInfo} ",
-                style = TextStyle(color = Color.Gray, fontSize = 12.sp)
+                modifier = Modifier.clickable { onEvent(ProfileEvent.OnVersionClick) },
+                style = TextStyle(color = Color.Gray, fontSize = 12.sp, textDecoration = TextDecoration.Underline)
             )
 
             Text(

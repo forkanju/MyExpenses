@@ -68,6 +68,12 @@ object Screens {
     data object Dashboard : NavKey
 
     @Serializable
+    data object VersionHistory : NavKey
+
+    @Serializable
+    data class VersionDetails(val version: ngo.friendship.mhealth.dc.domain.model.VersionInfo) : NavKey
+
+    @Serializable
     data object LocalTreatment : NavKey
 
     @Serializable
@@ -129,6 +135,8 @@ val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class, Screens.LocalTreatmentDetails::class, Screens.LocalTreatmentDetails.serializer())
     polymorphic(NavKey::class, Screens.ChangePassword::class, Screens.ChangePassword.serializer())
     polymorphic(NavKey::class, Screens.Dashboard::class, Screens.Dashboard.serializer())
+    polymorphic(NavKey::class, Screens.VersionHistory::class, Screens.VersionHistory.serializer())
+    polymorphic(NavKey::class, Screens.VersionDetails::class, Screens.VersionDetails.serializer())
     //dialog
     polymorphic(NavKey::class, Screens.Dialog.Error::class, Screens.Dialog.Error.serializer())
     polymorphic(
