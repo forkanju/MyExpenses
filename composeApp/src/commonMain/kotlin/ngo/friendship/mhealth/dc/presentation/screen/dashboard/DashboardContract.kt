@@ -20,6 +20,11 @@ sealed interface DashboardIntent {
     data object Refresh : DashboardIntent
     data object ClearError : DashboardIntent
     data class ShowSnackbar(val message: String, val type: SnackbarType = SnackbarType.DEFAULT) : DashboardIntent
+    data object SyncMedicine : DashboardIntent
+    data object SyncSetupData : DashboardIntent
+    data object SyncAdvice : DashboardIntent
+    data object SyncPrescription : DashboardIntent
+    data object SyncAll : DashboardIntent
 }
 
 sealed interface DashboardEffect {
