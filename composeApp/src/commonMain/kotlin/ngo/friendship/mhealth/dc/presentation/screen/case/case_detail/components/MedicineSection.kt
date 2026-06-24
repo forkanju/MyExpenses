@@ -255,6 +255,7 @@ fun MedicineComposerCard(
                 onToggleChange = { onStateChange(state.copy(mealTime = it)) },
                 onMessageClick = { },
                 doseSuggestions = doseSuggestions,
+                showMealTime = state.doseType in listOf("Cap", "Tab", "Syp", "Syrup"),
                 onAddClick = {
                     val genericName = state.genericNameQuery.text.trim()
                     val brandName = state.medicineQuery.text.trim()

@@ -278,17 +278,18 @@ fun CaseDetailScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                LabeledFormTextField(
+                FormAutoCompleteDropdownField(
                     label = "Doctor Advice",
                     placeholder = "Advice",
-                    value = state.formState.doctorAdvice,
+                    options = state.adviceList,
+                    selected = state.formState.doctorAdvice,
+                    getLabel = { it },
+                    onSelectedChange = { selected ->
+                        onIntent(CaseIntent.UpdateDoctorAdvice(selected))
+                    },
                     onValueChange = {
                         onIntent(CaseIntent.UpdateDoctorAdvice(it))
                     },
-                    isError = false,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-                    ),
                     enabled = !isAnsweredMode,
                     isAnsweredMode = isAnsweredMode
                 )

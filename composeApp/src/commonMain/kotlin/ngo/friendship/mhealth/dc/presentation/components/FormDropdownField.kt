@@ -72,6 +72,7 @@ fun <T> FormDropdownField(
     selected: T? = null,
     getLabel: (T) -> String,
     onSelectedChange: (T) -> Unit,
+    onValueChange: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -214,6 +215,7 @@ fun <T> FormAutoCompleteDropdownField(
     selected: T? = null,
     getLabel: (T) -> String,
     onSelectedChange: (T) -> Unit,
+    onValueChange: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isError: Boolean = false,
@@ -318,6 +320,7 @@ fun <T> FormAutoCompleteDropdownField(
                     suppressNextExpand = false
                     value = it
                     expanded = true
+                    onValueChange(it.text)
                 },
                 modifier = Modifier
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
@@ -391,6 +394,7 @@ fun <T> FormAutoCompleteDropdownField(
                             )
 
                             onSelectedChange(item)
+                            onValueChange(itemLabel)
                             expanded = false
                             keyboardController?.hide()
                             focusManager.clearFocus()

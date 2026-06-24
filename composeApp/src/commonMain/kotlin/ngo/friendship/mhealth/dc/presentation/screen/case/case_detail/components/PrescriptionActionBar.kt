@@ -43,6 +43,7 @@ fun PrescriptionActionRowAligned(
 
     modifier: Modifier = Modifier,
     isAnsweredMode: Boolean = false,
+    showMealTime: Boolean = true,
     doseSuggestions: List<String> = emptyList()
 ) {
     Row(
@@ -78,11 +79,13 @@ fun PrescriptionActionRowAligned(
             placeholder = "Qty"
         )
 
-        MealTimeToggle(
-            value = toggleValue,
-            onChange = onToggleChange,
-            isAnsweredMode = isAnsweredMode
-        )
+        if (showMealTime) {
+            MealTimeToggle(
+                value = toggleValue,
+                onChange = onToggleChange,
+                isAnsweredMode = isAnsweredMode
+            )
+        }
 
         AddMini(
             onClick = onAddClick,

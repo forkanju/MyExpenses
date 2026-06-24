@@ -50,7 +50,15 @@ class CaseViewModel(
         onIntent(CaseIntent.LoadMedicineList("Tab"))
         loadSetupData()
         loadPrescriptionTemplates()
+        loadAdviceList()
         loadDoseHistory()
+    }
+
+    private fun loadAdviceList() {
+        launch(loading = Loading.Gone) {
+            val list = mainRepository.getAdviceList()
+            _state.update { it.copy(adviceList = list.map { it.title }) }
+        }
     }
 
     private fun loadDoseHistory() {
