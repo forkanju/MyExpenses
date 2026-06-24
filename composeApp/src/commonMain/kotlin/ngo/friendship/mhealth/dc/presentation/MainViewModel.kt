@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
 import ngo.friendship.mhealth.dc.di.isUnauthorizedFlow
+import ngo.friendship.mhealth.dc.domain.model.NetworkStatus
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
@@ -88,6 +89,9 @@ class MainViewModel(
     val adviceListState: StateFlow<List<AdviceItemData>>
         field = MutableStateFlow(emptyList())
 
+    val networkStatus: StateFlow<NetworkStatus>
+        field = MutableStateFlow(NetworkStatus.ONLINE)
+
     var selectedCaseTab by mutableStateOf(CaseTab.Pending)
         private set
 
@@ -137,6 +141,14 @@ class MainViewModel(
                     backStack.replaceWith(Screens.Auth)
                 }
             }
+        }
+    }
+
+    fun refreshServerStatus() {
+        if (!isUserLoggedIn) return
+        viewModelScope.launch {
+            val status = mainRepository.checkServerStatus()
+            (networkStatus as MutableStateFlow).value = status
         }
     }
 

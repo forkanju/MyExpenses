@@ -2,6 +2,7 @@ package ngo.friendship.mhealth.dc.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ import ngo.friendship.mhealth.dc.theme.FriendshipTheme
 import ngo.friendship.mhealth.dc.theme.Red
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.Resources.Icon.AppLogoWhite
+import ngo.friendship.mhealth.dc.domain.model.NetworkStatus
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -57,6 +59,7 @@ fun CustomTopBar(
     userSubtitle: String? = null,
     profileImage: Any? = null,
     onProfileClick: () -> Unit,
+    networkStatus: NetworkStatus = NetworkStatus.ONLINE
 ) {
     Row(
         modifier = modifier
@@ -119,7 +122,12 @@ fun CustomTopBar(
                 }
             }
             Spacer(Modifier.width(10.dp))
-            IconButton(onClick = onProfileClick) {
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .clickable { onProfileClick() },
+                contentAlignment = Alignment.Center
+            ) {
                 Box(
                     modifier = Modifier
                         .size(30.dp)
@@ -164,6 +172,20 @@ fun CustomTopBar(
                         )
                     }
                 }
+
+                // Active Status Indicator
+                val statusColor = when (networkStatus) {
+                    NetworkStatus.ONLINE -> Color(0xFF4CAF50) // Green
+                    NetworkStatus.API_ERROR -> Color(0xFFFFC107) // Yellow
+                    NetworkStatus.OFFLINE -> Color(0xFFF44336) // Red
+                }
+                Box(
+                    modifier = Modifier
+                        .size(14.dp)
+                        .align(Alignment.TopEnd)
+                        .background(statusColor, CircleShape)
+                        .border(2.dp, backgroundColor, CircleShape)
+                )
             }
         }
     }

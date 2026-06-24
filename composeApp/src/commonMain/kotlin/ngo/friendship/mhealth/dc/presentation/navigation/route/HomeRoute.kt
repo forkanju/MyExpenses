@@ -36,6 +36,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
         val caseTabCounts by viewModel.caseTabCounts.collectAsStateWithLifecycle()
         val notificationCount = caseTabCounts[CaseTab.Pending] ?: 0
         val userProfile by viewModel.userProfileState.collectAsStateWithLifecycle()
+        val networkStatus by viewModel.networkStatus.collectAsStateWithLifecycle()
         val pagerState = rememberPagerState(
             initialPage = viewModel.selectedBottomTab.ordinal,
             pageCount = { BottomNavItems.entries.size }
@@ -80,6 +81,7 @@ fun EntryProviderScope<NavKey>.homeRoute(
         }
 
         LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+            viewModel.refreshServerStatus()
             if (viewModel.selectedBottomTab == BottomNavItems.Cases || viewModel.interviewListState.value.isEmpty())
                 viewModel.loadInterviewList()
         }
@@ -95,7 +97,8 @@ fun EntryProviderScope<NavKey>.homeRoute(
                     userName = userProfile?.userName ?: "Doctor Center",
                     userSubtitle = userProfile?.location ?: "Friendship NGO",
                     profileImage = userProfile?.getProfileImageSource() ?: Resources.Icon.Profile,
-                    onProfileClick = { viewModel.backStack.add(Screens.Dialog.ProfilePopup) }
+                    onProfileClick = { viewModel.backStack.add(Screens.Dialog.ProfilePopup) },
+                    networkStatus = networkStatus
                 )
             },
             bottomBar = {

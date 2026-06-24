@@ -19,6 +19,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.FcmProfileReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.FcmProfileResDto
+import ngo.friendship.mhealth.dc.data.remote.dto.HeartbeatReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.data.remote.dto.InterviewListReqDto
@@ -206,6 +207,17 @@ class ApiService(
     ): SaveAdviceResDto = client.processFormDataRequest(
         url = "mHealthEnt_gateway/api/usergate",
         body = request,
+    )
+
+    suspend fun checkUserGate(
+        request: HeartbeatReqDto,
+        appVersion: Int
+    ): JsonObject = client.processFormDataRequest(
+        url = "mHealthEnt_gateway/api/usergate",
+        body = request,
+        request = {
+            header("app_version", appVersion.toString())
+        }
     )
 
     suspend fun sendSms(

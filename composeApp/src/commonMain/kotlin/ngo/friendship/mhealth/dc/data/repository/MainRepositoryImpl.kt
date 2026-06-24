@@ -15,6 +15,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.AdviceListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.ChangePasswordReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.DoctorProfileReqDto
+import ngo.friendship.mhealth.dc.data.remote.dto.HeartbeatReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.MedicineListReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateDto
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionTemplateReqDto
@@ -24,6 +25,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.SaveInvestigationReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SaveMedicineReqDto
 import ngo.friendship.mhealth.dc.data.remote.dto.SetupDataReqDto
 import ngo.friendship.mhealth.dc.domain.mapper.toDomain
+import ngo.friendship.mhealth.dc.domain.model.NetworkStatus
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
@@ -263,6 +265,26 @@ class MainRepositoryImpl(
                 interviewId = interviewId
             )
         )
+    }
+
+    override suspend fun checkServerStatus(): NetworkStatus {
+        if (!ngo.friendship.mhealth.dc.domain.network.ConnectionListener.isConnected) {
+            return NetworkStatus.OFFLINE
+        }
+        return try {
+            api.checkUserGate(
+                request = HeartbeatReqDto.build(
+                    userName = localSettings.user.userName,
+                    password = localSettings.user.password,
+                    requestTime = currentTimestamp.toDateTimeServerSlash()
+                ),
+                appVersion = 3069
+            )
+            NetworkStatus.ONLINE
+        } catch (e: Exception) {
+            println("Server Status Check Failed: ${e.message}")
+            NetworkStatus.API_ERROR
+        }
     }
 
     override suspend fun clearAllData() {

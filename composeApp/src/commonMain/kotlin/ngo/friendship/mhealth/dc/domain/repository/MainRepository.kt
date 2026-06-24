@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import ngo.friendship.mhealth.dc.domain.model.NetworkStatus
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.UserProfile
@@ -23,5 +24,6 @@ interface MainRepository {
     ): Pair<Boolean, String?>
     suspend fun changePassword(old: String, new: String): Pair<Boolean, String?>
     suspend fun getDoctorFeedback(interviewId: Long): ngo.friendship.mhealth.dc.data.remote.dto.DoctorFeedbackResDto
+    suspend fun checkServerStatus(): NetworkStatus
     suspend fun clearAllData()
 }
