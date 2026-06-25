@@ -1,7 +1,9 @@
 package ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +18,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
@@ -25,13 +33,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.presentation.components.CompactTextStyle
 import ngo.friendship.mhealth.dc.presentation.components.DottedDivider
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
-import ngo.friendship.mhealth.dc.utils.toUiDate
 import ngo.friendship.mhealth.dc.utils.toUiDateTime
 import org.jetbrains.compose.resources.painterResource
 
@@ -61,119 +74,181 @@ fun CaseItem(
         )
     } else null
 
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(
-            topStart = 0.dp,
-            topEnd = 0.dp,
-            bottomEnd = 12.dp,
-            bottomStart = 12.dp
-        ),
-        colors = CardDefaults.cardColors(containerColor = cardContainerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-            Row(verticalAlignment = Alignment.Top) {
-                AvatarTileWithBadges(
-                    modifier = Modifier.size(width = 56.dp, height = 68.dp),
-                    timeText = ui.startTime.toUiDate(),
-                    idText = ui.beneficiaryCode.substringAfter("-"),
-                    isAnsweredStyle = isAnsweredStyle,
-                    photo = {
-                        Image(
-                            painter = painterResource(Resources.Icon.FCM),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize(),
-                            colorFilter = grayscaleFilter
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            onClick = onClick,
+            shape = RoundedCornerShape(
+                topStart = 0.dp,
+                topEnd = 0.dp,
+                bottomEnd = 12.dp,
+                bottomStart = 12.dp
+            ),
+            colors = CardDefaults.cardColors(containerColor = cardContainerColor),
+            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Row(verticalAlignment = Alignment.Top) {
+                    AvatarTileWithBadges(
+                        modifier = Modifier.size(width = 56.dp, height = 68.dp),
+                        idText = ui.beneficiaryCode.substringAfter("-"),
+                        isAnsweredStyle = isAnsweredStyle,
+                        photo = {
+                            Image(
+                                painter = painterResource(Resources.Icon.FCM),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(),
+                                colorFilter = grayscaleFilter
+                            )
+                        }
+                    )
+
+                    Spacer(Modifier.width(10.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = "${ui.beneficiaryName} (${ui.status})",
+                            style = CompactTextStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = titleColor
+                            )
+                        )
+
+                        Text(
+                            text = ui.location,
+                            style = CompactTextStyle(
+                                fontSize = FontSize.SMALL,
+                                fontStyle = FontStyle.Italic,
+                                color = locationColor
+                            )
+                        )
+
+                        Text(
+                            text = ui.questionnaireName,
+                            style = CompactTextStyle(
+                                fontSize = FontSize.MEDIUM,
+                                color = questionColor,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
                     }
+                }
+
+                Spacer(Modifier.height(8.dp))
+                DottedDivider()
+                Spacer(Modifier.height(4.dp))
+
+                Text(
+                    text = "Ref by: ${ui.userName}",
+                    style = CompactTextStyle(
+                        fontSize = FontSize.EXTRA_SMALL,
+                        fontStyle = FontStyle.Italic,
+                        color = refColor
+                    )
                 )
 
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.height(4.dp))
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${ui.beneficiaryName} (${ui.status})",
+                        text = "at",
                         style = CompactTextStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = titleColor
-                        )
-                    )
-
-                    Text(
-                        text = ui.location,
-                        style = CompactTextStyle(
-                            fontSize = FontSize.SMALL,
+                            fontSize = FontSize.EXTRA_SMALL,
                             fontStyle = FontStyle.Italic,
-                            color = locationColor
+                            color = refColor
                         )
                     )
 
+                    Spacer(Modifier.width(4.dp))
+
                     Text(
-                        text = ui.questionnaireName,
+                        text = ui.startTime.toUiDateTime(),
                         style = CompactTextStyle(
-                            fontSize = FontSize.MEDIUM,
-                            color = questionColor,
+                            fontSize = FontSize.EXTRA_SMALL,
+                            fontStyle = FontStyle.Italic,
+                            color = timeColor,
                             fontWeight = FontWeight.SemiBold
                         )
                     )
+
+                    Spacer(Modifier.width(4.dp))
+
+                    Text(
+                        text = ui.status,
+                        style = CompactTextStyle(
+                            fontSize = FontSize.EXTRA_SMALL,
+                            color = refColor
+                        ),
+                        fontStyle = FontStyle.Italic,
+                    )
                 }
             }
+        }
 
-            Spacer(Modifier.height(8.dp))
-            DottedDivider()
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = "Ref by: ${ui.userName}",
-                style = CompactTextStyle(
-                    fontSize = FontSize.EXTRA_SMALL,
-                    fontStyle = FontStyle.Italic,
-                    color = refColor
-                )
+        if (!isAnsweredStyle) {
+            CountdownBadge(
+                startTime = ui.startTime,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 8.dp, end = 8.dp)
             )
+        }
+    }
+}
 
-            Spacer(Modifier.height(4.dp))
+@Composable
+fun CountdownBadge(
+    startTime: String,
+    modifier: Modifier = Modifier
+) {
+    var remainingTimeMs by remember(startTime) { mutableLongStateOf(0L) }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "at",
-                    style = CompactTextStyle(
-                        fontSize = FontSize.EXTRA_SMALL,
-                        fontStyle = FontStyle.Italic,
-                        color = refColor
-                    )
-                )
+    LaunchedEffect(startTime) {
+        val interviewTime = try {
+            val cleaned = startTime
+                .substringBefore(".")
+                .replace(" ", "T")
+            LocalDateTime.parse(cleaned).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+        } catch (_: Exception) {
+            0L
+        }
 
-                Spacer(Modifier.width(4.dp))
+        if (interviewTime == 0L) return@LaunchedEffect
 
-                Text(
-                    text = ui.startTime.toUiDateTime(),
-                    style = CompactTextStyle(
-                        fontSize = FontSize.EXTRA_SMALL,
-                        fontStyle = FontStyle.Italic,
-                        color = timeColor,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                )
+        val thirtyMinutesMs = 30 * 60 * 1000L
+        val endTime = interviewTime + thirtyMinutesMs
 
-                Spacer(Modifier.width(4.dp))
+        while (true) {
+            val now = Clock.System.now().toEpochMilliseconds()
+            remainingTimeMs = (endTime - now).coerceAtLeast(0L)
+            if (remainingTimeMs <= 0) break
+            delay(1000)
+        }
+    }
 
-                Text(
-                    text = ui.status,
-                    style = CompactTextStyle(
-                        fontSize = FontSize.EXTRA_SMALL,
-                        color = refColor
-                    ),
-                    fontStyle = FontStyle.Italic,
-                )
-            }
+    if (remainingTimeMs > 0) {
+        val totalSeconds = remainingTimeMs / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        val timeStr = "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(4.dp))
+                .background(Color(0xFFE25555))
+                .padding(horizontal = 6.dp, vertical = 2.dp)
+        ) {
+            Text(
+                text = timeStr,
+                color = Color.White,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
