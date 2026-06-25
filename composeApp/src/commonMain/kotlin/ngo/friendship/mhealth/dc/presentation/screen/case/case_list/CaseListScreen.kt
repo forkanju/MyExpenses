@@ -140,7 +140,8 @@ fun CaseListContent(
                     CaseItem(
                         ui = item,
                         onClick = { onIntent(CaseListIntent.ClickCase(item)) },
-                        isAnsweredStyle = state.selectedTab == CaseTab.Answered
+                        isAnsweredStyle = state.selectedTab == CaseTab.Answered,
+                        showCountdown = state.selectedTab == CaseTab.Pending
                     )
                 }
             }

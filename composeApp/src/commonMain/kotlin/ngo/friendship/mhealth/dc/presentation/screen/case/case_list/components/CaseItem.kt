@@ -59,7 +59,8 @@ import org.jetbrains.compose.resources.painterResource
 fun CaseItem(
     ui: Interview,
     onClick: () -> Unit,
-    isAnsweredStyle: Boolean = false
+    isAnsweredStyle: Boolean = false,
+    showCountdown: Boolean = false
 ) {
     val cardContainerColor = if (isAnsweredStyle) Color.White else Color.White
     val titleColor = Color.Black
@@ -178,24 +179,24 @@ fun CaseItem(
 
                     Spacer(Modifier.width(4.dp))
 
-                    Text(
-                        text = ui.status,
-                        style = CompactTextStyle(
-                            fontSize = FontSize.EXTRA_SMALL,
-                            color = refColor
-                        ),
-                        fontStyle = FontStyle.Italic,
-                    )
+//                    Text(
+//                        text = ui.status,
+//                        style = CompactTextStyle(
+//                            fontSize = FontSize.EXTRA_SMALL,
+//                            color = refColor
+//                        ),
+//                        fontStyle = FontStyle.Italic,
+//                    )
                 }
             }
         }
 
-        if (!isAnsweredStyle) {
+        if (showCountdown) {
             CountdownBadge(
                 startTime = ui.startTime,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(top = 8.dp, end = 8.dp)
+                    .padding(end = 8.dp)
             )
         }
     }
@@ -240,7 +241,7 @@ fun CountdownBadge(
         Box(
             modifier = modifier
                 .clip(RoundedCornerShape(4.dp))
-                .background(Color(0xFFE25555))
+                .background(Color(0xFF1C9FE2))
                 .padding(horizontal = 6.dp, vertical = 2.dp)
         ) {
             Text(
