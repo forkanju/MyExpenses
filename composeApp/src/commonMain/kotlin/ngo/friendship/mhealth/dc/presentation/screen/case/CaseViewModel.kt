@@ -10,13 +10,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
 import ngo.friendship.mhealth.dc.data.remote.dto.PrescriptionItemDto
 import ngo.friendship.mhealth.dc.domain.model.Diagnosis
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
@@ -104,9 +103,11 @@ class CaseViewModel(
 
                         PrescriptionItemDto(
                             medId = medDto.medicineId.orEmpty(),
-                            genName = medDto.genericName.orEmpty().ifBlank { medicine?.genericName.orEmpty() },
+                            genName = medDto.genericName.orEmpty()
+                                .ifBlank { medicine?.genericName.orEmpty() },
                             medType = medicine?.type.orEmpty(),
-                            medName = medDto.brandName.orEmpty().ifBlank { medicine?.brandName.orEmpty() },
+                            medName = medDto.brandName.orEmpty()
+                                .ifBlank { medicine?.brandName.orEmpty() },
                             medQty = medDto.qty.orEmpty(),
                             saleQty = medDto.qty.orEmpty(),
                             medDuration = medDto.durationDay.orEmpty(),
@@ -349,9 +350,11 @@ class CaseViewModel(
 
                         PrescriptionItemDto(
                             medId = medDto.medicineId.orEmpty(),
-                            genName = medDto.genericName.orEmpty().ifBlank { medicine?.genericName.orEmpty() },
+                            genName = medDto.genericName.orEmpty()
+                                .ifBlank { medicine?.genericName.orEmpty() },
                             medType = medicine?.type.orEmpty(),
-                            medName = medDto.brandName.orEmpty().ifBlank { medicine?.brandName.orEmpty() },
+                            medName = medDto.brandName.orEmpty()
+                                .ifBlank { medicine?.brandName.orEmpty() },
                             medQty = medDto.qty.orEmpty(),
                             saleQty = medDto.qty.orEmpty(),
                             medDuration = medDto.durationDay.orEmpty(),
@@ -522,6 +525,7 @@ class CaseViewModel(
             }
         }
     }
+
     fun modifyQuestionAnswerJson2(
         array: JsonArray,
         index: Int,
@@ -552,7 +556,6 @@ class CaseViewModel(
     }
 
 
-
     private fun loadMedicineList(
         type: String = "Tab"
     ) {
@@ -566,7 +569,7 @@ class CaseViewModel(
         launch {
             var modifiedJsonArray1: JsonArray = _state.value.formState.questionAnswers
             var modifiedJsonArray2: JsonArray = _state.value.formState.questionAnswers2
-            
+
             var result = _state.value.questionAnswerData
             if (result.questionAnswerJson.isEmpty() && result.questionAnswerJson2.isEmpty()) {
                 "QuestionAnswerData is empty in state, fetching from repository...".log("CAPTION_DEBUG")
@@ -642,7 +645,7 @@ class CaseViewModel(
                                 })
                             }
                         }
-                        
+
                         finalTemplateArray = updatedJsonArray
                         "Modified First Caption JSON: $updatedJsonArray".log("CAPTION_DEBUG")
                     }
@@ -651,15 +654,30 @@ class CaseViewModel(
                     if (!secondCaption.isNullOrBlank()) {
                         var jsonArray = defJson.parseToJsonElement(secondCaption).jsonArray
                         "Modified Second Caption Array:modifyQuestionAnswerJson2 $jsonArray".log("CAPTION_DEBUG")
-                        val comments = _state.value.formState.commentsForFcm.replace(Regex("[\\r\\n]"), " ")
+                        val comments =
+                            _state.value.formState.commentsForFcm.replace(Regex("[\\r\\n]"), " ")
                         jsonArray = modifyQuestionAnswerJson2(jsonArray, 1, comments)
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 2, _state.value.formState.prescriptions.toJson())
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 3, _state.value.formState.selectedReferralCenter?.refCenterId.toString())
-                        jsonArray = modifyQuestionAnswerJson2(jsonArray, 4, _state.value.formState.nextFollowUpDate)
-                        
+                        jsonArray = modifyQuestionAnswerJson2(
+                            jsonArray,
+                            2,
+                            _state.value.formState.prescriptions.toJson()
+                        )
+                        jsonArray = modifyQuestionAnswerJson2(
+                            jsonArray,
+                            3,
+                            _state.value.formState.selectedReferralCenter?.refCenterId.toString()
+                        )
+                        jsonArray = modifyQuestionAnswerJson2(
+                            jsonArray,
+                            4,
+                            _state.value.formState.nextFollowUpDate
+                        )
+
                         modifiedJsonArray2 = buildQuestionAnswerJson2(jsonArray)
-                        
-                        "Modified Second Caption Array:modifyQuestionAnswerJson2 $modifiedJsonArray2".log("CAPTION_DEBUG")
+
+                        "Modified Second Caption Array:modifyQuestionAnswerJson2 $modifiedJsonArray2".log(
+                            "CAPTION_DEBUG"
+                        )
                     }
 
                 } catch (e: Exception) {
@@ -671,7 +689,9 @@ class CaseViewModel(
             val isFromTemplate = currentState.interviewDetails.interviewId == -1L
 
             // 1. Prescription Validation (Optional)
-            val duplicates = formState.prescriptions.groupBy { it.medId.ifBlank { "${it.genName} ${it.medName}" } }.any { it.value.size > 1 }
+            val duplicates =
+                formState.prescriptions.groupBy { it.medId.ifBlank { "${it.genName} ${it.medName}" } }
+                    .any { it.value.size > 1 }
             if (duplicates) {
                 showWarning("Duplicate same medicine entry not allowed!")
                 return@launch
@@ -713,9 +733,9 @@ class CaseViewModel(
                     isFcmChecked = currentState.customMessageState.isFcmChecked,
                     isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked,
                     // SWAP: QUESTION_ANSWER_JSON gets modifiedJsonArray2 (answers)
-                    questionAnswers =  finalTemplateArray?: JsonArray(emptyList()),
+                    questionAnswers = finalTemplateArray ?: JsonArray(emptyList()),
                     // SWAP: QUESTION_ANSWER_JSON2 gets finalTemplateArray (template string wrapped in JsonArray)
-                    questionAnswers2 = modifiedJsonArray2?: JsonArray(emptyList()),
+                    questionAnswers2 = modifiedJsonArray2 ?: JsonArray(emptyList()),
                 )
 
                 // Log final state for debugging
@@ -779,6 +799,7 @@ class CaseViewModel(
             }
         }
     }
+
     fun buildQuestionAnswerJson2(array: JsonArray): JsonArray {
         return try {
             JsonArray(
@@ -811,7 +832,8 @@ class CaseViewModel(
                                         defJson.decodeFromString<List<PrescriptionItemDto>>(jsonStr)
                                     prescriptions.addAll(list)
                                 } else if (jsonStr.startsWith("{")) {
-                                    val item = defJson.decodeFromString<PrescriptionItemDto>(jsonStr)
+                                    val item =
+                                        defJson.decodeFromString<PrescriptionItemDto>(jsonStr)
                                     prescriptions.add(item)
                                 }
                             } catch (e: Exception) {
@@ -819,7 +841,8 @@ class CaseViewModel(
                             }
                         }
 
-                        val setupData = mainRepository.getSetupData(forceRefresh = false).firstOrNull()
+                        val setupData =
+                            mainRepository.getSetupData(forceRefresh = false).firstOrNull()
 
                         val selectedReferralCenter = setupData?.referralCenters?.find {
                             it.refCenterId == feedback.refCenterId
@@ -832,7 +855,8 @@ class CaseViewModel(
                             }
                         } else if (!feedback.diagDesc.isNullOrBlank()) {
                             // Handle comma separated diagnoses
-                            val names = feedback.diagDesc.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                            val names = feedback.diagDesc.split(",").map { it.trim() }
+                                .filter { it.isNotBlank() }
                             names.forEach { name ->
                                 setupData?.diagnoses?.find {
                                     it.diagName.equals(name, ignoreCase = true)
@@ -847,7 +871,8 @@ class CaseViewModel(
                         val selectedInvestigations = mutableListOf<Investigation>()
                         if (!feedback.investigationAdvice.isNullOrBlank()) {
                             // Handle comma separated investigations
-                            val names = feedback.investigationAdvice.split(",").map { it.trim() }.filter { it.isNotBlank() }
+                            val names = feedback.investigationAdvice.split(",").map { it.trim() }
+                                .filter { it.isNotBlank() }
                             names.forEach { name ->
                                 setupData?.investigations?.find {
                                     it.investigationName.equals(name, ignoreCase = true) ||

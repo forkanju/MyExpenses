@@ -124,6 +124,24 @@ fun CaseDetailScreen(
             }
         }
 
+    val isValid = remember(state.formState, state.templateName, isFromTemplate) {
+        val form = state.formState
+        val hasMedicine = form.prescriptions.isNotEmpty()
+        val hasFollowUp = form.nextFollowUpDate.isNotBlank()
+        val hasReferral = form.selectedReferralCenter != null
+        val hasAdvice = form.doctorAdvice.isNotBlank()
+
+        if (isFromTemplate) {
+            state.templateName.isNotBlank() && (hasMedicine || hasAdvice)
+        } else {
+            if (hasMedicine) {
+                true
+            } else {
+                hasFollowUp || hasReferral || hasAdvice
+            }
+        }
+    }
+
     Scaffold(
         modifier = modifier.imePadding(),
         containerColor = if (isAnsweredMode) Color(0xFFEFEFEF) else Color.White,
@@ -151,7 +169,7 @@ fun CaseDetailScreen(
                             println("Share template")
                         },
                         sendButtonText = if (state.prescriptionId != null) "Update Template" else "Save Template",
-                        enabled = !isAnsweredMode,
+                        enabled = !isAnsweredMode && isValid,
                         isAnsweredMode = isAnsweredMode
                     )
                 }
@@ -512,7 +530,7 @@ fun CaseDetailScreen(
                             onShareClick = {
                                 println("Share prescription")
                             },
-                            enabled = !isAnsweredMode,
+                            enabled = !isAnsweredMode && isValid,
                             isAnsweredMode = isAnsweredMode
                         )
                         Spacer(modifier = Modifier.height(16.dp))
