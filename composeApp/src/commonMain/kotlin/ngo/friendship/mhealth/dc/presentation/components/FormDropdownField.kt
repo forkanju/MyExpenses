@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.presentation.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -40,6 +42,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
@@ -80,6 +86,7 @@ fun <T> FormDropdownField(
     isAnsweredMode: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     val labelColor = if (isAnsweredMode) Color(0xFF666666) else TextDarkerGray
     val borderColor = when {
@@ -152,10 +159,12 @@ fun <T> FormDropdownField(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 offset = DpOffset(0.dp, 4.dp),
+                scrollState = scrollState,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .widthIn(min = 150.dp, max = 250.dp)
-                    .heightIn(max = 200.dp),
+                    .heightIn(max = 200.dp)
+                    .drawVerticalScrollbar(scrollState),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                 tonalElevation = 2.dp,
                 shadowElevation = 8.dp,
@@ -207,6 +216,28 @@ fun <T> FormDropdownField(
     }
 }
 
+private fun Modifier.drawVerticalScrollbar(
+    state: ScrollState,
+    width: Dp = 4.dp,
+    color: Color = Color(0xFFCBD5E1)
+): Modifier = drawWithContent {
+    drawContent()
+    if (state.maxValue > 0) {
+        val viewPortHeight = size.height
+        val totalContentHeight = state.maxValue + viewPortHeight
+        val scrollbarHeight = (viewPortHeight / totalContentHeight) * viewPortHeight
+        val scrollbarOffset = (state.value / totalContentHeight) * viewPortHeight
+
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(size.width - width.toPx() - 2.dp.toPx(), scrollbarOffset),
+            size = Size(width.toPx(), scrollbarHeight),
+            cornerRadius = CornerRadius(width.toPx() / 2, width.toPx() / 2),
+            alpha = 0.7f
+        )
+    }
+}
+
 @Composable
 fun <T> FormAutoCompleteDropdownField(
     label: String? = null,
@@ -249,6 +280,7 @@ fun <T> FormAutoCompleteDropdownField(
     }
 
     var expanded by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
     var suppressNextExpand by remember { mutableStateOf(false) }
     var selectingSuggestion by remember { mutableStateOf(false) }
 
@@ -368,7 +400,9 @@ fun <T> FormAutoCompleteDropdownField(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                scrollState = scrollState,
                 modifier = Modifier.background(fieldBackground)
+                    .drawVerticalScrollbar(scrollState)
             ) {
                 filteredOptions.forEachIndexed { index, item ->
                     val itemLabel = getLabel(item)

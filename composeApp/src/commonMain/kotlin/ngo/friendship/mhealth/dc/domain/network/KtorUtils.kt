@@ -207,7 +207,7 @@ suspend inline fun <reified R> HttpClient.processGetRequest(
 }
 
 @Throws(Throwable::class)
-suspend fun <R> tryHttpCall(
+suspend fun <R> tryHttpCall2(
     block: suspend CoroutineScope.() -> R
 ): R {
     return try {
@@ -238,6 +238,33 @@ suspend fun <R> tryHttpCall(
     }
 }
 
+
+/**FOR DETAILS LOG AND GOOD FOR DEBUGGING*/
+@Throws(Throwable::class)
+suspend fun <R> tryHttpCall(
+    block: suspend CoroutineScope.() -> R
+): R {
+    return try {
+        withContext(context = Dispatchers.IO, block = block)
+    } catch (e: JsonConvertException) {
+        println("DEBUG: JSON Parsing Error: ${e.message}") // এখানে আসল কারণ দেখাবে
+        e.printStackTrace()
+        error("Invalid data found: ${e.message}")
+    } catch (e: ClientRequestException) { // 4xx
+        val status = e.response.status
+        println("DEBUG: Client Error Code: ${status.value}, Description: ${status.description}")
+        error("Client request error (Status: ${status.value})")
+    } catch (e: ServerResponseException) { // 5xx
+        println("DEBUG: Server Error: ${e.message}")
+        error("Server internal error")
+    } catch (e: Exception) {
+        // সব ধরণের আননোন এরর এর জন্য
+        println("DEBUG: HTTP Exception caught: ${e::class.simpleName} - ${e.message}")
+        e.printStackTrace()
+        if (!e.message.isNullOrBlank()) throw e else error("Unknown error occurred")
+    }
+}
+
 suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
     val body = tryGet { body<R>() }
     println("DEBUG: API Response Status: ${status.value}")
@@ -251,7 +278,9 @@ suspend inline fun <reified R> HttpResponse.getSuccessBody(): R {
 
     if (!status.isSuccess()) error(massage)
     if (body == null) error(massage)
-    if (baseResponse.responseCode == null || baseResponse.responseCode != "01" || baseResponse.errorCode == "01") error(massage)
+    if (baseResponse.responseCode == null || baseResponse.responseCode != "01" || baseResponse.errorCode == "01") error(
+        massage
+    )
     return body
 }
 
