@@ -1,18 +1,19 @@
 package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withTimeoutOrNull
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
+import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 
 class DxListViewModel(
     private val mainRepository: MainRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val _state = MutableStateFlow(DxListState())
     val state = _state.asStateFlow()
@@ -21,7 +22,28 @@ class DxListViewModel(
     val effect = _effect.receiveAsFlow()
 
     init {
-        loadDxItems()
+        observeDxItems()
+        loadDxItems(forceRefresh = false)
+    }
+
+    private fun observeDxItems() {
+        launch(loading = Loading.Gone) {
+            mainRepository.getSetupData(forceRefresh = false).collect { setupData ->
+                val items = setupData.diagnoses.map {
+                    DxItemData(
+                        title = it.diagName.replace("_", " "),
+                        subtitle = "ID: ${it.diagId}",
+                        details = emptyList()
+                    )
+                }
+                _state.update {
+                    it.copy(
+                        dxItems = items,
+                    )
+                }
+                filterDxItems()
+            }
+        }
     }
 
     fun onIntent(intent: DxListIntent) {
@@ -53,32 +75,19 @@ class DxListViewModel(
     }
 
     private fun loadDxItems(forceRefresh: Boolean = false) {
-        viewModelScope.launch {
+        launch(loading = if (forceRefresh) Loading.Gone else Loading.Primary) {
             if (forceRefresh) {
                 _state.update { it.copy(isRefreshing = true) }
-            } else {
-                _state.update { it.copy(isLoading = true) }
             }
+
             try {
-                mainRepository.getSetupData(forceRefresh = forceRefresh).collect { setupData ->
-                    val items = setupData.diagnoses.map {
-                        DxItemData(
-                            title = it.diagName.replace("_", " "),
-                            subtitle = "ID: ${it.diagId}",
-                            details = emptyList()
-                        )
-                    }
-                    _state.update {
-                        it.copy(
-                            dxItems = items,
-                        )
-                    }
-                    filterDxItems()
+                // withTimeoutOrNull ensures that even if Room/Network hangs, the loading will hide.
+                // 35 seconds total (allowing for the 30s network timeout)
+                withTimeoutOrNull(35_000L) {
+                    mainRepository.getSetupData(forceRefresh = forceRefresh).take(1).collect {}
                 }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Failed to load diagnoses") }
             } finally {
-                _state.update { it.copy(isLoading = false, isRefreshing = false) }
+                _state.update { it.copy(isRefreshing = false) }
             }
         }
     }
@@ -87,14 +96,14 @@ class DxListViewModel(
         _state.update { currentState ->
             val query = currentState.searchQuery
             val all = currentState.dxItems
-            
+
             val filtered = if (query.isBlank()) {
                 all
             } else {
                 all.filter { item ->
                     item.title.contains(query, ignoreCase = true) ||
-                    item.subtitle.contains(query, ignoreCase = true) ||
-                    item.details.any { it.contains(query, ignoreCase = true) }
+                            item.subtitle.contains(query, ignoreCase = true) ||
+                            item.details.any { it.contains(query, ignoreCase = true) }
                 }
             }
             currentState.copy(filteredDxItems = filtered)
@@ -102,20 +111,14 @@ class DxListViewModel(
     }
 
     private fun createDx(title: String, advices: String) {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, showNewDxDialog = false) }
-            try {
-                val (success, errorMessage) = mainRepository.saveDiagnosis(title)
-                if (success) {
-                    _effect.send(DxListEffect.DxCreated)
-                    loadDxItems(forceRefresh = true)
-                } else {
-                    _state.update { it.copy(error = errorMessage ?: "Failed to save diagnosis") }
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Failed to save diagnosis") }
-            } finally {
-                _state.update { it.copy(isLoading = false) }
+        launch {
+            _state.update { it.copy(showNewDxDialog = false) }
+            val (success, errorMessage) = mainRepository.saveDiagnosis(title)
+            if (success) {
+                _effect.send(DxListEffect.DxCreated)
+                loadDxItems(forceRefresh = true)
+            } else {
+                showError(errorMessage ?: "Failed to save diagnosis")
             }
         }
     }

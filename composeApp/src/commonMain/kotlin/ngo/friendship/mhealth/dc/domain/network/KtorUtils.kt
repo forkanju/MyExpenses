@@ -257,6 +257,12 @@ suspend fun <R> tryHttpCall(
     } catch (e: ServerResponseException) { // 5xx
         println("DEBUG: Server Error: ${e.message}")
         error("Server internal error")
+    } catch (e: ConnectTimeoutException) {
+        error("Connection timed out (30s limit reached). Please check your internet connection.")
+    } catch (e: SocketTimeoutException) {
+        error("Server response timeout. The server took too long to respond.")
+    } catch (e: UnresolvedAddressException) {
+        error("No internet connection or server unreachable.")
     } catch (e: Exception) {
         // সব ধরণের আননোন এরর এর জন্য
         println("DEBUG: HTTP Exception caught: ${e::class.simpleName} - ${e.message}")

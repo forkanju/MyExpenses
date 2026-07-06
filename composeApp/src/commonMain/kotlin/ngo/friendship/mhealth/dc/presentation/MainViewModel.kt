@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -108,6 +109,14 @@ class MainViewModel(
         private set
 
     init {
+        // Observe setup data separately for UI components that rely on stateIn
+        // This ensures they stay up to date if DB changes in background
+        launch(loading = Loading.Gone) {
+            mainRepository.getSetupData(forceRefresh = false).collect { 
+                // DB observation job
+            }
+        }
+        
         // Observe backstack to trigger refresh when user lands on Main screen (e.g. after login)
         viewModelScope.launch(mainContext) {
             snapshotFlow { backStack }.collect {
@@ -265,10 +274,8 @@ class MainViewModel(
     }
 
     fun saveAdvice(title: String, content: String) {
-        viewModelScope.launch(mainContext) {
-            loadingFlow.value = true
+        launch {
             val (isSuccess, errorMessage) = mainRepository.saveAdvice(title, content)
-            loadingFlow.value = false
             if (isSuccess) {
                 showSuccess("Advice saved successfully")
                 loadAdviceList()
@@ -279,10 +286,8 @@ class MainViewModel(
     }
 
     fun saveInvestigation(title: String) {
-        viewModelScope.launch(mainContext) {
-            loadingFlow.value = true
+        launch {
             val (isSuccess, errorMessage) = mainRepository.saveInvestigation(title)
-            loadingFlow.value = false
             if (isSuccess) {
                 showSuccess("Investigation saved successfully")
                 refreshSetupData()
@@ -294,18 +299,13 @@ class MainViewModel(
 
     fun refreshSetupData() {
         launch(loading = Loading.Secondary) {
-            mainRepository.getSetupData(forceRefresh = true).collectLatest {
-                // The setupDataState is already observing the repository flow
-                // so it will update automatically.
-            }
+            mainRepository.getSetupData(forceRefresh = true).first()
         }
     }
 
     fun changePassword(old: String, new: String) {
-        viewModelScope.launch(mainContext) {
-            loadingFlow.value = true
+        launch {
             val (isSuccess, message) = mainRepository.changePassword(old, new)
-            loadingFlow.value = false
             if (isSuccess) {
                 showSuccess("Password changed successfully. Please login again.")
                 logout()

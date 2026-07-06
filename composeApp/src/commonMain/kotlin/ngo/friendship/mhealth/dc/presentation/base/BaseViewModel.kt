@@ -47,20 +47,16 @@ abstract class BaseViewModel: ViewModel() {
         viewModelScope.launch(mainContext) {
             errorFlow.collect {
                 if (it.message.isBlank() || it.type != Info.Type.Default) return@collect
-                if (it.message.length > 50) {
-                    if (::backStack.isInitialized) {
-                        backStack.add(Screens.Dialog.Error(it.message))
-                    }
-                } else {
-                    if (::snackBarState.isInitialized) {
-                        snackBarState.currentSnackbarData?.dismiss()
-                        snackBarState.showSnackbar(
-                            ColoredSnackbarVisuals(
-                                message = it.message,
-                                type = SnackbarType.ERROR
-                            )
+                if (::backStack.isInitialized) {
+                    backStack.add(Screens.Dialog.Error(it.message))
+                } else if (::snackBarState.isInitialized) {
+                    snackBarState.currentSnackbarData?.dismiss()
+                    snackBarState.showSnackbar(
+                        ColoredSnackbarVisuals(
+                            message = it.message,
+                            type = SnackbarType.ERROR
                         )
-                    }
+                    )
                 }
             }
         }
