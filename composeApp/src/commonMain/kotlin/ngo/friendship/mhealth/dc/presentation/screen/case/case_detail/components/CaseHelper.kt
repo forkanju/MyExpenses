@@ -148,6 +148,11 @@ fun buildDefaultSmsMessage(
                 append(", ")
                 append(duration)
             }
+
+            if (item.sf.isNotBlank()) {
+                append(", Comment: ")
+                append(item.sf)
+            }
         }
     }
 

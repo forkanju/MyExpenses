@@ -116,8 +116,8 @@ class CaseViewModel(
                             mtrSf = medDto.dailyDose.orEmpty(),
                             afm = medDto.dailyDose.orEmpty(),
                             afmSf = medDto.dailyDose.orEmpty(),
-                            sf = "",
-                            smsSf = ""
+                            sf = medDto.sf.orEmpty(),
+                            smsSf = medDto.smsSf.orEmpty()
                         )
                     } ?: emptyList()
 

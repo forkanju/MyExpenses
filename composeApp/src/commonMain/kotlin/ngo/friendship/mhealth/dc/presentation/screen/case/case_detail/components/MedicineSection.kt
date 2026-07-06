@@ -138,8 +138,8 @@ fun PrescriptionItemCard(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 val quantityText = if (item.medQty.isNotBlank()) " | Qty: ${item.medQty}" else ""
-                val mealTimeText = if (item.afm.isNotBlank()) " | ${item.afm}" else ""
-                val commentText = if (item.sf.isNotBlank()) " | ${item.sf}" else ""
+                val mealTimeText = if (item.afm.isNotBlank()) " |Time:  ${item.afm}" else ""
+                val commentText = if (item.sf.isNotBlank()) " | Comment: ${item.sf}" else ""
                 Text(
                     text = "Dose: ${item.mtr} | Days: ${item.medDuration}$quantityText$mealTimeText$commentText",
                     color = subColor,
@@ -425,7 +425,7 @@ fun MedicineComposerCardPreview() {
                     mtrSf = "1+0+1",
                     afm = "",
                     afmSf = "",
-                    sf = "",
+                    sf = "After meal",
                     smsSf = ""
                 ),
                 onRemoveClick = {}
