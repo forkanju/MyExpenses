@@ -70,8 +70,8 @@ data class PatientInterviewFeedbackDto(
     @SerialName("GENDER")
     val gender: String? = null,
     @SerialName("TRANS_REF")
-    val transRef: Int? = null,
-    @SerialName("DIAG_NAME")
+    val transRef: Long? = null,
+    @SerialName("diag_name")
     val diagDesc: String? = null,
     @SerialName("UPDATE_ON")
     val updateOn: Long? = null,

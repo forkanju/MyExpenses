@@ -100,22 +100,22 @@ data class DoctorFeedbackObject(
     @SerialName("INTERVIEW_ID")
     val interviewId: Long?,
 
-    @SerialName("doctorFindings")
-    val doctorFindings: String = "static findings",
+    @SerialName("DOCTOR_FINDINGS")
+    val doctorFindings: String,
 
-    @SerialName("advice_message_for_fcm")
+    @SerialName("MESSAGE_TO_FCM")
     val commentsForFCM: String,
 
-    @SerialName("doctor_advice")
+    @SerialName("DOCTOR_ADVICE")
     val doctorAdvice: String,
 
     @SerialName("REF_CENTER_ID")
     val refCenterId: String?,
 
-    @SerialName("investigation_result")
+    @SerialName("INVES_RESULT")
     val investigationResult: String,
 
-    @SerialName("next_follow_up_date")
+    @SerialName("NEXT_FOLLOWUP_DATE")
     val nextFollowUpDate: String? = null,
 
     @SerialName("investigation")

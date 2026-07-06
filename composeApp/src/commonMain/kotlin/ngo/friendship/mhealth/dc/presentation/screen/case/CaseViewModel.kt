@@ -363,8 +363,8 @@ class CaseViewModel(
                             mtrSf = medDto.dailyDose.orEmpty(),
                             afm = medDto.dailyDose.orEmpty(),
                             afmSf = medDto.dailyDose.orEmpty(),
-                            sf = "",
-                            smsSf = ""
+                            sf = medDto.sf.orEmpty(),
+                            smsSf = medDto.smsSf.orEmpty()
                         )
                     } ?: emptyList()
 
@@ -414,35 +414,40 @@ class CaseViewModel(
         if (interviewId == -1L) return
 
         launch {
-            _state.update {
-                it.copy(
-                    selectedTab = sourceTab,
-                    interviewDetails = InterviewDetails()
-                )
-            }
+            try {
+                _state.update {
+                    it.copy(
+                        selectedTab = sourceTab,
+                        interviewDetails = InterviewDetails(),
+                        error = null
+                    )
+                }
 
-            val statusToSend = when (sourceTab) {
-                CaseTab.Pending -> CaseTab.Opened.apiParam
-                CaseTab.Answered -> null
-                CaseTab.Opened -> null
-                CaseTab.Older -> null
-            }
+                val statusToSend = when (sourceTab) {
+                    CaseTab.Pending -> CaseTab.Opened.apiParam
+                    CaseTab.Answered -> null
+                    CaseTab.Opened -> null
+                    CaseTab.Older -> null
+                }
 
-            if (statusToSend != null) {
-                repository.updateInterviewStatus(
-                    interviewId = interviewId,
-                    status = statusToSend
-                )
-            }
+                if (statusToSend != null) {
+                    repository.updateInterviewStatus(
+                        interviewId = interviewId,
+                        status = statusToSend
+                    )
+                }
 
-            val details = repository.getInterviewDetails(interviewId = interviewId)
-            _state.update { it.copy(interviewDetails = details) }
+                val details = repository.getInterviewDetails(interviewId = interviewId)
+                _state.update { it.copy(interviewDetails = details) }
 
-            loadMedicineList(_state.value.medicineComposerState.doseType.ifEmpty { "Tab" })
-            loadQuestionAnswerData(interviewId)
+                loadMedicineList(_state.value.medicineComposerState.doseType.ifEmpty { "Tab" })
+                loadQuestionAnswerData(interviewId)
 
-            if (sourceTab == CaseTab.Answered) {
-                loadDoctorFeedback(interviewId)
+                if (sourceTab == CaseTab.Answered) {
+                    loadDoctorFeedback(interviewId)
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Failed to open case") }
             }
         }
     }
@@ -450,33 +455,37 @@ class CaseViewModel(
     private fun loadInterviewDetails(interviewId: Long) {
         if (interviewId == -1L) return
         launch(onEnd = {
-            if (_state.value.interviewDetails.interviewId == -1L)
+            if (_state.value.interviewDetails.interviewId == -1L && _state.value.error == null)
                 launch { _uiEvent.send(CaseUiEvent.NavigateBack) }
         }) {
-            _state.update { it.copy(interviewDetails = InterviewDetails()) }
-            val details = repository.getInterviewDetails(interviewId = interviewId)
-            _state.update { it.copy(interviewDetails = details) }
+            try {
+                _state.update { it.copy(interviewDetails = InterviewDetails(), error = null) }
+                val details = repository.getInterviewDetails(interviewId = interviewId)
+                _state.update { it.copy(interviewDetails = details) }
 
-            val fcmInfo = details.fcmInfo
-            "Interview loaded. fcmInfo: $fcmInfo".log("CASE_DEBUG")
+                val fcmInfo = details.fcmInfo
+                "Interview loaded. fcmInfo: $fcmInfo".log("CASE_DEBUG")
 
-            fcmInfo?.takeIf { it.isNotBlank() }?.let { fcmCode ->
-                launch {
-                    _state.update { it.copy(fcmProfileState = it.fcmProfileState.copy(isLoading = true)) }
-                    "Fetching FCM Profile for code: $fcmCode".log("CASE_DEBUG")
-                    val profile = repository.getFcmProfile(fcmCode)
-                    "Fetched profile: ${profile?.userName}, ${profile?.location}".log("CASE_DEBUG")
-                    _state.update {
-                        it.copy(
-                            fcmProfileState = it.fcmProfileState.copy(
-                                fcmProfile = profile,
-                                isLoading = false
+                fcmInfo?.takeIf { it.isNotBlank() }?.let { fcmCode ->
+                    launch {
+                        _state.update { it.copy(fcmProfileState = it.fcmProfileState.copy(isLoading = true)) }
+                        "Fetching FCM Profile for code: $fcmCode".log("CASE_DEBUG")
+                        val profile = repository.getFcmProfile(fcmCode)
+                        "Fetched profile: ${profile?.userName}, ${profile?.location}".log("CASE_DEBUG")
+                        _state.update {
+                            it.copy(
+                                fcmProfileState = it.fcmProfileState.copy(
+                                    fcmProfile = profile,
+                                    isLoading = false
+                                )
                             )
-                        )
+                        }
                     }
+                } ?: run {
+                    "fcmInfo is null or blank, skipping FCM fetch".log("CASE_DEBUG")
                 }
-            } ?: run {
-                "fcmInfo is null or blank, skipping FCM fetch".log("CASE_DEBUG")
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Failed to load interview details") }
             }
         }
     }
@@ -532,7 +541,6 @@ class CaseViewModel(
         value: String?
     ): JsonArray {
         if (index !in 0 until array.size) return array
-        if (value.isNullOrEmpty()) return array
 
         return try {
             buildJsonArray {
@@ -623,6 +631,13 @@ class CaseViewModel(
                         if (_state.value.formState.nextFollowUpDate.isNotNull()) "false" else "true"
                     )
 
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10005",
+                        "hidden",
+                        if (_state.value.formState.investigationResult.isNotBlank()) "false" else "true"
+                    )
+
                     if (updatedQ != null) {
                         val updatedJsonArray = buildJsonArray {
                             jsonElement.jsonArray.forEach { element ->
@@ -672,6 +687,11 @@ class CaseViewModel(
                             4,
                             _state.value.formState.nextFollowUpDate
                         )
+                        jsonArray = modifyQuestionAnswerJson2(
+                            jsonArray,
+                            5,
+                            _state.value.formState.investigationResult
+                        )
 
                         modifiedJsonArray2 = buildQuestionAnswerJson2(jsonArray)
 
@@ -699,13 +719,13 @@ class CaseViewModel(
 
             // 2. Case-specific field validation
             if (!isFromTemplate) {
-                if (formState.doctorAdvice.isBlank()) {
-                    showWarning("Please enter doctor advice")
-                    return@launch
-                }
+                val hasMedicine = formState.prescriptions.isNotEmpty()
+                val hasAdvice = formState.doctorAdvice.isNotBlank()
+                val hasReferral = formState.selectedReferralCenter != null
+                val hasFollowUp = formState.nextFollowUpDate.isNotBlank()
 
-                if (formState.commentsForFcm.isBlank() && !currentState.isPrescriptionWithSmsChecked) {
-                    showWarning("Please enter comments for FCM")
+                if (!hasMedicine && !hasAdvice && !hasReferral && !hasFollowUp) {
+                    showWarning("Please provide at least one: Medicine, Advice, Referral or Follow-up date")
                     return@launch
                 }
             } else {
@@ -733,9 +753,9 @@ class CaseViewModel(
                     isFcmChecked = currentState.customMessageState.isFcmChecked,
                     isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked,
                     // SWAP: QUESTION_ANSWER_JSON gets modifiedJsonArray2 (answers)
-                    questionAnswers = finalTemplateArray ?: JsonArray(emptyList()),
+                    questionAnswers = modifiedJsonArray2 ?: JsonArray(emptyList()),
                     // SWAP: QUESTION_ANSWER_JSON2 gets finalTemplateArray (template string wrapped in JsonArray)
-                    questionAnswers2 = modifiedJsonArray2 ?: JsonArray(emptyList()),
+                    questionAnswers2 = finalTemplateArray ?: JsonArray(emptyList()),
                 )
 
                 // Log final state for debugging
@@ -805,7 +825,7 @@ class CaseViewModel(
             JsonArray(
                 array.filter { element ->
                     val answer = element.jsonObject["answer"]?.jsonPrimitive?.contentOrNull
-                    !answer.isNullOrEmpty() && answer != "0"
+                    answer != null && answer != "0"
                 }
             )
         } catch (e: Exception) {
@@ -814,13 +834,24 @@ class CaseViewModel(
     }
 
     private fun loadDoctorFeedback(interviewId: Long) {
+        if (interviewId == -1L) return
         launch(loading = Loading.Gone) {
             try {
+                _state.update { it.copy(error = null) }
                 val response = mainRepository.getDoctorFeedback(interviewId)
-                println("response69: ${response.data}")
-                if (response.responseCode == "01") {
-                    val feedbackList = response.data?.patientInterviewFeedback
-                    if (!feedbackList.isNullOrEmpty()) {
+
+                val code = response.responseCode
+                val feedbackList = response.data?.patientInterviewFeedback
+
+                if (code == "0" || code == "00") {
+                    _state.update { it.copy(error = "No data found") }
+                    return@launch
+                }
+
+                if (code == "01" || code == "1") {
+                    if (feedbackList.isNullOrEmpty()) {
+                        _state.update { it.copy(error = "No data found") }
+                    } else {
                         val feedback = feedbackList[0]
 
                         // Parse prescriptions
@@ -901,9 +932,16 @@ class CaseViewModel(
                             )
                         }
                     }
+                } else {
+                    _state.update {
+                        it.copy(
+                            error = response.errorDesc ?: "Failed to load feedback"
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 "Error loading doctor feedback: ${e.message}".log("CASE_DEBUG")
+                _state.update { it.copy(error = e.message ?: "An unknown error occurred") }
             }
         }
     }

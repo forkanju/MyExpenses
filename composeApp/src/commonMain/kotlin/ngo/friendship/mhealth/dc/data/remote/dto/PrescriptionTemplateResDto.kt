@@ -45,4 +45,6 @@ data class PrescriptionMedicineDto(
     @SerialName("TAKING_RULE") val takingRule: String? = null,
     @SerialName("GENERIC_NAME") val genericName: String? = null,
     @SerialName("BRAND_NAME") val brandName: String? = null,
+    @SerialName("SF") val sf: String? = null,
+    @SerialName("SMS_SF") val smsSf: String? = null,
 )

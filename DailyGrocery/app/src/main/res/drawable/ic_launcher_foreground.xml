@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shopping Bag -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,46h36l2,38h-40z" />
+    <!-- Handle -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M46,46c0,-10 16,-10 16,0"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+    <!-- Leaf Detail (Cutout showing background color) -->
+    <path
+        android:fillColor="#7CC344"
+        android:pathData="M54,60c8,-8 15,0 0,16c-15,-16 -8,-24 0,-16z" />
+</vector>

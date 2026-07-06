@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.DailyGrocery" parent="Theme.MaterialComponents.Light" />
+</resources>
