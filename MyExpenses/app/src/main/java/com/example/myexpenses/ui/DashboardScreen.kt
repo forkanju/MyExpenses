@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,16 +18,20 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,11 +48,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import android.content.Intent
 import com.example.myexpenses.MainViewModel
 import com.example.myexpenses.data.Expense
 import com.example.myexpenses.ui.components.ExpenseBottomSheet
@@ -58,14 +66,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.FloatingActionButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(viewModel: MainViewModel) {
     val expenses by viewModel.expenses.collectAsStateWithLifecycle()
     val totalSpent by viewModel.totalSpent.collectAsStateWithLifecycle()
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var editingExpense by remember { mutableStateOf<Expense?>(null) }
+    val selectedMonth by viewModel.selectedMonth.collectAsStateWithLifecycle()
+    val availableMonths = viewModel.availableMonths
+    val context = LocalContext.current
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
@@ -75,17 +86,6 @@ fun DashboardScreen(viewModel: MainViewModel) {
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         )
-    }, floatingActionButton = {
-        LargeFloatingActionButton(
-            onClick = {
-                editingExpense = null
-                showBottomSheet = true
-            },
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        ) {
-            Icon(Icons.Default.Add, contentDescription = "Add Expense")
-        }
     }) { innerPadding ->
         Column(
             modifier = Modifier
@@ -94,12 +94,56 @@ fun DashboardScreen(viewModel: MainViewModel) {
         ) {
             TotalSpentCard(totalSpent = totalSpent)
 
-            Text(
-                text = "Recent Transactions",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(16.dp),
-                fontWeight = FontWeight.Bold
-            )
+            // Month Selection Filter
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(availableMonths) { month ->
+                    FilterChip(
+                        selected = selectedMonth == month,
+                        onClick = { viewModel.selectMonth(month) },
+                        label = { Text(month.getName()) }
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = selectedMonth.getName(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+
+                IconButton(onClick = {
+                    viewModel.exportToCsv(
+                        onSuccess = { file ->
+                            val uri = FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                file
+                            )
+                            val intent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/csv"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(intent, "Download Expenses"))
+                        },
+                        onError = { /* Handle error, e.g., show Toast */ }
+                    )
+                }) {
+                    Icon(Icons.Default.Download, contentDescription = "Download CSV")
+                }
+            }
 
             if (expenses.isEmpty()) {
                 Box(
@@ -109,7 +153,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No expenses yet. Tap + to add one!",
+                        text = "No expenses for ${selectedMonth.getName()}.",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -119,8 +163,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
                     items(
                         items = expenses, key = { it.id }) { expense ->
@@ -130,8 +173,7 @@ fun DashboardScreen(viewModel: MainViewModel) {
                                 expense = expense, modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        editingExpense = expense
-                                        showBottomSheet = true
+                                        viewModel.openEditExpense(expense)
                                     })
                         }
                     }
@@ -140,14 +182,23 @@ fun DashboardScreen(viewModel: MainViewModel) {
         }
     }
 
-    if (showBottomSheet) {
-        ExpenseBottomSheet(expense = editingExpense, onSave = {
-            viewModel.addExpense(it)
-            showBottomSheet = false
-        }, onDismiss = {
-            showBottomSheet = false
-            editingExpense = null
-        })
+    if (viewModel.showBottomSheet) {
+        val categories by viewModel.categories.collectAsStateWithLifecycle()
+        val paymentModes by viewModel.paymentModes.collectAsStateWithLifecycle()
+        val suggestions by viewModel.descriptionSuggestions.collectAsStateWithLifecycle()
+        ExpenseBottomSheet(
+            expense = viewModel.editingExpense,
+            availableCategories = categories.map { it.name },
+            availablePaymentModes = paymentModes.map { it.name },
+            descriptionSuggestions = suggestions,
+            onAddCategory = { viewModel.addCategory(it) },
+            onAddPaymentMode = { viewModel.addPaymentMode(it) },
+            onSave = {
+                viewModel.addExpense(it)
+                viewModel.closeBottomSheet()
+            }, onDismiss = {
+                viewModel.closeBottomSheet()
+            })
     }
 }
 
@@ -198,34 +249,35 @@ fun SwipeToRevealDelete(
         }
 
         // Foreground Content
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .offset { IntOffset(offset.value.roundToInt(), 0) }
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(onDragStart = {
-                    autoCloseJob?.cancel()
-                }, onDragEnd = {
-                    scope.launch {
-                        if (offset.value < maxOffset / 2) {
-                            offset.animateTo(maxOffset)
-                            // Start 5-second timer to auto-close
-                            autoCloseJob = launch {
-                                delay(5000.milliseconds)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset { IntOffset(offset.value.roundToInt(), 0) }
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(onDragStart = {
+                        autoCloseJob?.cancel()
+                    }, onDragEnd = {
+                        scope.launch {
+                            if (offset.value < maxOffset / 2) {
+                                offset.animateTo(maxOffset)
+                                // Start 5-second timer to auto-close
+                                autoCloseJob = launch {
+                                    delay(5000.milliseconds)
+                                    offset.animateTo(0f)
+                                }
+                            } else {
                                 offset.animateTo(0f)
                             }
-                        } else {
-                            offset.animateTo(0f)
                         }
-                    }
-                }, onHorizontalDrag = { _, dragAmount ->
-                    scope.launch {
-                        val newOffset = (offset.value + dragAmount).coerceIn(maxOffset, 0f)
-                        offset.snapTo(newOffset)
-                    }
-                })
-            }) {
+                    }, onHorizontalDrag = { _, dragAmount ->
+                        scope.launch {
+                            val newOffset = (offset.value + dragAmount).coerceIn(maxOffset, 0f)
+                            offset.snapTo(newOffset)
+                        }
+                    })
+                }) {
             content()
         }
     }
