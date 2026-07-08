@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.presentation.base.ObserveAsEvents
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.components.CommonTopBar
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.components.NewMedicineDialog
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
@@ -47,7 +48,9 @@ fun MedicineListScreen(
     ObserveAsEvents(flow = viewModel.effect) { effect ->
         when (effect) {
             is MedicineListEffect.ShowSnackbar -> {
-                SnackbarController.sendEvent(message = effect.message, type = effect.type)
+                if (effect.type == SnackbarType.SUCCESS) {
+                    SnackbarController.sendEvent(message = effect.message, type = effect.type)
+                }
             }
         }
     }
@@ -117,15 +120,6 @@ fun MedicineListScreen(
                     viewModel.onIntent(MedicineListIntent.SaveMedicine(type, generic))
                 }
             )
-        }
-
-        if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = PrimaryBlue)
-            }
         }
     }
 }

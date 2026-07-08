@@ -7,20 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 
-class Converters {
-    @TypeConverter
-    fun fromCategory(value: ExpenseCategory): String {
-        return value.name
-    }
-
-    @TypeConverter
-    fun toCategory(value: String): ExpenseCategory {
-        return ExpenseCategory.valueOf(value)
-    }
-}
-
-@Database(entities = [Expense::class], version = 1, exportSchema = false)
-@TypeConverters(Converters::class)
+@Database(entities = [Expense::class, Category::class, PaymentMode::class], version = 3, exportSchema = false)
 abstract class ExpenseDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
 
@@ -34,7 +21,9 @@ abstract class ExpenseDatabase : RoomDatabase() {
                     context.applicationContext,
                     ExpenseDatabase::class.java,
                     "expense_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }

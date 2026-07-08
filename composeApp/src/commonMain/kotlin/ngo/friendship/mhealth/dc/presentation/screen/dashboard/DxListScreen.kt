@@ -93,18 +93,6 @@ fun DxListScreen(
         }
     }
 
-    LaunchedEffect(state.error) {
-        state.error?.let {
-            snackbarHostState.showSnackbar(
-                ColoredSnackbarVisuals(
-                    message = it,
-                    type = SnackbarType.ERROR
-                )
-            )
-            viewModel.onIntent(DxListIntent.ClearError)
-        }
-    }
-
     DxListContent(
         state = state,
         snackbarHostState = snackbarHostState,
@@ -188,10 +176,6 @@ fun DxListContent(
                     }
                 }
             }
-        }
-
-        if (state.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
 
         if (state.showNewDxDialog) {

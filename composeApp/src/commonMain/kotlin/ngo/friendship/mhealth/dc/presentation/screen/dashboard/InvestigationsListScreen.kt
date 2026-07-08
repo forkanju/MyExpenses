@@ -1,6 +1,5 @@
 package ngo.friendship.mhealth.dc.presentation.screen.dashboard
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,7 +35,6 @@ fun InvestigationsListScreen(
     var showNewInvestigationDialog by remember { mutableStateOf(false) }
     
     val setupData by viewModel.setupDataState.collectAsState()
-    val isLoading by viewModel.loadingFlow.collectAsState()
     val isRefreshing by viewModel.loadingSecondaryFlow.collectAsStateWithLifecycle()
 
     val investigationItems = setupData.investigations.filter {
@@ -114,15 +112,6 @@ fun InvestigationsListScreen(
                     showNewInvestigationDialog = false
                 }
             )
-        }
-
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = PrimaryBlue)
-            }
         }
     }
 }

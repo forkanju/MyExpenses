@@ -21,6 +21,8 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
+import ngo.friendship.mhealth.dc.presentation.navigation.components.InitBaseVM
+import ngo.friendship.mhealth.dc.presentation.navigation.components.entryWithVM
 import ngo.friendship.mhealth.dc.presentation.screen.case.CaseViewModel
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_detail.LocalCaseDetailScreen
 import ngo.friendship.mhealth.dc.presentation.screen.dashboard.AdviceTemplateListScreen
@@ -100,16 +102,18 @@ fun EntryProviderScope<NavKey>.dashboardRoute(
         )
     }
 
-    entry<Screens.DxList> {
-        val viewModel = koinViewModel<DxListViewModel>()
+    entryWithVM<Screens.DxList, DxListViewModel>(
+        backStack = mainViewModel.backStack,
+    ) {
         DxListScreen(
             viewModel = viewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
         )
     }
 
-    entry<Screens.MedicineList> {
-        val viewModel = koinViewModel<MedicineListViewModel>()
+    entryWithVM<Screens.MedicineList, MedicineListViewModel>(
+        backStack = mainViewModel.backStack,
+    ) {
         MedicineListScreen(
             viewModel = viewModel,
             onBack = { mainViewModel.backStack.removeLastOrNull() }
@@ -117,17 +121,27 @@ fun EntryProviderScope<NavKey>.dashboardRoute(
     }
 
     entry<Screens.AdviceTemplateList> {
-        AdviceTemplateListScreen(
-            viewModel = mainViewModel,
-            onBack = { mainViewModel.backStack.removeLastOrNull() }
-        )
+        InitBaseVM(
+            backStack = mainViewModel.backStack,
+            viewModel = mainViewModel
+        ) {
+            AdviceTemplateListScreen(
+                viewModel = mainViewModel,
+                onBack = { mainViewModel.backStack.removeLastOrNull() }
+            )
+        }
     }
 
     entry<Screens.InvestigationsList> {
-        InvestigationsListScreen(
-            viewModel = mainViewModel,
-            onBack = { mainViewModel.backStack.removeLastOrNull() }
-        )
+        InitBaseVM(
+            backStack = mainViewModel.backStack,
+            viewModel = mainViewModel
+        ) {
+            InvestigationsListScreen(
+                viewModel = mainViewModel,
+                onBack = { mainViewModel.backStack.removeLastOrNull() }
+            )
+        }
     }
 
     entry<Screens.LocalTreatment> {

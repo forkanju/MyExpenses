@@ -5,3 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data object Dashboard : NavKey
+
+@Serializable
+data object Analysis : NavKey

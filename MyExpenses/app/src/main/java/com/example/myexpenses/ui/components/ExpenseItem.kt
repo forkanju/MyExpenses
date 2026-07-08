@@ -15,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.myexpenses.data.Expense
 import com.example.myexpenses.data.ExpenseCategory
-import com.example.myexpenses.data.toColor
+import com.example.myexpenses.data.toCategoryColor
 import com.example.myexpenses.utils.CurrencyUtils
 import com.example.myexpenses.utils.DateUtils
-import java.util.Locale
 
 @Composable
 fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
@@ -41,7 +41,7 @@ fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(expense.category.toColor()),
+                    .background(expense.category.toCategoryColor()),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -57,13 +57,32 @@ fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
                 Text(
                     text = expense.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = expense.category.name.lowercase().replaceFirstChar { it.uppercase() },
+                        text = expense.category.lowercase().replaceFirstChar { it.uppercase() },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    Text(
+                        text = " • ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    )
+                    Text(
+                        text = expense.paymentMode.lowercase().replaceFirstChar { it.uppercase() },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     Text(
                         text = " • ",
@@ -73,7 +92,9 @@ fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
                     Text(
                         text = DateUtils.formatExpenseDate(expense.date),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -88,11 +109,15 @@ fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
     }
 }
 
-fun getCategoryIcon(category: ExpenseCategory): ImageVector {
-    return when (category) {
-        ExpenseCategory.FOOD -> Icons.Default.Fastfood
-        ExpenseCategory.TRANSPORT -> Icons.Default.DirectionsBus
-        ExpenseCategory.SHOPPING -> Icons.Default.ShoppingBag
-        ExpenseCategory.OTHERS -> Icons.Default.MoreHoriz
+fun getCategoryIcon(categoryName: String): ImageVector {
+    return try {
+        when (ExpenseCategory.valueOf(categoryName.uppercase())) {
+            ExpenseCategory.FOOD -> Icons.Default.Fastfood
+            ExpenseCategory.TRANSPORT -> Icons.Default.DirectionsBus
+            ExpenseCategory.SHOPPING -> Icons.Default.ShoppingBag
+            ExpenseCategory.OTHERS -> Icons.Default.MoreHoriz
+        }
+    } catch (e: IllegalArgumentException) {
+        Icons.Default.MoreHoriz
     }
 }
