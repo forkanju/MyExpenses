@@ -138,7 +138,8 @@ fun PrescriptionItemCard(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 val quantityText = if (item.medQty.isNotBlank()) " | Qty: ${item.medQty}" else ""
-                val mealTimeText = if (item.afm.isNotBlank()) " |Time:  ${item.afm}" else ""
+                val timeValue = item.mtrSf.substringAfter(".", "").trim()
+                val mealTimeText = if (timeValue.isNotBlank()) " | Time: $timeValue" else ""
                 val commentText = if (item.sf.isNotBlank()) " | Comment: ${item.sf}" else ""
                 Text(
                     text = "Dose: ${item.mtr} | Days: ${item.medDuration}$quantityText$mealTimeText$commentText",
@@ -191,7 +192,7 @@ fun MedicineComposerCard(
             }
 
             val genericNames = remember(medicines) {
-                medicines.map { it.genericName }.distinct()
+                medicines.map { it.genericName.trim() }.distinct().sortedBy { it.lowercase() }
             }
 
             DoseAndDrugAutoCompleteRow(
@@ -283,14 +284,15 @@ fun MedicineComposerCard(
                             MealTime.AFTER -> "After"
                         }
 
-                        val instruction = if (isOral) {
-                            if (state.note.isNotBlank()) "$mealTimeText. ${state.note}" else mealTimeText
+                        val doseWithTime = if (isOral) {
+                            if (state.dose.isNotBlank()) "${state.dose}.$mealTimeText" else mealTimeText
                         } else {
-                            state.note
+                            state.dose
                         }
 
+                        val displayMedicineName = brandName.ifBlank { genericName }
                         val smsSf =
-                            "Rx\r\n${beneficiaryName}, ${beneficiaryCode}, ${beneficiaryAge}y\r\n${genericName}. ${brandName} , ${state.days}d"
+                            "Rx\r\n${beneficiaryName}, ${beneficiaryCode}, ${beneficiaryAge}y\r\n${displayMedicineName}. ${doseWithTime} , ${state.days}d"
 
                         val item = PrescriptionItemDto(
                             medId = state.medicineId.toString(),
@@ -300,11 +302,11 @@ fun MedicineComposerCard(
                             medQty = state.quantity,
                             saleQty = state.quantity,
                             medDuration = state.days,
-                            mtr = state.dose,
+                            mtr =  state.dose,
                             mtrLbl = state.dose,
-                            mtrSf = instruction,
-                            afm = if (isOral) mealTimeText else "",
-                            afmSf = instruction,
+                            mtrSf =  doseWithTime,
+                            afm = state.note,
+                            afmSf = doseWithTime,
                             sf = state.note,
                             smsSf = smsSf
                         )

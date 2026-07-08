@@ -48,9 +48,9 @@ android {
                 "proguard-rules.pro"
             )
         }
-        buildFeatures {
-            buildConfig = true
-        }
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 

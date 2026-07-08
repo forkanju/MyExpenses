@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -29,6 +30,7 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.removeInvestigation
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.DoctorFeedbackFormState
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
+import ngo.friendship.mhealth.dc.utils.JsonSorter
 import ngo.friendship.mhealth.dc.utils.defJson
 import ngo.friendship.mhealth.dc.utils.isNotNull
 import ngo.friendship.mhealth.dc.utils.log
@@ -535,6 +537,43 @@ class CaseViewModel(
         }
     }
 
+    fun modifyQuestionAnswerCaptionJson(
+        obj: JsonObject?,
+        key: String,
+        targetField: String,
+        newValue: String
+    ): JsonObject? {
+        if (obj == null) return null
+        return buildJsonObject {
+            for ((k, v) in obj) {
+                if (k == key && v is JsonObject) {
+                    put(k, buildJsonObject {
+                        for ((innerK, innerV) in v) {
+                            if (innerK == "options" && innerV is JsonArray) {
+                                put(innerK, buildJsonArray {
+                                    innerV.forEachIndexed { index, element ->
+                                        if (index == 0 && element is JsonObject) {
+                                            add(buildJsonObject {
+                                                for ((ek, ev) in element) put(ek, ev)
+                                                put(targetField, JsonPrimitive(newValue))
+                                            })
+                                        } else {
+                                            add(element)
+                                        }
+                                    }
+                                })
+                            } else {
+                                put(innerK, innerV)
+                            }
+                        }
+                    })
+                } else {
+                    put(k, v)
+                }
+            }
+        }
+    }
+
     fun modifyQuestionAnswerJson2(
         array: JsonArray,
         index: Int,
@@ -610,11 +649,34 @@ class CaseViewModel(
                         if (_state.value.formState.commentsForFcm.isNotBlank()) "false" else "true"
                     )
 
+                    updatedQ = modifyQuestionAnswerCaptionJson(
+                        updatedQ,
+                        "question10001",
+                        "caption",
+                        _state.value.formState.commentsForFcm
+                    )
+
                     updatedQ = modifyQuestionAnswerJson(
                         updatedQ,
                         "question10002",
                         "hidden",
                         if (_state.value.formState.prescriptions.isNotEmpty()) "false" else "true"
+                    )
+
+                    val jsonArray = Json.parseToJsonElement(_state.value.formState.prescriptions.toJson()).jsonArray
+                    val pipeSeparatedPrescriptions =  JsonSorter.convertJsonArrayToPipeSeparated(jsonArray)
+                    updatedQ = modifyQuestionAnswerCaptionJson(
+                        updatedQ,
+                        "question10002",
+                        "caption",
+                        pipeSeparatedPrescriptions
+                    )
+
+                    updatedQ = modifyQuestionAnswerCaptionJson(
+                        updatedQ,
+                        "question10002",
+                        "value",
+                        pipeSeparatedPrescriptions
                     )
 
                     updatedQ = modifyQuestionAnswerJson(
@@ -623,12 +685,25 @@ class CaseViewModel(
                         "hidden",
                         if (_state.value.formState.selectedReferralCenter?.refCenterId.isNotNull()) "false" else "true"
                     )
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10003",
+                        "defaultval",
+                        _state.value.formState.selectedReferralCenter?.refCenterId.toString()
+                    )
 
                     updatedQ = modifyQuestionAnswerJson(
                         updatedQ,
                         "question10004",
                         "hidden",
                         if (_state.value.formState.nextFollowUpDate.isNotNull()) "false" else "true"
+                    )
+
+                    updatedQ = modifyQuestionAnswerJson(
+                        updatedQ,
+                        "question10004",
+                        "defaultval",
+                        _state.value.formState.nextFollowUpDate
                     )
 
                     updatedQ = modifyQuestionAnswerJson(
@@ -753,9 +828,9 @@ class CaseViewModel(
                     isFcmChecked = currentState.customMessageState.isFcmChecked,
                     isBeneficiaryChecked = currentState.customMessageState.isBeneficiaryChecked,
                     // SWAP: QUESTION_ANSWER_JSON gets modifiedJsonArray2 (answers)
-                    questionAnswers = modifiedJsonArray2 ?: JsonArray(emptyList()),
+                    questionAnswers = finalTemplateArray ?: JsonArray(emptyList()),
                     // SWAP: QUESTION_ANSWER_JSON2 gets finalTemplateArray (template string wrapped in JsonArray)
-                    questionAnswers2 = finalTemplateArray ?: JsonArray(emptyList()),
+                    questionAnswers2 = modifiedJsonArray2 ?: JsonArray(emptyList()),
                 )
 
                 // Log final state for debugging

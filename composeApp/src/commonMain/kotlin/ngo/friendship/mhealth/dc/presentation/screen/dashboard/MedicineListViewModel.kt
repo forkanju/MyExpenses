@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
+import ngo.friendship.mhealth.dc.domain.model.Medicine
 
 class MedicineListViewModel(
     private val mainRepository: MainRepository,
@@ -128,7 +129,11 @@ class MedicineListViewModel(
                             it.brandName.contains(currentState.searchQuery, ignoreCase = true)
                 }
             }
-            currentState.copy(filteredMedicines = filtered)
+            currentState.copy(
+                filteredMedicines = filtered.sortedWith(
+                    compareBy({ it.genericName.lowercase() }, { it.brandName.lowercase() })
+                )
+            )
         }
     }
 
