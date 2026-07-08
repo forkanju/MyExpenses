@@ -11,11 +11,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.domain.repository.MainRepository
-<<<<<<< HEAD
-import ngo.friendship.mhealth.dc.domain.model.Medicine
-=======
+
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
->>>>>>> 21b47d5c912fc528db0f3370b082974f26abf269
 
 class MedicineListViewModel(
     private val mainRepository: MainRepository,
