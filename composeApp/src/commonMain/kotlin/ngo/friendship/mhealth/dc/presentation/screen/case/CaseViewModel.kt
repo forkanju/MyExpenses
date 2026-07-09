@@ -664,7 +664,7 @@ class CaseViewModel(
                     )
 
                     val jsonArray = Json.parseToJsonElement(_state.value.formState.prescriptions.toJson()).jsonArray
-                    val pipeSeparatedPrescriptions =  JsonSorter.convertJsonArrayToPipeSeparated(jsonArray)
+                    val pipeSeparatedPrescriptions:String =  JsonSorter.convertJsonArrayToPipeSeparated(jsonArray)
                     updatedQ = modifyQuestionAnswerCaptionJson(
                         updatedQ,
                         "question10002",

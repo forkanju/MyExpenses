@@ -74,8 +74,21 @@ object JsonSorter {
     /**
      * Convert JsonArray to Pipe Separated Ordered JSON.
      */
+//    fun convertJsonArrayToPipeSeparated(jsonArray: JsonArray): String {
+//        val sortedArray = sortJsonArray(jsonArray)
+//        val data: String =  sortedArray.joinToString("|") { it.toString() };
+//        return data;
+//    }
+
+
     fun convertJsonArrayToPipeSeparated(jsonArray: JsonArray): String {
-        val sortedArray = sortJsonArray(jsonArray)
-        return sortedArray.joinToString("|") { it.toString() }
+        val builder = StringBuilder()
+
+        jsonArray.forEachIndexed { index, element ->
+            if (index > 0) builder.append("|")
+            builder.append(sortJson(element.jsonObject))
+        }
+        val result = builder.toString()
+        return builder.toString()
     }
 }
