@@ -32,6 +32,7 @@ fun CheckboxWithEditableText(
     enabled: Boolean = true,
     isAnsweredMode: Boolean = false
 ) {
+    if (isAnsweredMode && !checked) return
 
     val checkedColor = if (isAnsweredMode) Color(0xFF7A7A7A) else PrimaryColor
     val uncheckedColor = if (isAnsweredMode) Color(0xFFB0B0B0) else Gray

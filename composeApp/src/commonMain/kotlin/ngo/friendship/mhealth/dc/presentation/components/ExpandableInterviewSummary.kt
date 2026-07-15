@@ -130,8 +130,20 @@ fun ExpandableInterviewSummary(
         label = "arrow"
     )
 
-    val currentItems = remember(selectedTab, interviewItems, prescriptionItems) {
-        if (selectedTab == 0) interviewItems else prescriptionItems
+    val currentItems = remember(selectedTab, interviewItems, prescriptionItems, isAnsweredMode) {
+        val items = if (selectedTab == 0) interviewItems else prescriptionItems
+        items.filter {
+            val normalizedAnswer = it.answer.replace("\\s+".toRegex(), "")
+            val normalizedQuestion = it.question.replace("\\s+".toRegex(), "")
+            val isHiddenData = normalizedAnswer == "Prescription28" || normalizedQuestion == "Prescription2_8" || normalizedQuestion == "Prescription28"
+            if (isHiddenData) return@filter false
+            
+            if (isAnsweredMode) {
+                it.answer.isNotBlank() && it.answer != "0" && it.answer != "null"
+            } else {
+                true
+            }
+        }
     }
 
     val cardColor = if (isAnsweredMode) Color(0xFFF5F5F5) else Color.White

@@ -602,6 +602,8 @@ fun CaseDetailScreen(
         if (state.isSendMessageDialogVisible) {
             SendMessageDialog(
                 initialState = state.customMessageState,
+                fcmMobileNumber = state.fcmProfileState.fcmProfile?.mobileNo,
+                beneficiaryMobileNumber = state.formState.mobile,
                 onDismiss = { onIntent(CaseIntent.ToggleSendMessageDialog) },
                 onUpdateClick = { updatedState ->
                     onIntent(CaseIntent.UpdateCustomMessage(updatedState))

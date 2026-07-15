@@ -39,15 +39,27 @@ import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.model.Cust
 @Composable
 fun SendMessageDialog(
     initialState: CustomMessageState,
+    fcmMobileNumber: String? = null,
+    beneficiaryMobileNumber: String? = null,
     onDismiss: () -> Unit,
     onUpdateClick: (CustomMessageState) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var state by remember(initialState) { mutableStateOf(initialState) }
+    var state by remember(initialState) {
+        mutableStateOf(
+            initialState.copy(
+                isFcmChecked = !fcmMobileNumber.isNullOrBlank(),
+                isBeneficiaryChecked = !beneficiaryMobileNumber.isNullOrBlank(),
+                phoneNumber = if (beneficiaryMobileNumber.isNullOrBlank()) initialState.phoneNumber else beneficiaryMobileNumber
+            )
+        )
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         CustomMessageDialogContent(
             state = state,
+            isFcmEnabled = !fcmMobileNumber.isNullOrBlank(),
+            isBeneficiaryEnabled = !beneficiaryMobileNumber.isNullOrBlank(),
             onMessageChange = { state = state.copy(messageText = it) },
             onFcmToggle = { state = state.copy(isFcmChecked = it) },
             onBeneficiaryToggle = { state = state.copy(isBeneficiaryChecked = it) },
@@ -62,6 +74,8 @@ fun SendMessageDialog(
 @Composable
 fun CustomMessageDialogContent(
     state: CustomMessageState,
+    isFcmEnabled: Boolean = true,
+    isBeneficiaryEnabled: Boolean = true,
     onMessageChange: (String) -> Unit,
     onFcmToggle: (Boolean) -> Unit,
     onBeneficiaryToggle: (Boolean) -> Unit,
@@ -125,7 +139,8 @@ fun CustomMessageDialogContent(
                 CheckboxRow(
                     label = "FCM",
                     checked = state.isFcmChecked,
-                    onCheckedChange = onFcmToggle
+                    onCheckedChange = onFcmToggle,
+                    enabled = isFcmEnabled
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -133,7 +148,8 @@ fun CustomMessageDialogContent(
                 CheckboxRow(
                     label = "Beneficiary",
                     checked = state.isBeneficiaryChecked,
-                    onCheckedChange = onBeneficiaryToggle
+                    onCheckedChange = onBeneficiaryToggle,
+                    enabled = isBeneficiaryEnabled
                 )
             }
 
@@ -193,7 +209,8 @@ fun CustomMessageDialogContent(
 private fun CheckboxRow(
     label: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -201,13 +218,14 @@ private fun CheckboxRow(
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
+            enabled = enabled,
             colors = CheckboxDefaults.colors(
                 checkedColor = Color(0xFF284B96)
             )
         )
         Text(
             text = label,
-            color = Color.DarkGray,
+            color = if (enabled) Color.DarkGray else Color.LightGray,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.bodyMedium
         )
