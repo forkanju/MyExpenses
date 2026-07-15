@@ -40,6 +40,7 @@ data class CaseUiState(
     val prescriptionId: Long? = null,
     val prescriptionTemplates: List<PrescriptionTemplateDto> = emptyList(),
     val adviceList: List<String> = emptyList(),
+    val lastVisitedDate: String = "",
     val doseHistory: List<String> = emptyList(),
     val error: String? = null
 )

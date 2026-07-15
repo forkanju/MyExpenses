@@ -237,6 +237,7 @@ fun CaseDetailScreen(
                         questionnaireName = state.interviewDetails.questionnaireName,
                         startTime = state.interviewDetails.startTime,
                         createDate = state.interviewDetails.createDate,
+                        lastVisitedDate = state.lastVisitedDate,
                         isAnsweredMode = isAnsweredMode,
                         onDetailsClick = onBeneficiaryDetailsClick
                     )

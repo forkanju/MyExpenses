@@ -46,6 +46,7 @@ fun PatientProfileCard(
     questionnaireName: String? = null,
     startTime: String? = null,
     createDate: String? = null,
+    lastVisitedDate: String? = null,
     isAnsweredMode: Boolean = false,
     onDetailsClick: () -> Unit = {}
 ) {
@@ -164,6 +165,13 @@ fun PatientProfileCard(
                         text = "Uploaded: ${createDate?.toUiDateTime() ?: "N/A"}",
                         style = timeStyle
                     )
+
+                    if (lastVisitedDate?.isNotBlank() == true) {
+                        Text(
+                            text = "Last Visited: ${lastVisitedDate.toUiDateTime()}",
+                            style = timeStyle.copy(color = Color(0xFF2E7D32), fontWeight = FontWeight.Medium)
+                        )
+                    }
                 }
             }
         }

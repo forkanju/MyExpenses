@@ -141,7 +141,8 @@ fun BeneficiaryProfileScreen(
                     location = state.location,
                     age = state.beneficiaryAge,
                     mobileNo = state.beneficiaryProfile?.mobileNumber ?: "N/A",
-                    lastVisit = interviewDetails?.startTime ?: "",
+                    lastVisit = state.beneficiaryProfile?.serviceList?.firstOrNull()?.interviewTime
+                        ?: interviewDetails?.startTime ?: "",
                     onCallClick = { mobile ->
                         val clean = mobile.filter { it.isDigit() }
                         uriHandler.openUri("tel:$clean")
@@ -229,7 +230,7 @@ private fun BeneficiaryHeaderCard(
                     modifier = Modifier.clickable { onCallClick(mobileNo) }
                 )
                 Text(
-                    text = "Visited : $lastVisit",
+                    text = "Visited : ${if (lastVisit.isNotBlank()) lastVisit.toUiDate() else "N/A"}",
                     fontSize = 12.sp,
                     color = Color.Gray,
                     fontFamily = RobotoCondensedFont()

@@ -472,8 +472,10 @@ class CaseViewModel(
                         "Fetched Beneficiary Profile: ${profile?.benefName}, Mobile: ${profile?.mobileNumber}".log(
                             "CASE_DEBUG"
                         )
+                        val lastVisitedDate = profile?.serviceList?.firstOrNull()?.interviewTime ?: ""
                         _state.update {
                             it.copy(
+                                lastVisitedDate = lastVisitedDate,
                                 formState = it.formState.copy(
                                     mobile = profile?.mobileNumber ?: ""
                                 )
