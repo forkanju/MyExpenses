@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.home.model.KeyValueUi
 import ngo.friendship.mhealth.dc.theme.FontSize
@@ -51,8 +53,23 @@ fun KeyValueListCard(
             } else {
                 items.forEachIndexed { idx, kv ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(kv.key, fontSize = FontSize.SMALL, color = TextSecondary)
-                        Text(kv.value.toString(), fontSize = FontSize.SMALL, color = TextSecondary)
+                        Text(
+                            kv.key,
+                            fontSize = FontSize.SMALL,
+                            color = TextSecondary,
+                            modifier = Modifier.weight(0.8f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            kv.value.toString(),
+                            fontSize = FontSize.SMALL,
+                            color = TextSecondary,
+                            modifier = Modifier.weight(0.2f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.End
+                        )
                     }
                     if (idx != items.lastIndex) Spacer(Modifier.height(3.dp))
                 }
