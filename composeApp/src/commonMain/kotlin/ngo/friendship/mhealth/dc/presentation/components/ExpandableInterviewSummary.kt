@@ -135,7 +135,7 @@ fun ExpandableInterviewSummary(
         items.filter {
             val normalizedAnswer = it.answer.replace("\\s+".toRegex(), "")
             val normalizedQuestion = it.question.replace("\\s+".toRegex(), "")
-            val isHiddenData = normalizedAnswer == "Prescription28" || normalizedQuestion == "Prescription2_8" || normalizedQuestion == "Prescription28"
+            val isHiddenData = normalizedAnswer == "Prescription28" || normalizedQuestion == "Prescription2_8" || normalizedQuestion == "Prescription" || normalizedQuestion == "Prescription28"
             if (isHiddenData) return@filter false
             
             if (isAnsweredMode) {

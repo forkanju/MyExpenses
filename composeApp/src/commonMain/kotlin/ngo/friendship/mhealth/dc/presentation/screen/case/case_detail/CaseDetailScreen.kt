@@ -343,22 +343,6 @@ fun CaseDetailScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    FormAutoCompleteDropdownField(
-                        label = "Doctor Advice",
-                        placeholder = "Advice",
-                        options = state.adviceList,
-                        selected = state.formState.doctorAdvice,
-                        getLabel = { it },
-                        onSelectedChange = { selected ->
-                            onIntent(CaseIntent.UpdateDoctorAdvice(selected))
-                        },
-                        onValueChange = {
-                            onIntent(CaseIntent.UpdateDoctorAdvice(it))
-                        },
-                        enabled = !isAnsweredMode,
-                        isAnsweredMode = isAnsweredMode
-                    )
-
                     if (isFromTemplate) {
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -380,8 +364,8 @@ fun CaseDetailScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         LabeledFormTextField(
-                            label = "Doctor notes",
-                            placeholder = "Note",
+                            label = "Doctor Advice",
+                            placeholder = "Advice",
                             value = state.formState.doctorNotes,
                             onValueChange = {
                                 onIntent(CaseIntent.UpdateDoctorNotes(it))
@@ -479,8 +463,8 @@ fun CaseDetailScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         LabeledFormTextField(
-                            label = "Doctor notes",
-                            placeholder = "Note",
+                            label = "Doctor Advice",
+                            placeholder = "Advice",
                             value = state.formState.doctorNotes,
                             onValueChange = {
                                 onIntent(CaseIntent.UpdateDoctorNotes(it))
