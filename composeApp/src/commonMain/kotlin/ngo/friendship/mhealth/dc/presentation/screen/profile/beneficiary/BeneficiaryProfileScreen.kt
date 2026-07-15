@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -405,12 +406,12 @@ private fun PersonalInfoSection(state: BeneficiaryProfileUiState) {
 @Composable
 private fun ProfileInfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        verticalAlignment = Alignment.Top
     ) {
         Text(
             text = label,
+            modifier = Modifier.weight(1f),
             fontSize = 14.sp,
             color = Color.Gray,
             fontWeight = FontWeight.Normal,
@@ -418,10 +419,12 @@ private fun ProfileInfoRow(label: String, value: String) {
         )
         Text(
             text = value,
+            modifier = Modifier.weight(1f),
             fontSize = 14.sp,
             color = Color.Black,
             fontWeight = FontWeight.Medium,
-            fontFamily = RobotoCondensedFont()
+            fontFamily = RobotoCondensedFont(),
+            textAlign = TextAlign.End
         )
     }
 }

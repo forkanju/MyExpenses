@@ -1,4 +1,4 @@
-package ngo.friendship.mhealth.dc.presentation.screens.profile.fcm
+package ngo.friendship.mhealth.dc.presentation.screen.profile.fcm
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -42,12 +42,17 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
+import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileIntent
+import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiEffect
+import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiState
+import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileViewModel
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
@@ -88,14 +93,11 @@ fun FcmProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "FCM Profile",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF666666)
+                        "FCM Profile", style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Medium, color = Color(0xFF666666)
                         )
                     )
-                },
-                navigationIcon = {
+                }, navigationIcon = {
                     IconButton(onClick = { viewModel.onIntent(FcmProfileIntent.NavigateBack) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -103,39 +105,29 @@ fun FcmProfileScreen(
                             tint = Color(0xFF666666)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
-        },
-        containerColor = Color(0xFFF5F5F5)
+        }, containerColor = Color(0xFFF5F5F5)
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            ProfileHeaderCard(
-                state = state,
-                onCallClick = { mobile ->
-                    val clean = mobile.filter { it.isDigit() }
-                    if (clean.isNotEmpty()) {
-                        uriHandler.openUri("tel:$clean")
-                    }
-                },
-                onWhatsAppClick = { mobile ->
-                    val clean = mobile.filter { it.isDigit() }
-                    if (clean.isNotEmpty()) {
-                        uriHandler.openUri("https://api.whatsapp.com/send?phone=$clean")
-                    }
+            ProfileHeaderCard(state = state, onCallClick = { mobile ->
+                val clean = mobile.filter { it.isDigit() }
+                if (clean.isNotEmpty()) {
+                    uriHandler.openUri("tel:$clean")
                 }
-            )
+            }, onWhatsAppClick = { mobile ->
+                val clean = mobile.filter { it.isDigit() }
+                if (clean.isNotEmpty()) {
+                    uriHandler.openUri("https://api.whatsapp.com/send?phone=$clean")
+                }
+            })
             Spacer(modifier = Modifier.height(16.dp))
             TabRowSection(
                 selectedTab = state.selectedTab,
-                onTabSelected = { viewModel.onIntent(FcmProfileIntent.SelectTab(it)) }
-            )
+                onTabSelected = { viewModel.onIntent(FcmProfileIntent.SelectTab(it)) })
             Spacer(modifier = Modifier.height(16.dp))
 
             if (state.selectedTab == 0) {
@@ -147,9 +139,7 @@ fun FcmProfileScreen(
 
 @Composable
 private fun ProfileHeaderCard(
-    state: FcmProfileUiState,
-    onCallClick: (String) -> Unit,
-    onWhatsAppClick: (String) -> Unit
+    state: FcmProfileUiState, onCallClick: (String) -> Unit, onWhatsAppClick: (String) -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -158,21 +148,17 @@ private fun ProfileHeaderCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             AvatarBadge(
-                modifier = Modifier.size(80.dp),
-                idText = state.fcmProfile?.loginId ?: "",
-                photo = {
+                modifier = Modifier.size(80.dp), idText = state.fcmProfile?.loginId ?: "", photo = {
                     Image(
                         painter = painterResource(Resources.Icon.FCM),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
-                }
-            )
+                })
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -196,23 +182,18 @@ private fun ProfileHeaderCard(
                     fontFamily = RobotoCondensedFont(),
                     modifier = Modifier.clickable {
                         state.fcmProfile?.mobileNo?.let { onCallClick(it) }
-                    }
-                )
+                    })
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircleActionIcon(
-                    painter = painterResource(Resources.Icon.Call),
-                    onClick = {
+                    painter = painterResource(Resources.Icon.Call), onClick = {
                         state.fcmProfile?.mobileNo?.let { onCallClick(it) }
-                    }
-                )
+                    })
                 Spacer(modifier = Modifier.width(8.dp))
                 CircleActionIcon(
-                    painter = painterResource(Resources.Icon.Wapp),
-                    onClick = {
+                    painter = painterResource(Resources.Icon.Wapp), onClick = {
                         state.fcmProfile?.mobileNo?.let { onWhatsAppClick(it) }
-                    }
-                )
+                    })
             }
         }
     }
@@ -221,8 +202,7 @@ private fun ProfileHeaderCard(
 @Composable
 private fun TabRowSection(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val tabs = listOf("Personal info")
         tabs.forEachIndexed { index, title ->
@@ -230,27 +210,20 @@ private fun TabRowSection(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 title = title,
                 isSelected = selectedTab == index,
                 modifier = Modifier.weight(1f),
-                onClick = { onTabSelected(index) }
-            )
+                onClick = { onTabSelected(index) })
         }
     }
 }
 
 @Composable
 private fun TabItem(
-    title: String,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    title: String, isSelected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(8.dp),
         color = if (isSelected) PrimaryBlue else Color.White,
         border = if (isSelected) null else BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f)),
-        modifier = modifier
-            .height(36.dp)
-            .clickable { onClick() }
-    ) {
+        modifier = modifier.height(36.dp).clickable { onClick() }) {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = title,
@@ -274,8 +247,7 @@ private fun ProfileInfoSection(fcmProfile: FcmProfile?) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             ProfileInfoRow("Name", fcmProfile?.userName ?: "")
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
@@ -294,12 +266,12 @@ private fun ProfileInfoSection(fcmProfile: FcmProfile?) {
 @Composable
 private fun ProfileInfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        verticalAlignment = Alignment.Top
     ) {
         Text(
             text = label,
+            modifier = Modifier.weight(.5f),
             fontSize = 14.sp,
             color = Color.Gray,
             fontWeight = FontWeight.Normal,
@@ -307,28 +279,25 @@ private fun ProfileInfoRow(label: String, value: String) {
         )
         Text(
             text = value,
+            modifier = Modifier.weight(.5f),
             fontSize = 14.sp,
             color = Color.Black,
             fontWeight = FontWeight.Medium,
-            fontFamily = RobotoCondensedFont()
+            fontFamily = RobotoCondensedFont(),
+            textAlign = TextAlign.End
         )
     }
 }
 
 @Composable
 private fun CircleActionIcon(
-    painter: Painter,
-    onClick: () -> Unit
+    painter: Painter, onClick: () -> Unit
 ) {
     IconButton(
-        onClick = onClick,
-        modifier = Modifier.size(32.dp)
+        onClick = onClick, modifier = Modifier.size(32.dp)
     ) {
         Box(
-            modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape),
-            contentAlignment = Alignment.Center
+            modifier = Modifier.size(28.dp).clip(CircleShape), contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painter,
