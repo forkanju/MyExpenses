@@ -111,7 +111,12 @@ fun CaseDetailScreen(
     }
 
     val titlePrefix =
-        remember(isFromTemplate, state.templateName, state.fcmProfileState, state.interviewDetails.fcmInfo) {
+        remember(
+            isFromTemplate,
+            state.templateName,
+            state.fcmProfileState,
+            state.interviewDetails.fcmInfo
+        ) {
             if (isFromTemplate) {
                 if (state.templateName.isNotBlank()) state.templateName else "Prescription Template"
             } else {
@@ -230,6 +235,8 @@ fun CaseDetailScreen(
                         benefAge = state.interviewDetails.beneficiaryAge,
                         benefGender = state.interviewDetails.beneficiaryGender,
                         questionnaireName = state.interviewDetails.questionnaireName,
+                        startTime = state.interviewDetails.startTime,
+                        createDate = state.interviewDetails.createDate,
                         isAnsweredMode = isAnsweredMode,
                         onDetailsClick = onBeneficiaryDetailsClick
                     )
@@ -498,7 +505,9 @@ fun CaseDetailScreen(
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
                                     contentDescription = "Calendar",
-                                    tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(0xFF214695),
+                                    tint = if (isAnsweredMode) Color(0xFF6B6B6B) else Color(
+                                        0xFF214695
+                                    ),
                                     modifier = Modifier.size(18.dp)
                                 )
                             }, rightText = "Save as a template",//Save as a template

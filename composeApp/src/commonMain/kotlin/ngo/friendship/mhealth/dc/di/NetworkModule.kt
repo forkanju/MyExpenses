@@ -53,9 +53,9 @@ val networkModule = module {
                 accept(ContentType.Application.Json)
             }
             install(HttpTimeout) {
-                requestTimeoutMillis = 30_000L
-                connectTimeoutMillis = 30_000L
-                socketTimeoutMillis = 30_000L
+                requestTimeoutMillis = 60_000L
+                connectTimeoutMillis = 60_000L
+                socketTimeoutMillis =  60_000L
             }
             install(HttpCache)
             install(ContentNegotiation) {

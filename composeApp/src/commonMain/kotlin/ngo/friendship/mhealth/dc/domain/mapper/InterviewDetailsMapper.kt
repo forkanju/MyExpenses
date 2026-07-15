@@ -4,7 +4,7 @@ import ngo.friendship.mhealth.dc.data.remote.dto.InterviewDetailsResDto
 import ngo.friendship.mhealth.dc.domain.model.InterviewAnswer
 import ngo.friendship.mhealth.dc.domain.model.InterviewDetails
 import ngo.friendship.mhealth.dc.domain.model.SysPrescription
-import ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.components.calculateAge
+import ngo.friendship.mhealth.dc.utils.calculateAge
 
 fun InterviewDetailsResDto.InterviewDetails.toDomain(): InterviewDetails = InterviewDetails(
     interviewId = interviewId ?: -1,
@@ -28,6 +28,7 @@ fun InterviewDetailsResDto.InterviewDetails.toDomain(): InterviewDetails = Inter
     waitingFor = waitingFor,
     stName = stName,
     description = description,
+    createDate = createDate,
     details = detailsList.map { it.toDomain() },
     sysPrescriptionList = sysPrescriptionList.map { it.toDomain() }
 )

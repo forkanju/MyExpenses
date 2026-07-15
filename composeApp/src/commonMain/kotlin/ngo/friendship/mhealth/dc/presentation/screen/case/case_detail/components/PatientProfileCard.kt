@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.theme.RobotoCondensedFont
+import ngo.friendship.mhealth.dc.utils.toUiDateTime
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -43,6 +44,8 @@ fun PatientProfileCard(
     benefAge: String? = null,
     benefGender: String? = null,
     questionnaireName: String? = null,
+    startTime: String? = null,
+    createDate: String? = null,
     isAnsweredMode: Boolean = false,
     onDetailsClick: () -> Unit = {}
 ) {
@@ -63,13 +66,12 @@ fun PatientProfileCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(100.dp)
     ) {
 
         // 🧱 Main Card
         Card(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxWidth(),
             shape = RoundedCornerShape(
                 topStart = 0.dp,
                 topEnd = 12.dp,
@@ -78,7 +80,10 @@ fun PatientProfileCard(
             ),
             colors = CardDefaults.cardColors(containerColor = containerColor)
         ) {
-            Row(modifier = Modifier.padding(8.dp)) {
+            Row(
+                modifier = Modifier.padding(8.dp),
+                verticalAlignment = Alignment.Top
+            ) {
 
                 AvatarBadge(
                     modifier = Modifier.size(width = 50.dp, height = 62.dp),
@@ -97,7 +102,7 @@ fun PatientProfileCard(
 
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .weight(1f)
                         .padding(start = 8.dp)
                 ) {
 
@@ -130,7 +135,7 @@ fun PatientProfileCard(
                         )
                     }
 
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(2.dp))
 
                     Text(
                         text = questionnaireName ?: "Oral Ulcer",
@@ -139,6 +144,25 @@ fun PatientProfileCard(
                             fontFamily = RobotoCondensedFont(),
                             fontWeight = FontWeight.SemiBold
                         )
+                    )
+
+                    Spacer(Modifier.height(2.dp))
+
+                    val timeStyle = TextStyle(
+                        color = titleColor.copy(alpha = 0.7f),
+                        fontFamily = RobotoCondensedFont(),
+                        fontWeight = FontWeight.Normal,
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize
+                    )
+
+                    Text(
+                        text = "Interview: ${startTime?.toUiDateTime() ?: "N/A"}",
+                        style = timeStyle
+                    )
+
+                    Text(
+                        text = "Uploaded: ${createDate?.toUiDateTime() ?: "N/A"}",
+                        style = timeStyle
                     )
                 }
             }

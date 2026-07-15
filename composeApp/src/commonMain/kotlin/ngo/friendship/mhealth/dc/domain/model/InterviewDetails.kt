@@ -25,6 +25,7 @@ data class InterviewDetails(
     val stName: String? = null,
     val beneficiaryAge: String? = "",//Fake
     val description: String? = null,
+    val createDate: String? = null,
     val details: List<InterviewAnswer> = emptyList(),
     val sysPrescriptionList: List<SysPrescription> = emptyList()
 )

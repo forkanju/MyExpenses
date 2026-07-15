@@ -268,33 +268,14 @@ fun ExpandableInterviewSummary(
             }
         }
 
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(36.dp)
                 .background(footerColor)
                 .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Uploaded: ",
-                fontSize = 12.sp,
-                color = Color.White,
-                fontStyle = FontStyle.Italic,
-                fontFamily = RobotoCondensedFont()
-            )
-
-            Text(
-                text = uploadedDateTime,
-                fontSize = 12.sp,
-                color = Color.White,
-                fontStyle = FontStyle.Italic,
-                fontWeight = FontWeight.Bold,
-                fontFamily = RobotoCondensedFont()
-            )
-
-            Spacer(Modifier.width(6.dp))
-
             Icon(
                 painter = painterResource(resource = Resources.Icon.Arrow),
                 contentDescription = "Expand/Collapse",
@@ -305,8 +286,6 @@ fun ExpandableInterviewSummary(
                     .clickable { expanded = !expanded }
             )
 
-            Spacer(modifier = Modifier.weight(1f))
-
             Text(
                 text = "",//See full Interview
                 fontSize = 13.sp,
@@ -315,7 +294,9 @@ fun ExpandableInterviewSummary(
                 fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Normal,
                 fontFamily = RobotoCondensedFont(),
-                modifier = Modifier.clickable { onSeeFullClick() }
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .clickable { onSeeFullClick() }
             )
         }
     }

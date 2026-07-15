@@ -43,7 +43,7 @@ data class InterviewDetailsResDto(
         @SerialName("WAITING_FOR") val waitingFor: String? = null,
         @SerialName("stName") val stName: String? = null,
         @SerialName("description") val description: String? = null,
-
+        @SerialName("CREATE_DATE") val createDate: String? = null,
         @SerialName("details_list") val detailsList: List<DetailItem> = emptyList(),
         @SerialName("sys_prescription_list") val sysPrescriptionList: List<SysPrescriptionItem> = emptyList()
     )

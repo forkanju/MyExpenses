@@ -93,6 +93,11 @@ class CaseRepositoryImpl(
 
         val details = response.data?.interviewDetails
             ?: error("Interview details not found")
+
+        "Interview Details API -> START_TIME: ${details.startTime}, CREATE_DATE: ${details.createDate}".log(
+            "API_RESPONSE"
+        )
+
         return details.toDomain()
     }
 
