@@ -27,7 +27,7 @@ data class InterviewListResDto(
         @SerialName("BENEF_CODE") val benefCode: String? = null,
         @SerialName("LOCATION") val location: String? = null,
         @SerialName("STATUS") val status: String? = null,
-        @SerialName("START_TIME") val startTime: String? = null,
+        @SerialName("START_TIME") val startTime: String? = null,//interview time
         @SerialName("QUESTIONNAIRE_ID") val questionnaireId: Long? = null,
         @SerialName("QUESTIONNAIRE_NAME") val questionnaireName: String? = null,
         @SerialName("stCaption") val stCaption: String? = null,
@@ -45,6 +45,8 @@ data class InterviewListResDto(
         @SerialName("fcmInfo") val fcmInfo: String? = null,
         @SerialName("WAITING_FOR") val waitingFor: String? = null,
         @SerialName("stName") val stName: String? = null,
-        @SerialName("description") val description: String? = null
-    )
+        @SerialName("description") val description: String? = null,
+        @SerialName("GENDER") val gender: String? = null,
+        @SerialName("DOB") val dob: String? = null,
+        @SerialName("CREATE_DATE") val createDate: String? = null)//upload time
 }

@@ -887,3 +887,47 @@ fun String.toUiDate(): String {
         this
     }
 }
+
+/**
+ * Calculates age from DOB string and returns formatted string like "5y", "6m", "3d".
+ * Expected format: "yyyy-MM-dd" or "yyyy-MM-dd HH:mm:ss"
+ */
+fun String.calculateAge(): String {
+    return try {
+        val dobDate = if (this.contains("T") || this.contains(" ")) {
+            val cleaned = this.substringBefore(".").replace(" ", "T")
+            LocalDateTime.parse(cleaned).date
+        } else {
+            LocalDate.parse(this)
+        }
+
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+        val years = today.year - dobDate.year
+        val months = today.month.number - dobDate.month.number
+        val days = today.day - dobDate.day
+
+        var adjustedYears = years
+        var adjustedMonths = months
+        var adjustedDays = days
+
+        if (adjustedDays < 0) {
+            adjustedMonths -= 1
+            // Simple approximation for days in month, or we could get actual days in dobDate's month
+            adjustedDays += 30 
+        }
+
+        if (adjustedMonths < 0) {
+            adjustedYears -= 1
+            adjustedMonths += 12
+        }
+
+        return when {
+            adjustedYears > 0 -> "${adjustedYears}y"
+            adjustedMonths > 0 -> "${adjustedMonths}m"
+            else -> "${adjustedDays.coerceAtLeast(0)}d"
+        }
+    } catch (_: Exception) {
+        ""
+    }
+}

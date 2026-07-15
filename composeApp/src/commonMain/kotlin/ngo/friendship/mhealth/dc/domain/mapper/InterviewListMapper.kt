@@ -28,5 +28,8 @@ fun InterviewListResDto.Item.toDomain(): Interview = Interview(
     fcmInfo = fcmInfo,
     waitingFor = waitingFor,
     stName = stName,
-    description = description
+    description = description,
+    gender = gender,
+    dob = dob,
+    createDate = createDate
 )

@@ -27,5 +27,8 @@ data class Interview(
     val fcmInfo: String? = null,
     val waitingFor: String? = null,
     val stName: String? = null,
-    val description: String? = null
+    val description: String? = null,
+    val gender: String? = null,
+    val dob: String? = null,
+    val createDate: String? = null
 )

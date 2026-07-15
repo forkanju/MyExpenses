@@ -44,6 +44,7 @@ import ngo.friendship.mhealth.dc.presentation.components.DottedDivider
 import ngo.friendship.mhealth.dc.theme.FontSize
 import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
+import ngo.friendship.mhealth.dc.utils.calculateAge
 import ngo.friendship.mhealth.dc.utils.toUiDateTime
 import org.jetbrains.compose.resources.painterResource
 import kotlin.time.Clock
@@ -112,13 +113,30 @@ fun CaseItem(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         horizontalAlignment = Alignment.Start
                     ) {
-                        Text(
-                            text = ui.beneficiaryName,
-                            style = CompactTextStyle(
-                                fontWeight = FontWeight.Bold,
-                                color = titleColor
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = ui.beneficiaryName,
+                                style = CompactTextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = titleColor
+                                )
                             )
-                        )
+                            val info = listOfNotNull(
+                                ui.gender?.takeIf { it.isNotBlank() },
+                                ui.dob?.takeIf { it.isNotBlank() }?.calculateAge()
+                            ).joinToString(", ")
+
+                            if (info.isNotBlank()) {
+                                Text(
+                                    text = " ($info)",
+                                    style = CompactTextStyle(
+                                        fontSize = FontSize.EXTRA_SMALL,
+                                        color = locationColor,
+                                        fontWeight = FontWeight.Normal
+                                    )
+                                )
+                            }
+                        }
 
                         Text(
                             text = ui.location,
@@ -177,16 +195,17 @@ fun CaseItem(
                         )
                     )
 
-                    Spacer(Modifier.width(4.dp))
-
-//                    Text(
-//                        text = ui.status,
-//                        style = CompactTextStyle(
-//                            fontSize = FontSize.EXTRA_SMALL,
-//                            color = refColor
-//                        ),
-//                        fontStyle = FontStyle.Italic,
-//                    )
+                    if (!ui.createDate.isNullOrBlank()) {
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Uploaded at: ${ui.createDate.toUiDateTime()}",
+                            style = CompactTextStyle(
+                                fontSize = FontSize.EXTRA_SMALL,
+                                fontStyle = FontStyle.Italic,
+                                color = refColor
+                            )
+                        )
+                    }
                 }
             }
         }
