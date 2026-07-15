@@ -465,6 +465,23 @@ class CaseViewModel(
                 val details = repository.getInterviewDetails(interviewId = interviewId)
                 _state.update { it.copy(interviewDetails = details) }
 
+                "Beneficiary Code for mobile fetch: ${details.beneficiaryCode}".log("CASE_DEBUG")
+                details.beneficiaryCode.takeIf { it.isNotBlank() }?.let { benefCode ->
+                    launch {
+                        val profile = repository.getBeneficiaryProfile(benefCode)
+                        "Fetched Beneficiary Profile: ${profile?.benefName}, Mobile: ${profile?.mobileNumber}".log(
+                            "CASE_DEBUG"
+                        )
+                        _state.update {
+                            it.copy(
+                                formState = it.formState.copy(
+                                    mobile = profile?.mobileNumber ?: ""
+                                )
+                            )
+                        }
+                    }
+                }
+
                 val fcmInfo = details.fcmInfo
                 "Interview loaded. fcmInfo: $fcmInfo".log("CASE_DEBUG")
 
@@ -663,8 +680,10 @@ class CaseViewModel(
                         if (_state.value.formState.prescriptions.isNotEmpty()) "false" else "true"
                     )
 
-                    val jsonArray = Json.parseToJsonElement(_state.value.formState.prescriptions.toJson()).jsonArray
-                    val pipeSeparatedPrescriptions:String =  JsonSorter.convertJsonArrayToPipeSeparated(jsonArray)
+                    val jsonArray =
+                        Json.parseToJsonElement(_state.value.formState.prescriptions.toJson()).jsonArray
+                    val pipeSeparatedPrescriptions: String =
+                        JsonSorter.convertJsonArrayToPipeSeparated(jsonArray)
                     updatedQ = modifyQuestionAnswerCaptionJson(
                         updatedQ,
                         "question10002",

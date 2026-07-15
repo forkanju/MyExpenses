@@ -48,9 +48,9 @@ fun SendMessageDialog(
     var state by remember(initialState) {
         mutableStateOf(
             initialState.copy(
-                isFcmChecked = !fcmMobileNumber.isNullOrBlank(),
-                isBeneficiaryChecked = !beneficiaryMobileNumber.isNullOrBlank(),
-                phoneNumber = if (beneficiaryMobileNumber.isNullOrBlank()) initialState.phoneNumber else beneficiaryMobileNumber
+                isFcmChecked = initialState.isFcmChecked,
+                isBeneficiaryChecked = initialState.isBeneficiaryChecked,
+                phoneNumber = initialState.phoneNumber // Keep empty if it was empty
             )
         )
     }
@@ -58,6 +58,8 @@ fun SendMessageDialog(
     Dialog(onDismissRequest = onDismiss) {
         CustomMessageDialogContent(
             state = state,
+            fcmMobileNumber = fcmMobileNumber,
+            beneficiaryMobileNumber = beneficiaryMobileNumber,
             isFcmEnabled = !fcmMobileNumber.isNullOrBlank(),
             isBeneficiaryEnabled = !beneficiaryMobileNumber.isNullOrBlank(),
             onMessageChange = { state = state.copy(messageText = it) },
@@ -74,6 +76,8 @@ fun SendMessageDialog(
 @Composable
 fun CustomMessageDialogContent(
     state: CustomMessageState,
+    fcmMobileNumber: String? = null,
+    beneficiaryMobileNumber: String? = null,
     isFcmEnabled: Boolean = true,
     isBeneficiaryEnabled: Boolean = true,
     onMessageChange: (String) -> Unit,
@@ -133,24 +137,37 @@ fun CustomMessageDialogContent(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                CheckboxRow(
-                    label = "FCM",
-                    checked = state.isFcmChecked,
-                    onCheckedChange = onFcmToggle,
-                    enabled = isFcmEnabled
-                )
+                Column(horizontalAlignment = Alignment.Start) {
+                    CheckboxRow(
+                        label = "FCM",
+                        checked = state.isFcmChecked,
+                        onCheckedChange = onFcmToggle,
+                        enabled = isFcmEnabled
+                    )
+                    Text(
+                        text = "(${fcmMobileNumber ?: "N/A"})",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
 
-                Spacer(modifier = Modifier.width(16.dp))
-
-                CheckboxRow(
-                    label = "Beneficiary",
-                    checked = state.isBeneficiaryChecked,
-                    onCheckedChange = onBeneficiaryToggle,
-                    enabled = isBeneficiaryEnabled
-                )
+                Column(horizontalAlignment = Alignment.Start) {
+                    CheckboxRow(
+                        label = "Beneficiary",
+                        checked = state.isBeneficiaryChecked,
+                        onCheckedChange = onBeneficiaryToggle,
+                        enabled = isBeneficiaryEnabled
+                    )
+                    Text(
+                        text = "(${beneficiaryMobileNumber ?: "N/A"})",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -158,11 +175,11 @@ fun CustomMessageDialogContent(
             OutlinedTextField(
                 value = state.phoneNumber,
                 onValueChange = onPhoneNumberChange,
-                modifier = Modifier.width(180.dp),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 placeholder = {
                     Text(
-                        text = "Add Number",
+                        text = "Add number",
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontWeight = FontWeight.Normal
                         ),

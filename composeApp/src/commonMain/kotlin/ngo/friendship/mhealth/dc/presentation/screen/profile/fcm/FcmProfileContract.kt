@@ -1,8 +1,6 @@
-package ngo.friendship.mhealth.dc.presentation.screens.profile.fcm
+package ngo.friendship.mhealth.dc.presentation.screen.profile.fcm
 
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
-import ngo.friendship.mhealth.dc.domain.model.Interview
-import ngo.friendship.mhealth.dc.domain.model.UserProfile
 
 data class FcmProfileUiState(
     val beneficiaryId: Long = -1L,

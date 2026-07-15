@@ -45,7 +45,8 @@ data class InterviewDetailsResDto(
         @SerialName("description") val description: String? = null,
         @SerialName("CREATE_DATE") val createDate: String? = null,
         @SerialName("details_list") val detailsList: List<DetailItem> = emptyList(),
-        @SerialName("sys_prescription_list") val sysPrescriptionList: List<SysPrescriptionItem> = emptyList()
+        @SerialName("sys_prescription_list") val sysPrescriptionList: List<SysPrescriptionItem> = emptyList(),
+        @SerialName("sms_numbers") val smsNumbers: List<SmsNumberItem> = emptyList()
     )
 
     @Serializable
@@ -58,5 +59,11 @@ data class InterviewDetailsResDto(
     @Serializable
     data class SysPrescriptionItem(
         @SerialName("prescription") val prescription: String? = null
+    )
+
+    @Serializable
+    data class SmsNumberItem(
+        @SerialName("FCM_MOBILE") val fcmMobile: String? = null,
+        @SerialName("BENEF_MOBILE") val benefMobile: String? = null
     )
 }

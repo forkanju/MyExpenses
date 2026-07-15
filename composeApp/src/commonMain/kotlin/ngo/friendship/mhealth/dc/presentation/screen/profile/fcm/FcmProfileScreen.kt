@@ -49,9 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ngo.friendship.mhealth.dc.domain.model.FcmProfile
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.AvatarBadge
-import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileIntent
-import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiEffect
-import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileUiState
 import ngo.friendship.mhealth.dc.presentation.screens.profile.fcm.FcmProfileViewModel
 import ngo.friendship.mhealth.dc.theme.PrimaryBlue
 import ngo.friendship.mhealth.dc.theme.Resources

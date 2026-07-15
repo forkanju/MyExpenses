@@ -94,6 +94,10 @@ class CaseRepositoryImpl(
         val details = response.data?.interviewDetails
             ?: error("Interview details not found")
 
+        "Interview Details API Response: $response".log("API_RESPONSE")
+        "Interview Details sms_numbers: ${details.smsNumbers}".log("API_RESPONSE")
+        "Interview Details details_list: ${details.detailsList}".log("API_RESPONSE")
+
         "Interview Details API -> START_TIME: ${details.startTime}, CREATE_DATE: ${details.createDate}".log(
             "API_RESPONSE"
         )
@@ -242,7 +246,8 @@ class CaseRepositoryImpl(
         "FCM Response: code=${response.responseCode}, name=${response.responseName}, error=${response.errorDesc}".log(
             "FCM_DEBUG"
         )
-        "FCM Data: ${response.data?.fcmProfile}".log("FCM_DEBUG")
+        "FCM Data Full Response: $response".log("FCM_DEBUG")
+        "FCM Mobile Number: ${response.data?.fcmProfile?.mobileNo}".log("FCM_DEBUG")
         return response.data?.fcmProfile?.toDomainFcmProfile()
     }
 

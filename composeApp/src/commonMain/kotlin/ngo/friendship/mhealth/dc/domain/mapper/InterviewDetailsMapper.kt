@@ -29,6 +29,8 @@ fun InterviewDetailsResDto.InterviewDetails.toDomain(): InterviewDetails = Inter
     stName = stName,
     description = description,
     createDate = createDate,
+    fcmMobile = smsNumbers.firstOrNull()?.fcmMobile,
+    beneficiaryMobile = smsNumbers.firstOrNull()?.benefMobile,
     details = detailsList.map { it.toDomain() },
     sysPrescriptionList = sysPrescriptionList.map { it.toDomain() }
 )
