@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import kotlin.time.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -47,6 +46,7 @@ import ngo.friendship.mhealth.dc.theme.PrimaryColor
 import ngo.friendship.mhealth.dc.theme.Resources
 import ngo.friendship.mhealth.dc.utils.toUiDateTime
 import org.jetbrains.compose.resources.painterResource
+import kotlin.time.Clock
 
 /**
  * A composable that displays a single case item in a list.
@@ -113,7 +113,7 @@ fun CaseItem(
                         horizontalAlignment = Alignment.Start
                     ) {
                         Text(
-                            text = "${ui.beneficiaryName} (${ui.status})",
+                            text = ui.beneficiaryName,
                             style = CompactTextStyle(
                                 fontWeight = FontWeight.Bold,
                                 color = titleColor
@@ -214,7 +214,8 @@ fun CountdownBadge(
             val cleaned = startTime
                 .substringBefore(".")
                 .replace(" ", "T")
-            LocalDateTime.parse(cleaned).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+            LocalDateTime.parse(cleaned).toInstant(TimeZone.currentSystemDefault())
+                .toEpochMilliseconds()
         } catch (_: Exception) {
             0L
         }
@@ -236,7 +237,8 @@ fun CountdownBadge(
         val totalSeconds = remainingTimeMs / 1000
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
-        val timeStr = "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+        val timeStr =
+            "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 
         Box(
             modifier = modifier
