@@ -186,8 +186,9 @@ fun MedicineComposerCard(
     ) {
         Column(Modifier.padding(12.dp)) {
             LaunchedEffect(medicineBrandTypeList) {
-                if (state.doseType.isEmpty() && medicineBrandTypeList.isNotEmpty()) {
-                    onStateChange(state.copy(doseType = medicineBrandTypeList.first()))
+                if (state.doseType.isEmpty()) {
+                    val defaultType = medicineBrandTypeList.firstOrNull() ?: "Tab"
+                    onStateChange(state.copy(doseType = defaultType))
                 }
             }
 
@@ -204,7 +205,6 @@ fun MedicineComposerCard(
                 suggestions = genericNames,
                 rightPlaceholder = "Type generic name",
                 onSuggestionSelected = { selected ->
-                    // ... (same as before)
                     val genericNameText = selected.text.trim()
 
                     val medicine = medicines.find {
@@ -217,6 +217,7 @@ fun MedicineComposerCard(
 
                     val brandName = medicine?.brandName ?: ""
                     val medicineId = medicine?.medicineId ?: -1L
+                    val medicineType = medicine?.type ?: state.doseType
 
 
                     onStateChange(
@@ -226,7 +227,8 @@ fun MedicineComposerCard(
                                 brandName,
                                 TextRange(brandName.length)
                             ),
-                            medicineId = medicineId
+                            medicineId = medicineId,
+                            doseType = if (medicineType.isNotBlank()) medicineType else state.doseType
                         )
                     )
                 },

@@ -2,6 +2,7 @@ package ngo.friendship.mhealth.dc.presentation.screen.case.case_detail.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
@@ -55,30 +56,33 @@ fun PrescriptionActionRowAligned(
                 .fillMaxWidth()
                 .height(48.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            UnderlineTextFieldMini(
+            OutlinedTextFieldMini(
                 value = doseValue,
                 onValueChange = onDoseChange,
-                width = 80.dp,
+                width = 0.dp,
+                modifier = Modifier.weight(0.4f),
                 isAnsweredMode = isAnsweredMode,
                 placeholder = "Dose",
                 suggestions = doseSuggestions
             )
 
-            UnderlineTextFieldMini(
+            OutlinedTextFieldMini(
                 value = daysValue,
                 onValueChange = onDaysChange,
-                width = 30.dp,
+                width = 0.dp,
+                modifier = Modifier.weight(0.2f),
                 isAnsweredMode = isAnsweredMode,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 placeholder = "Days"
             )
 
-            UnderlineTextFieldMini(
+            OutlinedTextFieldMini(
                 value = quantityValue,
                 onValueChange = onQuantityChange,
-                width = 30.dp,
+                width = 0.dp,
+                modifier = Modifier.weight(0.2f),
                 isAnsweredMode = isAnsweredMode,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 placeholder = "Qty"
@@ -91,23 +95,36 @@ fun PrescriptionActionRowAligned(
                     isAnsweredMode = isAnsweredMode
                 )
             }
-
-            AddMini(
-                onClick = onAddClick,
-                isAnsweredMode = isAnsweredMode
-            )
         }
 
         Spacer(Modifier.height(8.dp))
-        UnderlineTextFieldMini(
-            value = noteValue,
-            onValueChange = onNoteChange,
-            width = 0.dp, // Take full width
+
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            isAnsweredMode = isAnsweredMode,
-            placeholder = "Advice for this medicine (for FCM view)..."
-        )
-        Spacer(Modifier.height(8.dp))
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            OutlinedTextFieldMini(
+                value = noteValue,
+                onValueChange = onNoteChange,
+                width = 0.dp,
+                modifier = Modifier.weight(0.8f),
+                isAnsweredMode = isAnsweredMode,
+                placeholder = "Advice for this medicine (for FCM view)..."
+            )
+
+            if (!isAnsweredMode) {
+                Box(
+                    modifier = Modifier.weight(0.2f),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    AddMini(
+                        onClick = onAddClick,
+                        isAnsweredMode = isAnsweredMode
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -193,7 +210,7 @@ private fun AddMini(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UnderlineTextFieldMini(
+fun OutlinedTextFieldMini(
     value: String,
     onValueChange: (String) -> Unit,
     width: Dp,
@@ -206,13 +223,14 @@ fun UnderlineTextFieldMini(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else Gray
-    val dividerColor = when {
+    val textColor = if (isAnsweredMode) Color(0xFF4F4F4F) else TextPrimary
+    val borderColor = when {
         isAnsweredMode -> Color(0xFFC7C7C7)
         isFocused -> FocusedBorderColor
-        else -> Gray
+        else -> UnfocusedBorderColor
     }
-    val dividerHeight = if (isFocused) 1.5.dp else 1.dp
+
+    val bgColor = if (isAnsweredMode) Color(0xFFF7F7F7) else Color.White
 
     val finalModifier = if (modifier == Modifier) Modifier.width(width)
     else modifier
@@ -232,39 +250,42 @@ fun UnderlineTextFieldMini(
         onExpandedChange = { if (!isAnsweredMode) expanded = it },
         modifier = finalModifier
     ) {
-        Column(modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true)) {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier.fillMaxWidth(),
-                textStyle = TextStyle(color = textColor, fontSize = 13.sp),
-                singleLine = true,
-                readOnly = isAnsweredMode,
-                keyboardOptions = keyboardOptions,
-                interactionSource = interactionSource,
-                decorationBox = { innerTextField ->
-                    Box(contentAlignment = Alignment.CenterStart) {
-                        if (value.isEmpty()) {
-                            Text(placeholder, color = Gray.copy(alpha = 0.5f), fontSize = 13.sp)
-                        }
-                        innerTextField()
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true),
+            textStyle = TextStyle(color = textColor, fontSize = 13.sp),
+            singleLine = true,
+            readOnly = isAnsweredMode,
+            keyboardOptions = keyboardOptions,
+            interactionSource = interactionSource,
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(bgColor)
+                        .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(6.dp))
+                        .padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (value.isEmpty()) {
+                        Text(placeholder, color = Gray.copy(alpha = 0.5f), fontSize = 11.sp)
                     }
+                    innerTextField()
                 }
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dividerHeight)
-                    .background(dividerColor)
-            )
-        }
+            }
+        )
 
         if (filteredSuggestions.isNotEmpty() && !isAnsweredMode) {
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.width(IntrinsicSize.Max).background(Color.White)
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+                    .background(Color.White)
             ) {
                 filteredSuggestions.forEach { suggestion ->
                     DropdownMenuItem(
