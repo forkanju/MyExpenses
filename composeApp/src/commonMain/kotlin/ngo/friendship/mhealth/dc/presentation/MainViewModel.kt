@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ngo.friendship.mhealth.dc.data.local.LocalSettings
@@ -48,7 +50,7 @@ sealed interface MainUiEvent {
     data object OpenMoreTab : MainUiEvent
 }
 
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class MainViewModel(
     val settings: LocalSettings,
     private val caseRepository: CaseRepository,
@@ -72,17 +74,22 @@ class MainViewModel(
     var selectedBottomTab by mutableStateOf(BottomNavItems.Cases)
         private set
 
+    private val profileRefreshTrigger = MutableSharedFlow<Unit>(replay = 1)
+
     val setupDataState = mainRepository.getSetupData(forceRefresh = false).stateIn(
         scope = viewModelScope,
         started = SharingStarted.Lazily,
         initialValue = SetupData()
     )
 
-    val userProfileState = mainRepository.getDoctorProfile().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = null
-    )
+    val userProfileState = profileRefreshTrigger
+        .onStart { emit(Unit) }
+        .flatMapLatest { mainRepository.getDoctorProfile() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     val interviewListState: StateFlow<List<Interview>>
         field = MutableStateFlow(emptyList())
@@ -120,9 +127,12 @@ class MainViewModel(
         // Observe backstack to trigger refresh when user lands on Main screen (e.g. after login)
         viewModelScope.launch(mainContext) {
             snapshotFlow { backStack }.collect {
-                if (isUserLoggedIn && !isCaseCountsLoaded) {
-                    println("DEBUG: MainViewModel triggered refreshAllCounts via BackStack observer")
-                    refreshAllCounts()
+                if (isUserLoggedIn) {
+                    profileRefreshTrigger.emit(Unit)
+                    if (!isCaseCountsLoaded) {
+                        println("DEBUG: MainViewModel triggered refreshAllCounts via BackStack observer")
+                        refreshAllCounts()
+                    }
                 }
             }
         }
