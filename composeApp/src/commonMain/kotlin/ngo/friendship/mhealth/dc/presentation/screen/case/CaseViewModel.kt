@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -593,6 +592,40 @@ class CaseViewModel(
         }
     }
 
+    fun modifyQuestionAnswerOptionsJson(
+        obj: JsonObject?,
+        key: String,
+        prescriptions: List<PrescriptionItemDto>
+    ): JsonObject? {
+        if (obj == null) return null
+        return buildJsonObject {
+            for ((k, v) in obj) {
+                if (k == key && v is JsonObject) {
+                    put(k, buildJsonObject {
+                        for ((innerK, innerV) in v) {
+                            if (innerK == "options") {
+                                put(innerK, buildJsonArray {
+                                    prescriptions.forEachIndexed { index, prescription ->
+                                        val prescriptionJson = prescription.toJson()
+                                        add(buildJsonObject {
+                                            put("caption", JsonPrimitive(prescriptionJson))
+                                            put("id", JsonPrimitive(index + 1))
+                                            put("value", JsonPrimitive(prescriptionJson))
+                                        })
+                                    }
+                                })
+                            } else {
+                                put(innerK, innerV)
+                            }
+                        }
+                    })
+                } else {
+                    put(k, v)
+                }
+            }
+        }
+    }
+
     fun modifyQuestionAnswerJson2(
         array: JsonArray,
         index: Int,
@@ -682,22 +715,10 @@ class CaseViewModel(
                         if (_state.value.formState.prescriptions.isNotEmpty()) "false" else "true"
                     )
 
-                    val jsonArray =
-                        Json.parseToJsonElement(_state.value.formState.prescriptions.toJson()).jsonArray
-                    val pipeSeparatedPrescriptions: String =
-                        JsonSorter.convertJsonArrayToPipeSeparated(jsonArray)
-                    updatedQ = modifyQuestionAnswerCaptionJson(
+                    updatedQ = modifyQuestionAnswerOptionsJson(
                         updatedQ,
                         "question10002",
-                        "caption",
-                        pipeSeparatedPrescriptions
-                    )
-
-                    updatedQ = modifyQuestionAnswerCaptionJson(
-                        updatedQ,
-                        "question10002",
-                        "value",
-                        pipeSeparatedPrescriptions
+                        _state.value.formState.prescriptions
                     )
 
                     updatedQ = modifyQuestionAnswerJson(
