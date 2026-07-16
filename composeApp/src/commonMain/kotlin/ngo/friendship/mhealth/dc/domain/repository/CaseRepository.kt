@@ -24,7 +24,7 @@ interface CaseRepository {
 
     suspend fun saveDoctorFeedback(formState: DoctorFeedbackFormState): SaveDoctorFeedbackResult
 
-    suspend fun getQuestionAnswerData(): QuestionAnswerJson
+    suspend fun getQuestionAnswerData(forceRefresh: Boolean = false): QuestionAnswerJson
 
     suspend fun updateInterviewStatus(interviewId: Long, status: String): Pair<Boolean, String?>
 

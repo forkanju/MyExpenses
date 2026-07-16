@@ -157,8 +157,9 @@ fun PatientProfileCard(
                     )
 
                     Text(
-                        text = "Interview: ${startTime?.toUiDateTime() ?: "N/A"}",
-                        style = timeStyle
+                        text = "interviewed: ${startTime?.toUiDateTime() ?: "N/A"}",
+                        style = timeStyle,
+                        color = Color(0xFFE25555)
                     )
 
                     Text(
@@ -169,7 +170,10 @@ fun PatientProfileCard(
                     if (lastVisitedDate?.isNotBlank() == true) {
                         Text(
                             text = "Last Visited: ${lastVisitedDate.toUiDateTime()}",
-                            style = timeStyle.copy(color = Color(0xFF2E7D32), fontWeight = FontWeight.Medium)
+                            style = timeStyle.copy(
+                                color = Color(0xFF2E7D32),
+                                fontWeight = FontWeight.Medium
+                            )
                         )
                     }
                 }
