@@ -71,101 +71,103 @@ fun SetupNavDisplay(modifier: Modifier = Modifier) {
                 }
             },
             content = { paddingValues ->
-                NavDisplay(
-                    backStack = backStack,
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator()
-                    ),
-                    sceneStrategies = listOf(
-                        SinglePaneSceneStrategy(),
-                        DialogSceneStrategy()
-                    ),
-                    transitionSpec = {
-                        // Material 3 Forward: Slide in from right with fade, slide out to left with fade
-                        (slideInHorizontally(
-                            initialOffsetX = { it },
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = FastOutSlowInEasing
-                            )
-                        ) + fadeIn(animationSpec = tween(400))).togetherWith(
-                            slideOutHorizontally(
-                                targetOffsetX = { -it / 3 },
+                if (backStack.isNotEmpty()) {
+                    NavDisplay(
+                        backStack = backStack,
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                            rememberViewModelStoreNavEntryDecorator()
+                        ),
+                        sceneStrategies = listOf(
+                            SinglePaneSceneStrategy(),
+                            DialogSceneStrategy()
+                        ),
+                        transitionSpec = {
+                            // Material 3 Forward: Slide in from right with fade, slide out to left with fade
+                            (slideInHorizontally(
+                                initialOffsetX = { it },
                                 animationSpec = tween(
                                     durationMillis = 400,
                                     easing = FastOutSlowInEasing
                                 )
-                            ) + fadeOut(animationSpec = tween(400))
-                        )
-                    },
-                    popTransitionSpec = {
-                        // Material 3 Backward: Slide in from left with fade, slide out to right with fade
-                        (slideInHorizontally(
-                            initialOffsetX = { -it / 3 },
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = FastOutSlowInEasing
+                            ) + fadeIn(animationSpec = tween(400))).togetherWith(
+                                slideOutHorizontally(
+                                    targetOffsetX = { -it / 3 },
+                                    animationSpec = tween(
+                                        durationMillis = 400,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ) + fadeOut(animationSpec = tween(400))
                             )
-                        ) + fadeIn(animationSpec = tween(400))).togetherWith(
-                            slideOutHorizontally(
-                                targetOffsetX = { it },
+                        },
+                        popTransitionSpec = {
+                            // Material 3 Backward: Slide in from left with fade, slide out to right with fade
+                            (slideInHorizontally(
+                                initialOffsetX = { -it / 3 },
                                 animationSpec = tween(
                                     durationMillis = 400,
                                     easing = FastOutSlowInEasing
                                 )
-                            ) + fadeOut(animationSpec = tween(400))
-                        )
-                    },
-                    predictivePopTransitionSpec = { offset ->
-                        // Predictive back: Interactive slide that follows the gesture offset
-                        (slideInHorizontally(
-                            initialOffsetX = { -it / 3 + offset },
-                            animationSpec = tween(durationMillis = 0)
-                        ) + fadeIn()).togetherWith(
-                            slideOutHorizontally(
-                                targetOffsetX = { offset },
+                            ) + fadeIn(animationSpec = tween(400))).togetherWith(
+                                slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(
+                                        durationMillis = 400,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ) + fadeOut(animationSpec = tween(400))
+                            )
+                        },
+                        predictivePopTransitionSpec = { offset ->
+                            // Predictive back: Interactive slide that follows the gesture offset
+                            (slideInHorizontally(
+                                initialOffsetX = { -it / 3 + offset },
                                 animationSpec = tween(durationMillis = 0)
-                            ) + fadeOut()
-                        )
-                    },
-                    entryProvider = entryProvider {
-                        dialogRoute(
-                            viewModel = viewModel
-                        )
-                        authRoute(
-                            mainViewModel = viewModel,
-                            snackBarState = snackBarState,
-                            modifier = Modifier
-                                .padding(paddingValues)
-                                .imePadding()
-                        )
-                        homeRoute(
-                            viewModel = viewModel
-                        )
+                            ) + fadeIn()).togetherWith(
+                                slideOutHorizontally(
+                                    targetOffsetX = { offset },
+                                    animationSpec = tween(durationMillis = 0)
+                                ) + fadeOut()
+                            )
+                        },
+                        entryProvider = entryProvider {
+                            dialogRoute(
+                                viewModel = viewModel
+                            )
+                            authRoute(
+                                mainViewModel = viewModel,
+                                snackBarState = snackBarState,
+                                modifier = Modifier
+                                    .padding(paddingValues)
+                                    .imePadding()
+                            )
+                            homeRoute(
+                                viewModel = viewModel
+                            )
 
-                        dashboardRoute(
-                            mainViewModel = viewModel
-                        )
+                            dashboardRoute(
+                                mainViewModel = viewModel
+                            )
 
-                        caseRoute(
-                            mainViewModel = viewModel,
-                            snackBarState = snackBarState,
-                        )
+                            caseRoute(
+                                mainViewModel = viewModel,
+                                snackBarState = snackBarState,
+                            )
 
-                        fcmProfileRoute(
-                            mainViewModel = viewModel
-                        )
+                            fcmProfileRoute(
+                                mainViewModel = viewModel
+                            )
 
-                        beneficiaryProfileRoute(
-                            mainViewModel = viewModel
-                        )
+                            beneficiaryProfileRoute(
+                                mainViewModel = viewModel
+                            )
 
-                        profileRoute(
-                            mainViewModel = viewModel
-                        )
-                    }
-                )
+                            profileRoute(
+                                mainViewModel = viewModel
+                            )
+                        }
+                    )
+                }
             }
         )
     }

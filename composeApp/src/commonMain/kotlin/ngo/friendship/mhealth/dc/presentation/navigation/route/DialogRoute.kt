@@ -120,7 +120,9 @@ fun EntryProviderScope<NavKey>.dialogRoute(
                     onClick = {
                         when (data.action) {
                             ConfirmAction.Exit ->
-                                viewModel.backStack.clear()
+                                while (viewModel.backStack.size > 1) {
+                                    viewModel.backStack.removeLast()
+                                }
 
                             ConfirmAction.Logout ->
                                 viewModel.logout()
