@@ -157,7 +157,7 @@ fun PatientProfileCard(
                     )
 
                     Text(
-                        text = "interviewed: ${startTime?.toUiDateTime() ?: "N/A"}",
+                        text = "Interviewed: ${startTime?.toUiDateTime() ?: "N/A"}",
                         style = timeStyle,
                         color = Color(0xFFE25555)
                     )
