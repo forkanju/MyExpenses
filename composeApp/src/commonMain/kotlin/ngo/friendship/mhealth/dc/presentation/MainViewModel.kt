@@ -98,7 +98,7 @@ class MainViewModel(
         field = MutableStateFlow(emptyList())
 
     val networkStatus: StateFlow<NetworkStatus>
-        field = MutableStateFlow(NetworkStatus.ONLINE)
+        field = MutableStateFlow(NetworkStatus.OFFLINE)
 
     var selectedCaseTab by mutableStateOf(CaseTab.Pending)
         private set
@@ -116,6 +116,7 @@ class MainViewModel(
         private set
 
     init {
+        refreshServerStatus()
         // Observe setup data separately for UI components that rely on stateIn
         // This ensures they stay up to date if DB changes in background
         launch(loading = Loading.Gone) {
