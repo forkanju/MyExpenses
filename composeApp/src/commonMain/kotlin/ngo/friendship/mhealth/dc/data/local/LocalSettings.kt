@@ -1,6 +1,7 @@
 package ngo.friendship.mhealth.dc.data.local
 
 import com.russhwolf.settings.Settings
+import ngo.friendship.mhealth.dc.domain.model.QuestionAnswerJson
 import ngo.friendship.mhealth.dc.domain.model.SetupData
 import ngo.friendship.mhealth.dc.domain.model.User
 import ngo.friendship.mhealth.dc.utils.fromJson
@@ -26,6 +27,10 @@ class LocalSettings {
     var doseHistory: List<String>
         get() = settings.getStringOrNull("dose_history").fromJson<List<String>>() ?: emptyList()
         set(value) = settings.putString("dose_history", value.toJson())
+
+    var questionAnswerData: QuestionAnswerJson?
+        get() = settings.getStringOrNull("qa_data").fromJson<QuestionAnswerJson>()
+        set(value) = settings.putOrRemove("qa_data", value)
 
     fun saveDoseToHistory(dose: String) {
         val current = doseHistory.toMutableList()

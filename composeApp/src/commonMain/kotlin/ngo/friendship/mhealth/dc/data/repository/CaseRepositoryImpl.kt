@@ -185,7 +185,12 @@ class CaseRepositoryImpl(
         return medicineDao.getAllMedicinesFlow()
     }
 
-    override suspend fun getQuestionAnswerData(): QuestionAnswerJson {
+    override suspend fun getQuestionAnswerData(forceRefresh: Boolean): QuestionAnswerJson {
+        val cached = localSettings.questionAnswerData
+        if (cached != null && !forceRefresh) {
+            return cached
+        }
+
         val response = api.getQuestionAnswerData(
             request = QuestionAnswerJsonReqDto.build(
                 userName = localSettings.user.userName,
@@ -193,7 +198,9 @@ class CaseRepositoryImpl(
                 requestTime = currentTimestamp.toDateTimeServerSlash()
             )
         )
-        return response.toDomain()
+        val domain = response.toDomain()
+        localSettings.questionAnswerData = domain
+        return domain
     }
 
     override suspend fun updateInterviewStatus(

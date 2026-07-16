@@ -2,7 +2,7 @@ package ngo.friendship.mhealth.dc.domain.model
 
 import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class QuestionAnswerJson(
     val questionAnswerJson: List<QuestionAnswerTemplate> = emptyList(),
     val questionAnswerJson2: List<QuestionAnswerTemplateDefault> = emptyList()

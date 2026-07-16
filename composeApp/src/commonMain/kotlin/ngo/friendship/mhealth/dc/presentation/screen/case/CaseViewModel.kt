@@ -53,6 +53,9 @@ class CaseViewModel(
         loadPrescriptionTemplates()
         loadAdviceList()
         loadDoseHistory()
+        launch(loading = Loading.Gone) {
+            repository.getQuestionAnswerData(forceRefresh = true)
+        }
     }
 
     private fun loadAdviceList() {
@@ -432,22 +435,36 @@ class CaseViewModel(
                     CaseTab.Older -> null
                 }
 
-                if (statusToSend != null) {
-                    repository.updateInterviewStatus(
-                        interviewId = interviewId,
-                        status = statusToSend
-                    )
+                // Launch independent tasks in parallel
+                statusToSend?.let { status ->
+                    launch(loading = Loading.Gone) {
+                        repository.updateInterviewStatus(
+                            interviewId = interviewId,
+                            status = status
+                        )
+                    }
                 }
 
+                launch(loading = Loading.Gone) {
+                    loadMedicineList(_state.value.medicineComposerState.doseType.ifEmpty { "Tab" })
+                }
+
+                launch(loading = Loading.Gone) {
+                    loadQuestionAnswerData(interviewId)
+                }
+
+                if (sourceTab == CaseTab.Answered) {
+                    launch(loading = Loading.Gone) {
+                        loadDoctorFeedback(interviewId)
+                    }
+                }
+
+                // Main data fetch
                 val details = repository.getInterviewDetails(interviewId = interviewId)
                 _state.update { it.copy(interviewDetails = details) }
 
-                loadMedicineList(_state.value.medicineComposerState.doseType.ifEmpty { "Tab" })
-                loadQuestionAnswerData(interviewId)
-
-                if (sourceTab == CaseTab.Answered) {
-                    loadDoctorFeedback(interviewId)
-                }
+                // Wait for other critical background jobs if needed, 
+                // but usually they can finish on their own as they update the state.
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message ?: "Failed to open case") }
             }
@@ -466,6 +483,8 @@ class CaseViewModel(
                 _state.update { it.copy(interviewDetails = details) }
 
                 "Beneficiary Code for mobile fetch: ${details.beneficiaryCode}".log("CASE_DEBUG")
+                
+                // Parallelize profile fetches
                 details.beneficiaryCode.takeIf { it.isNotBlank() }?.let { benefCode ->
                     launch {
                         val profile = repository.getBeneficiaryProfile(benefCode)
