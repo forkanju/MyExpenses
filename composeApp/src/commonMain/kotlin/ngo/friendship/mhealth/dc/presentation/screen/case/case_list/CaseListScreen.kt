@@ -26,6 +26,7 @@ import ngo.friendship.mhealth.dc.presentation.components.SearchRow
 import ngo.friendship.mhealth.dc.presentation.components.TopTabsRow
 import ngo.friendship.mhealth.dc.presentation.base.ObserveAsEvents
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarController
+import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
 import ngo.friendship.mhealth.dc.presentation.screens.case.case_list.components.CaseItem
 import ngo.friendship.mhealth.dc.theme.FriendshipTheme
@@ -42,15 +43,15 @@ fun CaseListScreen(
     val state by viewModel.state.collectAsState()
 
     ObserveAsEvents(flow = viewModel.errorFlow) { error ->
-        SnackbarController.sendEvent(error.message, type = ngo.friendship.mhealth.dc.presentation.base.SnackbarType.ERROR)
+        SnackbarController.sendEvent(error.message, type = SnackbarType.ERROR)
     }
 
     ObserveAsEvents(flow = viewModel.successFlow) { success ->
-        SnackbarController.sendEvent(success.message, type = ngo.friendship.mhealth.dc.presentation.base.SnackbarType.SUCCESS)
+        SnackbarController.sendEvent(success.message, type = SnackbarType.SUCCESS)
     }
 
     ObserveAsEvents(flow = viewModel.warningFlow) { warning ->
-        SnackbarController.sendEvent(warning.message, type = ngo.friendship.mhealth.dc.presentation.base.SnackbarType.WARNING)
+        SnackbarController.sendEvent(warning.message, type = SnackbarType.WARNING)
     }
 
     LaunchedEffect(initialTab) {

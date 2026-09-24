@@ -23,7 +23,6 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
-import fcmProfileRoute
 import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.base.ColoredSnackbarVisuals
 import ngo.friendship.mhealth.dc.presentation.base.SnackbarType
@@ -33,6 +32,7 @@ import ngo.friendship.mhealth.dc.presentation.navigation.route.beneficiaryProfil
 import ngo.friendship.mhealth.dc.presentation.navigation.route.caseRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dashboardRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.dialogRoute
+import ngo.friendship.mhealth.dc.presentation.navigation.route.fcmProfileRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.homeRoute
 import ngo.friendship.mhealth.dc.presentation.navigation.route.profileRoute
 import ngo.friendship.mhealth.dc.theme.Dimen

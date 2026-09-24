@@ -4,9 +4,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.serialization.SavedStateConfiguration
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.SerializersModule
-import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
-
 import ngo.friendship.mhealth.dc.domain.model.PrescriptionTemplate
+import ngo.friendship.mhealth.dc.presentation.screen.case.CaseDetailsMode
 
 @Serializable
 object Screens {
@@ -71,7 +70,8 @@ object Screens {
     data object VersionHistory : NavKey
 
     @Serializable
-    data class VersionDetails(val version: ngo.friendship.mhealth.dc.domain.model.VersionInfo) : NavKey
+    data class VersionDetails(val version: ngo.friendship.mhealth.dc.domain.model.VersionInfo) :
+        NavKey
 
     @Serializable
     data object LocalTreatment : NavKey
@@ -123,16 +123,40 @@ val navKeySerializersModule = SerializersModule {
         Screens.CaseDetail::class,
         Screens.CaseDetail.serializer()
     )
-    polymorphic(NavKey::class, Screens.PrescriptionTemplateList::class, Screens.PrescriptionTemplateList.serializer())
+    polymorphic(
+        NavKey::class,
+        Screens.PrescriptionTemplateList::class,
+        Screens.PrescriptionTemplateList.serializer()
+    )
     polymorphic(NavKey::class, Screens.DxList::class, Screens.DxList.serializer())
     polymorphic(NavKey::class, Screens.MedicineList::class, Screens.MedicineList.serializer())
-    polymorphic(NavKey::class, Screens.AdviceTemplateList::class, Screens.AdviceTemplateList.serializer())
-    polymorphic(NavKey::class, Screens.InvestigationsList::class, Screens.InvestigationsList.serializer())
+    polymorphic(
+        NavKey::class,
+        Screens.AdviceTemplateList::class,
+        Screens.AdviceTemplateList.serializer()
+    )
+    polymorphic(
+        NavKey::class,
+        Screens.InvestigationsList::class,
+        Screens.InvestigationsList.serializer()
+    )
     polymorphic(NavKey::class, Screens.FcmProfile::class, Screens.FcmProfile.serializer())
-    polymorphic(NavKey::class, Screens.BeneficiaryProfile::class, Screens.BeneficiaryProfile.serializer())
+    polymorphic(
+        NavKey::class,
+        Screens.BeneficiaryProfile::class,
+        Screens.BeneficiaryProfile.serializer()
+    )
     polymorphic(NavKey::class, Screens.LocalTreatment::class, Screens.LocalTreatment.serializer())
-    polymorphic(NavKey::class, Screens.LocalPrescriptionForm::class, Screens.LocalPrescriptionForm.serializer())
-    polymorphic(NavKey::class, Screens.LocalTreatmentDetails::class, Screens.LocalTreatmentDetails.serializer())
+    polymorphic(
+        NavKey::class,
+        Screens.LocalPrescriptionForm::class,
+        Screens.LocalPrescriptionForm.serializer()
+    )
+    polymorphic(
+        NavKey::class,
+        Screens.LocalTreatmentDetails::class,
+        Screens.LocalTreatmentDetails.serializer()
+    )
     polymorphic(NavKey::class, Screens.ChangePassword::class, Screens.ChangePassword.serializer())
     polymorphic(NavKey::class, Screens.Dashboard::class, Screens.Dashboard.serializer())
     polymorphic(NavKey::class, Screens.VersionHistory::class, Screens.VersionHistory.serializer())

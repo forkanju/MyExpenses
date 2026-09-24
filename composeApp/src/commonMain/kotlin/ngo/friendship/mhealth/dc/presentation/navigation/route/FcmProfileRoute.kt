@@ -1,8 +1,10 @@
+package ngo.friendship.mhealth.dc.presentation.navigation.route
+
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import ngo.friendship.mhealth.dc.presentation.MainViewModel
 import ngo.friendship.mhealth.dc.presentation.navigation.Screens
 import ngo.friendship.mhealth.dc.presentation.screen.profile.fcm.FcmProfileScreen
-import ngo.friendship.mhealth.dc.presentation.MainViewModel
 
 fun EntryProviderScope<NavKey>.fcmProfileRoute(
     mainViewModel: MainViewModel

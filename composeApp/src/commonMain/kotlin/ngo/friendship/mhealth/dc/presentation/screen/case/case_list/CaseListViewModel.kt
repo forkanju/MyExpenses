@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ngo.friendship.mhealth.dc.domain.model.Interview
 import ngo.friendship.mhealth.dc.presentation.base.BaseViewModel
 import ngo.friendship.mhealth.dc.domain.repository.CaseRepository
 import ngo.friendship.mhealth.dc.presentation.screen.case.case_list.components.CaseTab
@@ -32,7 +33,7 @@ class CaseListViewModel(
         _isRefreshing,
         _error
     ) { flows ->
-        val allInterviews = flows[0] as List<ngo.friendship.mhealth.dc.domain.model.Interview>
+        val allInterviews = flows[0] as List<Interview>
         val tab = flows[1] as CaseTab
         val query = flows[2] as String
         val loading = flows[3] as Boolean
